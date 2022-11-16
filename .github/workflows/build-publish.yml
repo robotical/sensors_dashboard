@@ -31,6 +31,9 @@ jobs:
       - name: build phone app
         run: npm run build
 
+      - name: detele me
+        run: ls .
+        
       - name: publishing to NPM
         run: npm publish
         env:
