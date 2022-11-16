@@ -43,6 +43,7 @@
     "@babel/preset-typescript": "^7.16.7"
   },
   "scripts": {
+    "build:webapp-dev": "rm -rf dist && NODE_ENV=development babel src --out-dir dist --extensions '.tsx' --extensions '.ts'  --copy-files && tsc",
     "build:webapp": "rm -rf dist && NODE_ENV=production babel src --out-dir dist --extensions '.tsx' --extensions '.ts'  --copy-files && tsc",
     "start": "react-scripts start",
     "build": "react-scripts build",

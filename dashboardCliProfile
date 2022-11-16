@@ -1,0 +1,18 @@
+export WebappHome=/Users/nikolastheodoropoulos/Documents/Robotical/marty-web-app
+export dashHome=/Users/nikolastheodoropoulos/Documents/Robotical/sensors-dashboard
+
+
+alias cdhome='cd $dashHome'
+alias sourceDashboardProf='cdhome && source dashboardCliProfile'
+
+buildAllAndCpToWebApp () {
+    local type="${1:-debug}"
+    if [ $type = debug ]; then npm run build:webapp-dev; fi
+    if [ $type = prod ]; then npm run build:webapp; fi
+    cpToWebapp
+}
+
+cpToWebapp () {
+    rm -rf $WebappHome/node_modules/@robotical/sensors-dashboard/*
+    cp -r $MBJRHome/* $WebappHome/node_modules/@robotical/sensors-dashboard
+}
