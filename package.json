@@ -5,7 +5,7 @@
   "main": "README.md",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/robotical/sensors-dashboard.git"
+    "url": "git+https://github.com/robotical/sensors_dashboard.git"
   },
   "keywords": [
     "marty",
@@ -15,9 +15,9 @@
   "author": "Nikos Theodoropoulos",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/robotical/sensors-dashboard/issues"
+    "url": "https://github.com/robotical/sensors_dashboard/issues"
   },
-  "homepage": "https://github.com/robotical/sensors-dashboard#readme",
+  "homepage": "https://github.com/robotical/sensors_dashboard#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
