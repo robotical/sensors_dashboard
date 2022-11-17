@@ -17,7 +17,6 @@
   "bugs": {
     "url": "https://github.com/robotical/sensors_dashboard/issues"
   },
-  "homepage": "https://github.com/robotical/sensors_dashboard#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"

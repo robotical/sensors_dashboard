@@ -1,0 +1,27 @@
+@font-face {
+  font-family: 'BigNoodleTitling Regular';
+  font-style: normal;
+  font-weight: normal;
+  src: local('BigNoodleTitling Regular'),
+    url('../fonts/big_noodle_titling.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'BigNoodleTitling Oblique';
+  font-style: normal;
+  font-weight: normal;
+  src: local('BigNoodleTitling Oblique'),
+    url('../fonts/big_noodle_titling_oblique.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lato Regular';
+  font-weight: normal;
+  src: url('../fonts/Lato-Regular.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Lato Bold';
+  font-weight: bold;
+  src: url('../fonts/Lato-Bold.ttf') format('ttf');
+}

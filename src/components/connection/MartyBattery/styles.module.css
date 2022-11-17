@@ -1,0 +1,13 @@
+.martyBattContainer {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr 40%;
+    align-items: end;
+    row-gap: 2px;
+    padding-bottom: .8rem;
+}
+
+.martyBattPercentage {
+    font-size: 1.4rem;
+    padding-left: .2rem;
+}

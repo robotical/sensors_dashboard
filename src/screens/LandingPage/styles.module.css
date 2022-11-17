@@ -1,0 +1,5 @@
+.mainContainer {
+    grid-template-areas: "header" "main-content";
+    grid-template-rows: .1fr .9fr;
+    height: 100%;
+}
