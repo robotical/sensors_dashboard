@@ -1,6 +1,7 @@
 import marty2Instance, {Marty2} from "./app-bridge/mv2-rn";
-import './App.css';
 import LandingPage from "./screens/LandingPage";
+import "./styles/typography.css";
+import './index.css';
 
 // extending the existing window interface to tell it about our new property mv2
 declare global {

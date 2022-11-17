@@ -13,8 +13,12 @@ buildAllAndCpToWebApp () {
 }
 
 cpToWebapp () {
-    rm -rf $WebappHome/node_modules/@robotical/sensors-dashboard/*
-    cp -r $MBJRHome/* $WebappHome/node_modules/@robotical/sensors-dashboard
+    # this gives hooks error. you need to link and the do 
+    # npm link ../sensors-dashboard/node_modules/react
+    rm -rf $WebappHome/node_modules/@robotical/sensors-dashboard/dist/*
+    cp -r $dashHome/dist/* $WebappHome/node_modules/@robotical/sensors-dashboard/dist
+    cd $WebappHome && npm link $dashHome/node_modules/react
+    cd $dashHome
 }
 
 buildAllAndCpToPhoneApp () {
@@ -24,5 +28,5 @@ buildAllAndCpToPhoneApp () {
 
 cpToPhoneApp () {
     rm -rf $PhoneAppHome/assets/www/sensors-dashboard-build/*
-    cp -r $MBJRHome/build/* $PhoneAppHome/assets/www/sensors-dashboard-build
+    cp -r $dashHome/build/* $PhoneAppHome/assets/www/sensors-dashboard-build
 }

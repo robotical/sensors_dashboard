@@ -25,9 +25,15 @@ const ConnectButton = () => {
     setIsConnected(mv2Dashboard.isConnected);
   };
 
-  const onClickConnect = async () => {};
+  const onClickConnect = async () => {
+    console.log("connecting")
+    const connectMsg = { type: "connect" };
+    mv2Dashboard.send_REST(JSON.stringify(connectMsg));
+  };
 
-  const onClickDisconnect = () => {};
+  const onClickDisconnect = () => {
+    mv2Dashboard.send_REST("disconnect");
+  };
 
   return (
     <div className={styles.connectButtonContainer}>

@@ -59,6 +59,7 @@ export class Marty2 extends EventDispatcher {
   }
 
   setIsConnected(isConnected: boolean) {
+    console.log("setting is connected", isConnected)
     if (isConnected !== this.isConnected) {
       this.isConnected = isConnected;
       this.dispatchEvent({
