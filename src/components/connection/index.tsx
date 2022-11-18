@@ -14,7 +14,7 @@ const ConnectButton = () => {
       onMartyConnectedChanged
     );
     return () => {
-      mv2Dashboard.addEventListener(
+      mv2Dashboard.removeEventListener(
         "onIsConnectedChange",
         onMartyConnectedChanged
       );
@@ -22,6 +22,7 @@ const ConnectButton = () => {
   }, []);
 
   const onMartyConnectedChanged = () => {
+    console.log("got connected event");
     setIsConnected(mv2Dashboard.isConnected);
   };
 
@@ -32,7 +33,8 @@ const ConnectButton = () => {
   };
 
   const onClickDisconnect = () => {
-    mv2Dashboard.send_REST("disconnect");
+    const disconnectMsg = { type: "disconnect" };
+    mv2Dashboard.send_REST(JSON.stringify(disconnectMsg));
   };
 
   return (

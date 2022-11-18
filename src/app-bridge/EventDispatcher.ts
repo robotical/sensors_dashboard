@@ -31,10 +31,13 @@ class EventDispatcher {
     }
 
     dispatchEvent (evt: {type: EventType, [key: string]: any}) {
+        console.log("evt:", evt)
+        console.log("listeners,", this._listeners);
         this._listeners
             .filter(item => item.type === evt.type)
             .forEach(item => {
                 const {type, listener, options: {once}} = item;
+                console.log("calling:",evt);
                 listener.call(this, evt);
                 if (once === true) this.removeEventListener(type, listener)
             });
