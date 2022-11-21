@@ -6,16 +6,18 @@ import ButtonDisconn from "./ButtonDisconn";
 import styles from "./styles.module.css";
 
 const ConnectButton = () => {
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(mv2Dashboard.isConnected);
 
   useEffect(() => {
     mv2Dashboard.addEventListener(
       "onIsConnectedChange",
+      "",
       onMartyConnectedChanged
     );
     return () => {
       mv2Dashboard.removeEventListener(
         "onIsConnectedChange",
+        "",
         onMartyConnectedChanged
       );
     };

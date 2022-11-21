@@ -9,21 +9,26 @@ buildAllAndCpToWebApp () {
     local type="${1:-debug}"
     if [ $type = debug ]; then npm run build:webapp-dev; fi
     if [ $type = prod ]; then npm run build:webapp; fi
-    cpToWebapp
+    linkToWebapp
 }
 
-cpToWebapp () {
-    # this gives hooks error. you need to link and the do 
+linkToWebapp () {
+    # this gives hooks error. you need to link and then do
     # npm link $WebappHome/node_modules/react
     # rm -rf $WebappHome/node_modules/@robotical/sensors-dashboard/dist/* $WebappHome/node_modules/@robotical/sensors-dashboard/src/*
     # cp -r $dashHome/dist/* $WebappHome/node_modules/@robotical/sensors-dashboard/dist
     # cp -r $dashHome/src/* $WebappHome/node_modules/@robotical/sensors-dashboard/src
+    cd $dashHome
+    npm link
     npm link $WebappHome/node_modules/react
+    cd $WebappHome 
+    npm link @robotical/sensors-dashboard
+    cd $dashHome
 }
 
 buildAllAndCpToPhoneApp () {
     npm run build
-    cpToWebapp
+    cpToPhoneApp
 }
 
 cpToPhoneApp () {

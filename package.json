@@ -1,6 +1,6 @@
 {
   "name": "@robotical/sensors-dashboard",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A dashboard tool for depicting Marty data by Robotical",
   "main": "README.md",
   "repository": {
@@ -22,6 +22,10 @@
     "access": "public"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.10.14",
+    "@mui/material": "^5.10.14",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -29,17 +33,25 @@
     "@types/node": "^16.18.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
-    "react": "^18.2.0",
+    "plotly.js": "^2.16.3",
     "react-dom": "^18.2.0",
+    "react-plotly.js": "^2.6.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.3",
     "web-vitals": "^2.1.4"
   },
+  "peerDependencies": {
+    "@robotical/ricjs": ">=1.7.3",
+    "react": ">=18.2.0"
+  },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
+    "@types/react-plotly.js": "^2.5.2",
     "@babel/core": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
-    "@babel/preset-typescript": "^7.16.7"
+    "@babel/preset-typescript": "^7.16.7",
+    "@robotical/ricjs": "^1.7.3",
+    "react": "^18.2.0"
   },
   "scripts": {
     "build:webapp-dev": "rm -rf dist && NODE_ENV=development babel src --out-dir dist --extensions '.tsx' --extensions '.ts'  --copy-files && tsc",

@@ -51,3 +51,7 @@
   ]
 }
 
+
+Troubleshooting
+To avoid Hooks error due to different react versions in packages
+add react <= version in peerDependencies and devDependencies of the packages

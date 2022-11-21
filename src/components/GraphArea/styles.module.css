@@ -1,0 +1,6 @@
+.graphArea {
+    display: grid;
+    grid-template-areas: "addons-list graph" "addons-list graph-controls";
+    grid-template-columns: .2fr .8fr;
+    grid-template-rows: 1fr min-content;
+}

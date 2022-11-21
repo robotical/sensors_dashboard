@@ -1,3 +1,8 @@
+import {
+  ROSSerialAddOnStatus,
+  ROSSerialIMU,
+  ROSSerialSmartServos,
+} from "@robotical/ricjs";
 import EventDispatcher from "./EventDispatcher";
 
 /* 
@@ -9,7 +14,9 @@ export class Marty2 extends EventDispatcher {
   public rssi: number;
   public isConnected: boolean;
   public martyName: string;
-  public addons: any[] = [];
+  public addons: ROSSerialAddOnStatus[] = [];
+  public servos: ROSSerialSmartServos | null = null;
+  public accel: ROSSerialIMU | null = null;
 
   commandPromise: {
     resolve: (value: unknown) => void;
@@ -22,12 +29,65 @@ export class Marty2 extends EventDispatcher {
     this.battRemainCapacityPercent = 0;
     this.rssi = 0;
     this.isConnected = false;
-    this.commandPromise = null;
     this.martyName = "";
   }
 
-  setAddons(addons: any) {
-    this.addons = JSON.parse(addons).addons;
+  setAddons(addons: string) {
+    try {
+      this.addons = JSON.parse(addons).addons;
+      for (const addon of this.addons) {
+        for (const valKey in addon.vals) {
+          // @ts-ignore
+          const value = addon.vals[valKey];
+          if (typeof value === "number") {
+            this.dispatchEvent({
+              type: `on${valKey}Change`,
+              value: value,
+            });
+          }
+        }
+      }
+    } catch (e) {
+      this.addons = [];
+    }
+  }
+
+  setServos(servos: string) {
+    try {
+      this.servos = JSON.parse(servos);
+      for (const servo of this.servos!.smartServos) {
+        this.dispatchEvent({
+          type: `on${servo.id}posChange`,
+          value: servo.pos,
+        });
+        this.dispatchEvent({
+          type: `on${servo.id}currChange`,
+          value: servo.current,
+        });
+      }
+    } catch (e) {
+      this.servos = null;
+    }
+  }
+
+  setAccel(accel: string) {
+    try {
+      this.accel = JSON.parse(accel);
+      this.dispatchEvent({
+        type: "onAccelxChange",
+        value: this.accel?.accel.x,
+      });
+      this.dispatchEvent({
+        type: "onAccelyChange",
+        value: this.accel?.accel.y,
+      });
+      this.dispatchEvent({
+        type: "onAccelzChange",
+        value: this.accel?.accel.z,
+      });
+    } catch (e) {
+      this.accel = null;
+    }
   }
 
   setMartyName(name: string) {
@@ -44,11 +104,15 @@ export class Marty2 extends EventDispatcher {
   setRSSI(rssi: number) {
     if (rssi !== this.rssi) {
       this.rssi = rssi;
-      this.dispatchEvent({ type: "onRSSIChange", rssi: this.rssi });
+      this.dispatchEvent({
+        type: "onRSSIChange",
+        rssi: this.rssi,
+      });
     }
   }
 
   setBattRemainCapacityPercent(battery: number) {
+    battery = Math.round(battery);
     if (battery !== this.battRemainCapacityPercent) {
       this.battRemainCapacityPercent = battery;
       this.dispatchEvent({
@@ -61,7 +125,6 @@ export class Marty2 extends EventDispatcher {
   setIsConnected(isConnected: boolean) {
     if (isConnected !== this.isConnected) {
       this.isConnected = isConnected;
-      console.log("dispatching");
       this.dispatchEvent({
         type: "onIsConnectedChange",
         isConnected: this.isConnected,
@@ -79,25 +142,6 @@ export class Marty2 extends EventDispatcher {
       // eslint-disable-next-line no-console
       console.log(`Error sending to react native: ${err}`);
     }
-  }
-
-  /**
-   * Sends a command to the react-native code and returns a promise that will be
-   * fulfilled when the react-native code replies
-   * @param {{command: string}} payload Payload to send to the react-native code
-   * @returns {Promise} Promise
-   */
-  sendCommand(payload: any) {
-    if (this.commandPromise) {
-      console.warn("Command already in flight");
-    }
-    const promise = new Promise((resolve, reject) => {
-      this.commandPromise = { resolve, reject };
-    });
-
-    //@ts-ignore
-    window.ReactNativeWebView.postMessage(JSON.stringify(payload));
-    return promise;
   }
 
   /**
