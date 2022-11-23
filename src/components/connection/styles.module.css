@@ -1,7 +1,6 @@
 .connectButtonContainer {
     background-color: var(--colour-BLUE_LIGHT_3);
     border-radius: 5px;
-    width: 30%;
     margin: 1rem;
 }
 

@@ -3,6 +3,14 @@ import {
   ROSSerialIMU,
   ROSSerialSmartServos,
 } from "@robotical/ricjs";
+import {
+  ACCELEROMETER_NAME,
+  ACCELEROMETER_NAME_Y,
+  ACCELEROMETER_NAME_Z,
+  ACCELEROMETER_NAME_X,
+  MOTOR_CURRENT_NAME,
+  MOTOR_POSITION_NAME,
+} from "../utils/types/addon-names";
 import EventDispatcher from "./EventDispatcher";
 
 /* 
@@ -41,7 +49,7 @@ export class Marty2 extends EventDispatcher {
           const value = addon.vals[valKey];
           if (typeof value === "number") {
             this.dispatchEvent({
-              type: `on${valKey}Change`,
+              type: `on${addon.whoAmI}=>${valKey.replace(addon.name, "")}Change`,
               value: value,
             });
           }
@@ -57,11 +65,11 @@ export class Marty2 extends EventDispatcher {
       this.servos = JSON.parse(servos);
       for (const servo of this.servos!.smartServos) {
         this.dispatchEvent({
-          type: `on${servo.id}posChange`,
+          type: `on${MOTOR_POSITION_NAME}=>${servo.id}Change`,
           value: servo.pos,
         });
         this.dispatchEvent({
-          type: `on${servo.id}currChange`,
+          type: `on${MOTOR_CURRENT_NAME}=>${servo.id}Change`,
           value: servo.current,
         });
       }
@@ -74,15 +82,15 @@ export class Marty2 extends EventDispatcher {
     try {
       this.accel = JSON.parse(accel);
       this.dispatchEvent({
-        type: "onAccelxChange",
+        type: `on${ACCELEROMETER_NAME}=>${ACCELEROMETER_NAME_X}Change`,
         value: this.accel?.accel.x,
       });
       this.dispatchEvent({
-        type: "onAccelyChange",
+        type: `on${ACCELEROMETER_NAME}=>${ACCELEROMETER_NAME_Y}Change`,
         value: this.accel?.accel.y,
       });
       this.dispatchEvent({
-        type: "onAccelzChange",
+        type: `on${ACCELEROMETER_NAME}=>${ACCELEROMETER_NAME_Z}Change`,
         value: this.accel?.accel.z,
       });
     } catch (e) {

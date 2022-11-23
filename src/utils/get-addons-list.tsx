@@ -5,20 +5,28 @@ import {
   ROSSerialSmartServos,
 } from "@robotical/ricjs";
 import AddonSub from "../models/addons/AddonSub";
+import {
+  ACCELEROMETER_NAME,
+  ACCELEROMETER_NAME_X,
+  ACCELEROMETER_NAME_Y,
+  ACCELEROMETER_NAME_Z,
+  MOTOR_CURRENT_NAME,
+  MOTOR_POSITION_NAME,
+} from "./types/addon-names";
 
 function getAddonsList(addons: ROSSerialAddOnStatus[]) {
   const addonsNormalised = [];
   for (const addon of addons) {
-    const id = addon.name + addon.whoAmI;
+    const id = addon.whoAmI;
     const subAddons = [];
     for (const valKey in addon.vals) {
       // @ts-ignore
       const value = addon.vals[valKey];
       if (typeof value === "number") {
-        subAddons.push(new AddonSub(valKey, value));
+        subAddons.push(new AddonSub(valKey.replace(addon.name, ""), value));
       }
     }
-    addonsNormalised.push(new Addon(addon.name, id, subAddons));
+    addonsNormalised.push(new Addon(id, id, subAddons));
   }
   return addonsNormalised;
 }
@@ -29,12 +37,14 @@ function getServosList(servos: ROSSerialSmartServos) {
   const currAddonSub: AddonSub[] = [];
   const addonsNormalised = [];
   for (const servo of smartServos) {
-    posAddonSub.push(new AddonSub(servo.id.toString()+"pos", servo.pos));
-    currAddonSub.push(new AddonSub(servo.id.toString()+"curr", servo.current));
+    posAddonSub.push(new AddonSub(servo.id.toString(), servo.pos));
+    currAddonSub.push(new AddonSub(servo.id.toString(), servo.current));
   }
-  addonsNormalised.push(new Addon("Motor Position", "motor-pos", posAddonSub));
   addonsNormalised.push(
-    new Addon("Motor Current", "motor-current", currAddonSub)
+    new Addon(MOTOR_POSITION_NAME, "motor-pos", posAddonSub)
+  );
+  addonsNormalised.push(
+    new Addon(MOTOR_CURRENT_NAME, "motor-current", currAddonSub)
   );
 
   return addonsNormalised;
@@ -42,11 +52,11 @@ function getServosList(servos: ROSSerialSmartServos) {
 
 function getAccelList(accel: ROSSerialIMU) {
   const addonSubs = [
-    new AddonSub("x", accel.accel.x),
-    new AddonSub("y", accel.accel.y),
-    new AddonSub("z", accel.accel.z),
+    new AddonSub(ACCELEROMETER_NAME_X, accel.accel.x),
+    new AddonSub(ACCELEROMETER_NAME_Y, accel.accel.y),
+    new AddonSub(ACCELEROMETER_NAME_Z, accel.accel.z),
   ];
-  return [new Addon("Accelerometer", "accelerometer", addonSubs)];
+  return [new Addon(ACCELEROMETER_NAME, "accelerometer", addonSubs)];
 }
 
 export default function getAllAddonsList(
@@ -54,5 +64,7 @@ export default function getAllAddonsList(
   servos: ROSSerialSmartServos,
   accel: ROSSerialIMU
 ) {
-    return getAddonsList(addons).concat(getServosList(servos)).concat(getAccelList(accel));
+  return getAddonsList(addons)
+    .concat(getServosList(servos))
+    .concat(getAccelList(accel));
 }

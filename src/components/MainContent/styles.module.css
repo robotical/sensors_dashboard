@@ -1,0 +1,18 @@
+.container {
+    display: grid;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.graphsArea {
+    display: grid;
+    grid-auto-rows: minmax(40vh, 40vh);
+
+}
+
+.addGraphBtn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background-color: lightgray;
+    cursor: pointer;
+}

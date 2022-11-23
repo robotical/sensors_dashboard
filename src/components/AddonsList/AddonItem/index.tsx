@@ -1,10 +1,8 @@
 import styles from "./styles.module.css";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Collapse from "@mui/material/Collapse";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
 import ExpandLess from "@mui/icons-material/ExpandLess";
 import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
@@ -16,7 +14,7 @@ interface AddonItemProps {
 }
 
 export default function AddonItem({ addon }: AddonItemProps) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
     setOpen(!open);
@@ -25,10 +23,10 @@ export default function AddonItem({ addon }: AddonItemProps) {
   return (
     <>
       <ListItemButton onClick={handleClick}>
-        <ListItemIcon>
+        {/* <ListItemIcon>
           <InboxIcon />
-        </ListItemIcon>
-        <ListItemText primary={addon.name} />
+        </ListItemIcon> */}
+        <ListItemText primary={addon.name} primaryTypographyProps={{fontSize: '16px'}}  />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>

@@ -11,11 +11,11 @@ export default class AddonSub {
     }
   
     setSelectedListener(
-      selectedListener: React.Dispatch<React.SetStateAction<number>>
+      selectedListener: () => void
     ) {
       this.selectedListener = () => {
         // updating react state
-        selectedListener((oldState) => oldState + 1);
+        selectedListener();
   
         // updating selected value
         this.selected = !this.selected;

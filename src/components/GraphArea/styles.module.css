@@ -1,6 +1,15 @@
 .graphArea {
     display: grid;
-    grid-template-areas: "addons-list graph" "addons-list graph-controls";
-    grid-template-columns: .2fr .8fr;
+    grid-template-areas: "addons-list graph close-graph" "addons-list graph-controls .";
+    grid-template-columns: .25fr .7fr min-content;
     grid-template-rows: 1fr min-content;
+    row-gap: 1rem;
+    border-top: 2px solid black;
+    padding-top: 1rem;
+    margin-bottom: 1rem;
+    white-space: nowrap;
+}
+
+.closeGraph {
+    grid-area: close-graph
 }
