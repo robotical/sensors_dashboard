@@ -1,12 +1,10 @@
 import AddonSub from "./AddonSub";
 
 export default class Addon {
-  name: string;
-  id: string;
+  whoAmI: string;
   addonInputs: AddonSub[];
-  constructor(name: string, id: string, addonInputs: AddonSub[]) {
-    this.name = name;
-    this.id = id;
+  constructor(whoAmI: string, addonInputs: AddonSub[]) {
+    this.whoAmI = whoAmI;
     this.addonInputs = addonInputs;
   }
 }

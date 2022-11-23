@@ -9,9 +9,13 @@ import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-
 
 interface DropdownProps {
   label: string;
-  options: DropdownOptionsInterface;
-  onChange: (selectedOption: string) => void;
-  selectedOption: string;
+  options: DropdownOptionsInterface[];
+  onChange: (
+    selectedOption: DropdownOptionsInterface,
+    rule: "start" | "end"
+  ) => void;
+  selectedOption: DropdownOptionsInterface | undefined;
+  rule: "start" | "end";
 }
 
 export default function Dropdown({
@@ -19,38 +23,53 @@ export default function Dropdown({
   onChange,
   options,
   selectedOption,
+  rule,
 }: DropdownProps) {
   const optionsJSX = [];
-  for (const addonInputKey in options) {
-    const addonInputOptions = options[addonInputKey];
-    console.log(addonInputKey, 'index.tsx', 'line: ', '24');
-    const menuItemsWithinCategory = addonInputOptions.map(
-      (addonInputOption) => {
-        return (
-          <MenuItem
-            value={addonInputKey+"=>"+addonInputOption}
-            key={addonInputKey+"=>"+addonInputOption}
-          >
-            {addonInputOption.split("=>")[1]}
-          </MenuItem>
-        );
-      }
-    );
+  // reformat options array to a compatible type for the dropdown with categories
+  const optionsObj: { [whoAmI: string]: DropdownOptionsInterface[] } = {};
+  for (const option of options) {
+    const whoAmI = option[0];
+    if (optionsObj.hasOwnProperty(whoAmI)) {
+      optionsObj[whoAmI].push(option);
+    } else {
+      optionsObj[whoAmI] = [option];
+    }
+  }
+  for (const whoAmI in optionsObj) {
+    const menuItemsWithinCategory = optionsObj[whoAmI].map((option) => {
+      return (
+        <MenuItem
+          value={option as string[]}
+          key={option[0] + option[1] + option[2]}
+        >
+          {option[2]}
+        </MenuItem>
+      );
+    });
     optionsJSX.push([
-      <ListSubheader>{addonInputKey}</ListSubheader>,
+      whoAmI !== "default" && <ListSubheader>{whoAmI}</ListSubheader>,
       menuItemsWithinCategory,
     ]);
   }
 
+
   return (
     <FormControl fullWidth>
-      {!selectedOption && <InputLabel id="demo-simple-select-label">{label}</InputLabel> }
+      {!selectedOption && (
+        <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+      )}
       <TextField
         id="standard-select-currency"
         select
         label={label}
         value={selectedOption}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) =>
+          onChange(
+            (e.target.value as unknown) as DropdownOptionsInterface,
+            rule
+          )
+        }
         size="small"
       >
         {optionsJSX}

@@ -1,23 +1,13 @@
-import { EventType } from "../../app-bridge/EventDispatcher";
+import {
+  ListenerOptionsType,
+} from "../../app-bridge/EventDispatcher";
+import { DropdownOptionsInterface } from "./start-end-options";
 
-export function isStartRuleMet (evt: {
-    type: EventType;
-    [key: string]: any;
-    subtype: string;
-  }, rule: string) {
-    // is the incoming event relevant to the rule?
-    const ruleArray = rule.split("=>");
-    const ruleAddon = ruleArray[0];
-    const ruleIsolated = ruleArray[1];
-    console.log("rule", rule);
-    console.log("evt", evt);
-    return false;
+export function isRuleMet(evt: ListenerOptionsType, rule: DropdownOptionsInterface) {
+  if (!isEvtRelevantToRule(evt, rule)) return false;
+  return rule[3](evt.value!);
 }
 
-export function isEndRuleMet(evt: {
-    type: EventType;
-    [key: string]: any;
-    subtype: string;
-  }, rule: string) {
-    return false
-  }
+function isEvtRelevantToRule(evt: ListenerOptionsType, rule: DropdownOptionsInterface) {
+  return (evt.whoAmI === rule[0] && evt.addonInput === rule[1]) || rule[0] === "default";
+}

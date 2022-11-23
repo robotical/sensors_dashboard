@@ -2,6 +2,7 @@ import styles from "./styles.module.css";
 import { ReactComponent as PlaySVG } from "../../assets/graph-controls/play.svg";
 import { ReactComponent as PauseSVG } from "../../assets/graph-controls/pause.svg";
 import { ReactComponent as StopSVG } from "../../assets/graph-controls/stop.svg";
+import { ReactComponent as RecordingSVG } from "../../assets/graph-controls/recording.svg";
 import { Checkbox } from "@mui/material";
 import Dropdown from "../Dropdown";
 import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-options";
@@ -12,12 +13,19 @@ interface GraphControlsProps {
   onClickStop: () => void;
   onAutoScrollToggle: () => void;
   autoScrollEnabled: boolean;
-  onStartOptionChange: (selectedOption: string) => void;
-  onEndOptionChange: (selectedOption: string) => void;
-  startSelectedOption: string;
-  endSelectedOption: string;
-  startOptions: DropdownOptionsInterface;
-  endOptions: DropdownOptionsInterface;
+  onStartOptionChange: (
+    selectedOption: DropdownOptionsInterface,
+    rule: "start" | "end"
+  ) => void;
+  onEndOptionChange: (
+    selectedOption: DropdownOptionsInterface,
+    rule: "start" | "end"
+  ) => void;
+  startSelectedOption: DropdownOptionsInterface | undefined;
+  endSelectedOption: DropdownOptionsInterface | undefined;
+  startOptions: DropdownOptionsInterface[];
+  endOptions: DropdownOptionsInterface[];
+  isTracking: boolean;
 }
 
 export default function GraphControls({
@@ -32,12 +40,13 @@ export default function GraphControls({
   endSelectedOption,
   startOptions,
   endOptions,
+  isTracking,
 }: GraphControlsProps) {
   return (
     <div className={styles.container}>
       <div className={styles.playPauseContainer}>
         <div className={styles.graphControlsSVGContainer} onClick={onClickPlay}>
-          <PlaySVG />
+          {isTracking ? <RecordingSVG /> : <PlaySVG />}
         </div>
         <div
           className={styles.graphControlsSVGContainer}
@@ -58,12 +67,14 @@ export default function GraphControls({
 
       <div className={styles.startEndRules}>
         <Dropdown
+          rule="start"
           label="Start when"
           onChange={onStartOptionChange}
           options={startOptions}
           selectedOption={startSelectedOption}
         />
         <Dropdown
+          rule="end"
           label="End when"
           onChange={onEndOptionChange}
           options={endOptions}

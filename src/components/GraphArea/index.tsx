@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { EventType } from "../../app-bridge/EventDispatcher";
+import { ListenerOptionsType } from "../../app-bridge/EventDispatcher";
 import mv2Dashboard from "../../app-bridge/mv2-rn";
 import Addon from "../../models/addons/Addon";
 import getAllAddonsList from "../../utils/get-addons-list";
-import { isEndRuleMet, isStartRuleMet } from "../../utils/start-end-rules/decider";
+import { isRuleMet } from "../../utils/start-end-rules/decider";
 import {
   DropdownOptionsInterface,
-  getEndOptions,
-  getStartOptions,
+  getRuleOptions,
 } from "../../utils/start-end-rules/start-end-options";
 import AddonsList from "../AddonsList";
 import Graph from "../Graph";
@@ -24,8 +23,9 @@ export interface TraceData {
   y: number[];
 }
 
+export type TraceIdType = `${string}=>${string}`;
 export type GraphDataType = {
-  [traceTitle: string]: TraceData;
+  [traceTitle: TraceIdType]: TraceData;
 };
 
 export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
@@ -38,10 +38,10 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const isTracking = useRef<boolean>(false);
   const hasStartRuleMet = useRef<boolean>(false);
   const hasEndRuleMet = useRef<boolean>(false);
-  const startSelectedOption = useRef<string>("");
-  const endSelectedOption = useRef<string>("");
-  const startOptions = useRef<DropdownOptionsInterface>({});
-  const endOptions = useRef<DropdownOptionsInterface>({});
+  const startSelectedOption = useRef<DropdownOptionsInterface>([] as unknown as DropdownOptionsInterface);
+  const endSelectedOption = useRef<DropdownOptionsInterface>([] as unknown as DropdownOptionsInterface);
+  const startOptions = useRef<DropdownOptionsInterface[]>([]);
+  const endOptions = useRef<DropdownOptionsInterface[]>([]);
 
   useEffect(() => {
     const normalisedAddons = getAllAddonsList(
@@ -56,12 +56,12 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   useEffect(() => {
     removeAddonsListeners(addons);
     addAddonsListeners(addons);
-    const startOpts = getStartOptions(addons);
+    const startOpts = getRuleOptions(addons, "start");
     startOptions.current = startOpts;
-    startSelectedOption.current = "=>"+startOpts[""][0];
-    const endOpts = getEndOptions(addons);
+    startSelectedOption.current = startOpts.filter(opt => opt[1] === "default")[0];
+    const endOpts = getRuleOptions(addons, "end");
     endOptions.current = endOpts;
-    endSelectedOption.current = endOpts[""][0];
+    endSelectedOption.current = endOpts.filter(opt => opt[1] === "default")[0];
     setRefreshGraphArea((oldV) => oldV + 1);
     return () => {
       removeAddonsListeners(addons);
@@ -85,13 +85,13 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       for (const addonInput of addon.addonInputs) {
         if (addonInput.selected) {
           mv2Dashboard.addEventListener(
-            `on${addon.name+"=>"+addonInput.name}Change`,
+            `on${addon.whoAmI+"=>"+addonInput.name}Change`,
             graphId,
             onAddonChange
           );
         } else {
           mv2Dashboard.removeEventListener(
-            `on${addon.name+"=>"+addonInput.name}Change`,
+            `on${addon.whoAmI+"=>"+addonInput.name}Change`,
             graphId,
             onAddonChange
           );
@@ -104,7 +104,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     for (const addon of addns) {
       for (const addonInput of addon.addonInputs) {
         mv2Dashboard.removeEventListener(
-          `on${addon.name+"=>"+addonInput.name}Change`,
+          `on${addon.whoAmI+"=>"+addonInput.name}Change`,
           graphId,
           onAddonChange
         );
@@ -112,38 +112,31 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     }
   };
 
-  const onAddonChange = (evt: {
-    type: EventType;
-    [key: string]: any;
-    subtype: string;
-  }) => {
+  const onAddonChange = (evt: ListenerOptionsType) => {
     /* for the following if's, order matters */
     if (!isTracking.current) return;
+    if (!startSelectedOption.current || !endSelectedOption.current) return;
     // decide whether or not to start based on start/end rules
-    if (!hasStartRuleMet.current && !isStartRuleMet(evt, startSelectedOption.current)) return;
+    if (!hasStartRuleMet.current && !isRuleMet(evt, startSelectedOption.current)) return;
     hasStartRuleMet.current = true;
-    if (hasEndRuleMet.current || isEndRuleMet(evt, endSelectedOption.current)) {
+    if (hasEndRuleMet.current || isRuleMet(evt, endSelectedOption.current)) {
       hasEndRuleMet.current = true;
       return;
     }
-    let mxDataLen = 1;
-    for (const traceKey in graphData.current) {
-      if (graphData.current[traceKey].x.length > 0)
-        mxDataLen = graphData.current[traceKey].x.length;
-    }
-    maxDataLen.current = mxDataLen;
-
-    if (graphData.current.hasOwnProperty(evt.type)) {
-      graphData.current[evt.type].x.push(
-        graphData.current[evt.type].x[
-          graphData.current[evt.type].x.length - 1
+    
+    maxDataLen.current = getMaxDataLen(graphData.current);
+    const traceId:TraceIdType = `${evt.whoAmI}=>${evt.addonInput}`;
+    if (graphData.current.hasOwnProperty(traceId)) {
+      graphData.current[traceId].x.push(
+        graphData.current[traceId].x[
+          graphData.current[traceId].x.length - 1
         ] + 1
       );
-      graphData.current[evt.type].y.push(evt.value);
+      graphData.current[traceId].y.push(evt.value!);
     } else {
-      graphData.current[evt.type] = {
-        x: [mxDataLen],
-        y: [evt.value],
+      graphData.current[traceId] = {
+        x: [maxDataLen.current],
+        y: [evt.value!],
       };
     }
     setRefreshGraphArea((old) => old + 1);
@@ -152,26 +145,37 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const stopHandler = () => {
     isTracking.current = false;
     for (const traceKey in graphData.current) {
-      delete graphData.current[traceKey];
+      delete graphData.current[traceKey as TraceIdType];
     }
     maxDataLen.current = 0;
+    hasStartRuleMet.current = false;
+    hasEndRuleMet.current = false;
     setRefreshGraphArea((old) => old + 1);
   };
 
   const setIsTracking = (value: boolean) => {
+    // if there are no selected addons do nothing;
+    let isAnyAddonSelected = false;
+    for (const addon of addons) {
+      for (const addonInput of addon.addonInputs) {
+        if (addonInput.selected) {
+          isAnyAddonSelected = true;
+          break;
+        }
+      }
+    }
+    if (!isAnyAddonSelected) return;
     isTracking.current = value;
     setRefreshGraphArea((old) => old + 1);
   };
 
-  const onStartOptionChange = (selectedOption: string) => {
+  const onRuleOptionChange = (selectedOption: DropdownOptionsInterface, rule: "start" | "end") => {
     if (isTracking.current) return; // changing rule won't affect graph if it's currently traking 
-    startSelectedOption.current = selectedOption;
-    setRefreshGraphArea((old) => old + 1);
-  };
-
-  const onEndOptionChange = (selectedOption: string) => {
-    if (isTracking.current) return; // changing rule won't affect graph if it's currently traking 
-    endSelectedOption.current = selectedOption;
+    if (rule === "start") {
+      startSelectedOption.current = selectedOption;
+    } else {
+      endSelectedOption.current = selectedOption;
+    }
     setRefreshGraphArea((old) => old + 1);
   };
 
@@ -189,16 +193,27 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
         onClickStop={stopHandler}
         onAutoScrollToggle={() => setAutoScrollEnabled((oldVal) => !oldVal)}
         autoScrollEnabled={autoScrollEnabled}
-        onStartOptionChange={onStartOptionChange}
-        onEndOptionChange={onEndOptionChange}
+        onStartOptionChange={onRuleOptionChange}
+        onEndOptionChange={onRuleOptionChange}
         startSelectedOption={startSelectedOption.current}
         endSelectedOption={endSelectedOption.current}
         startOptions={startOptions.current}
         endOptions={endOptions.current}
+        isTracking={isTracking.current}
       />
       <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
         X
       </div>
     </div>
   );
+}
+
+
+const getMaxDataLen = (data: GraphDataType) => {
+  let mxDataLen = 1;
+  for (const traceKey in data) {
+    if (data[traceKey as TraceIdType].x.length > 0)
+      mxDataLen = data[traceKey as TraceIdType].x.length;
+  }
+  return mxDataLen;
 }

@@ -26,7 +26,7 @@ export default function AddonItem({ addon }: AddonItemProps) {
         {/* <ListItemIcon>
           <InboxIcon />
         </ListItemIcon> */}
-        <ListItemText primary={addon.name} primaryTypographyProps={{fontSize: '16px'}}  />
+        <ListItemText primary={addon.whoAmI} primaryTypographyProps={{fontSize: '16px'}}  />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>

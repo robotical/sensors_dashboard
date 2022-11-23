@@ -3,6 +3,8 @@ import {
   ROSSerialIMU,
   ROSSerialSmartServos,
 } from "@robotical/ricjs";
+import EXCLUDED_ADDONS from "../utils/constants/excluded-addons";
+import SERVO_NAMES_MAP from "../utils/constants/servo-names";
 import {
   ACCELEROMETER_NAME,
   ACCELEROMETER_NAME_Y,
@@ -44,13 +46,17 @@ export class Marty2 extends EventDispatcher {
     try {
       this.addons = JSON.parse(addons).addons;
       for (const addon of this.addons) {
+        if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
         for (const valKey in addon.vals) {
           // @ts-ignore
           const value = addon.vals[valKey];
           if (typeof value === "number") {
+            const nameOfAddonInput = valKey.replace(addon.name, "");
             this.dispatchEvent({
-              type: `on${addon.whoAmI}=>${valKey.replace(addon.name, "")}Change`,
+              type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
               value: value,
+              whoAmI: addon.whoAmI,
+              addonInput: nameOfAddonInput,
             });
           }
         }
@@ -65,12 +71,16 @@ export class Marty2 extends EventDispatcher {
       this.servos = JSON.parse(servos);
       for (const servo of this.servos!.smartServos) {
         this.dispatchEvent({
-          type: `on${MOTOR_POSITION_NAME}=>${servo.id}Change`,
+          type: `on${MOTOR_POSITION_NAME}=>${SERVO_NAMES_MAP[servo.id]}Change`,
           value: servo.pos,
+          whoAmI: MOTOR_POSITION_NAME,
+          addonInput: SERVO_NAMES_MAP[servo.id],
         });
         this.dispatchEvent({
-          type: `on${MOTOR_CURRENT_NAME}=>${servo.id}Change`,
+          type: `on${MOTOR_CURRENT_NAME}=>${SERVO_NAMES_MAP[servo.id]}Change`,
           value: servo.current,
+          whoAmI: MOTOR_CURRENT_NAME,
+          addonInput: SERVO_NAMES_MAP[servo.id],
         });
       }
     } catch (e) {
@@ -84,14 +94,20 @@ export class Marty2 extends EventDispatcher {
       this.dispatchEvent({
         type: `on${ACCELEROMETER_NAME}=>${ACCELEROMETER_NAME_X}Change`,
         value: this.accel?.accel.x,
+        whoAmI: ACCELEROMETER_NAME,
+        addonInput: ACCELEROMETER_NAME_X,
       });
       this.dispatchEvent({
         type: `on${ACCELEROMETER_NAME}=>${ACCELEROMETER_NAME_Y}Change`,
         value: this.accel?.accel.y,
+        whoAmI: ACCELEROMETER_NAME,
+        addonInput: ACCELEROMETER_NAME_Y,
       });
       this.dispatchEvent({
         type: `on${ACCELEROMETER_NAME}=>${ACCELEROMETER_NAME_Z}Change`,
         value: this.accel?.accel.z,
+        whoAmI: ACCELEROMETER_NAME,
+        addonInput: ACCELEROMETER_NAME_Z,
       });
     } catch (e) {
       this.accel = null;

@@ -1,4 +1,5 @@
-type ListenerType = (options: {[key: string]: any, type: EventType, subtype: string}) => void;
+export type ListenerOptionsType = {[key: string]: any, type: EventType, subtype: string, whoAmI?: string; addonInput?: string; value?: number;}
+export type ListenerType = (options: ListenerOptionsType) => void;
 export type EventType = `on${string}=>${string}Change` | `on${string}Change`;
 
 class EventDispatcher { 

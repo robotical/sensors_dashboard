@@ -1,4 +1,4 @@
-import { GraphDataType, TraceData } from "../GraphArea";
+import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
 import Plot from "react-plotly.js";
 
@@ -14,11 +14,11 @@ export default function Graph({ data, maxDataLen, autoScrollEnabled}: GraphProps
   for (const traceKey in data) {
     try {
       const trace = {
-        x: data[traceKey].x,
-        y: data[traceKey].y,
+        x: data[traceKey as TraceIdType].x,
+        y: data[traceKey as TraceIdType].y,
         type: "scatter",
         mode: "lines",
-        name: traceKey
+        name: traceKey.split("=>")[1]
       };
       traces.push(trace);
     } catch (e) {}
@@ -35,7 +35,7 @@ export default function Graph({ data, maxDataLen, autoScrollEnabled}: GraphProps
           zeroline: false,
           showgrid: false,
           title: "Time",
-          range: (maxDataLen > 10 && autoScrollEnabled) ? [maxDataLen -10, maxDataLen] : [],
+          range: (maxDataLen > 50 && autoScrollEnabled) ? [maxDataLen -50, maxDataLen] : [],
         },
         yaxis: {
           linecolor: "black",

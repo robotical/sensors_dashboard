@@ -13,20 +13,23 @@ import {
   MOTOR_CURRENT_NAME,
   MOTOR_POSITION_NAME,
 } from "./types/addon-names";
+import EXCLUDED_ADDONS from "./constants/excluded-addons";
+import SERVO_NAMES_MAP from "./constants/servo-names";
 
 function getAddonsList(addons: ROSSerialAddOnStatus[]) {
   const addonsNormalised = [];
   for (const addon of addons) {
-    const id = addon.whoAmI;
+    if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
     const subAddons = [];
     for (const valKey in addon.vals) {
       // @ts-ignore
       const value = addon.vals[valKey];
       if (typeof value === "number") {
-        subAddons.push(new AddonSub(valKey.replace(addon.name, ""), value));
+        const addonInputName = valKey.replace(addon.name, "");
+        subAddons.push(new AddonSub(addonInputName, value));
       }
     }
-    addonsNormalised.push(new Addon(id, id, subAddons));
+    addonsNormalised.push(new Addon(addon.whoAmI, subAddons));
   }
   return addonsNormalised;
 }
@@ -37,14 +40,14 @@ function getServosList(servos: ROSSerialSmartServos) {
   const currAddonSub: AddonSub[] = [];
   const addonsNormalised = [];
   for (const servo of smartServos) {
-    posAddonSub.push(new AddonSub(servo.id.toString(), servo.pos));
-    currAddonSub.push(new AddonSub(servo.id.toString(), servo.current));
+    posAddonSub.push(new AddonSub(SERVO_NAMES_MAP[servo.id], servo.pos));
+    currAddonSub.push(new AddonSub(SERVO_NAMES_MAP[servo.id], servo.current));
   }
   addonsNormalised.push(
-    new Addon(MOTOR_POSITION_NAME, "motor-pos", posAddonSub)
+    new Addon(MOTOR_POSITION_NAME, posAddonSub)
   );
   addonsNormalised.push(
-    new Addon(MOTOR_CURRENT_NAME, "motor-current", currAddonSub)
+    new Addon(MOTOR_CURRENT_NAME, currAddonSub)
   );
 
   return addonsNormalised;
@@ -56,7 +59,7 @@ function getAccelList(accel: ROSSerialIMU) {
     new AddonSub(ACCELEROMETER_NAME_Y, accel.accel.y),
     new AddonSub(ACCELEROMETER_NAME_Z, accel.accel.z),
   ];
-  return [new Addon(ACCELEROMETER_NAME, "accelerometer", addonSubs)];
+  return [new Addon(ACCELEROMETER_NAME, addonSubs)];
 }
 
 export default function getAllAddonsList(
