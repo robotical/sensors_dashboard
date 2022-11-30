@@ -35,7 +35,7 @@ export default function Graph({ data, maxDataLen, autoScrollEnabled}: GraphProps
           mirror: true,
           zeroline: false,
           showgrid: false,
-          title: "Time",
+          title: "Time (seconds)",
           range: (maxDataLen > 50 && autoScrollEnabled) ? [maxDataLen -50, maxDataLen] : [],
         },
         yaxis: {

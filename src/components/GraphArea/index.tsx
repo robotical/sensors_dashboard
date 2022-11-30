@@ -46,6 +46,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const endSelectedOption = useRef<DropdownOptionsInterface>([] as unknown as DropdownOptionsInterface);
   const startOptions = useRef<DropdownOptionsInterface[]>([]);
   const endOptions = useRef<DropdownOptionsInterface[]>([]);
+  const startDisplayingTime = useRef<number | null>(null);
 
   useEffect(() => {
     const normalisedAddons = getAllAddonsList(
@@ -127,19 +128,22 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       hasEndRuleMet.current = true;
       return;
     }
+
+    if (!startDisplayingTime.current)  {
+      startDisplayingTime.current = new Date().getTime();
+    }
     
     maxDataLen.current = getMaxDataLen(graphData.current);
     const traceId:TraceIdType = `${evt.whoAmI}=>${evt.addonInput}`;
+    const newTimestamp =  (new Date().getTime() -startDisplayingTime.current) / 1000;
     if (graphData.current.hasOwnProperty(traceId)) {
       graphData.current[traceId].x.push(
-        graphData.current[traceId].x[
-          graphData.current[traceId].x.length - 1
-        ] + 1
+        +newTimestamp.toFixed(2)
       );
       graphData.current[traceId].y.push(evt.value!);
     } else {
       graphData.current[traceId] = {
-        x: [maxDataLen.current],
+        x: [+newTimestamp.toFixed(2)],
         y: [evt.value!],
       };
     }
@@ -154,6 +158,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     maxDataLen.current = 0;
     hasStartRuleMet.current = false;
     hasEndRuleMet.current = false;
+    startDisplayingTime.current = null;
     setRefreshGraphArea((old) => old + 1);
   };
 
