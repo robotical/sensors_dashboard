@@ -149,10 +149,23 @@ export class Marty2 extends EventDispatcher {
   setIsConnected(isConnected: boolean) {
     if (isConnected !== this.isConnected) {
       this.isConnected = isConnected;
-      this.dispatchEvent({
-        type: "onIsConnectedChange",
-        isConnected: this.isConnected,
-      });
+      // if we just got connected, we hold off
+      // before sending the event so we have time
+      // to populate the addons
+      if (this.isConnected) {
+        const tmout = setTimeout(() => {
+          this.dispatchEvent({
+            type: "onIsConnectedChange",
+            isConnected: this.isConnected,
+          });
+          clearTimeout(tmout);
+        }, 5000);
+      } else {
+        this.dispatchEvent({
+          type: "onIsConnectedChange",
+          isConnected: this.isConnected,
+        });
+      }
     }
   }
 
