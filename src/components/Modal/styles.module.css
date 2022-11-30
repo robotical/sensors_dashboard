@@ -1,0 +1,78 @@
+
+@keyframes comeInFromTop {
+ 0% {
+  transform: translateY(-100%);
+  }
+  80% {
+    transform: translateY(20%);
+  }
+
+  100%{
+    transform: translateY(0);
+  }
+}
+
+@keyframes leaveToTop {
+  0% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(20%);
+  }
+  
+  100%{
+    transform: translateY(-200%);
+  }
+}
+
+.styledModalBody {
+  padding-top: 10px;
+}
+
+.styledModalHeader{
+  display: flex;
+  justify-content: flex-end;
+  font-size: 25px;
+}
+
+
+.styledModal{
+  background: var(--colour-GREY_2);
+  border-radius: 15px;
+  padding: 15px;
+  max-height: 90vh;
+  overflow-y: scroll;
+}
+
+.styleModalComeInFromTop {
+  animation: comeInFromTop  .7s ease-in;
+}
+
+.styleModalLeaveToTop {
+  animation: leaveToTop  .7s ease-in;
+}
+
+.modalLogoContainer {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 1rem;
+}
+
+.styledModalOverlay{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+}
+
+.styledTitle{
+  font-size: 2.5rem;
+  font-family: "BigNoodleTitling Regular";
+  text-align: center;
+}

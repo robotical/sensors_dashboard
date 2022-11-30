@@ -1,0 +1,25 @@
+.howToUseModalContainer {
+    max-width: 90vw;
+    display: grid;
+    row-gap: 1rem;
+}
+
+.howToUseModalTextTitle {
+    font-size: 2rem;
+    font-weight: bolder;
+    font-family: 'Lato Bold';
+}
+
+.howToUseModalImg {
+    max-width: 100%;
+    justify-self: center;
+}
+
+.howToUseModalTextParagraph {
+    line-height: 1.5;
+}
+
+.closeButton {
+    justify-self: center;
+    padding: 0.5rem 1rem;
+}
