@@ -43,12 +43,8 @@ function getServosList(servos: ROSSerialSmartServos) {
     posAddonSub.push(new AddonSub(SERVO_NAMES_MAP[servo.id], servo.pos));
     currAddonSub.push(new AddonSub(SERVO_NAMES_MAP[servo.id], servo.current));
   }
-  addonsNormalised.push(
-    new Addon(MOTOR_POSITION_NAME, posAddonSub)
-  );
-  addonsNormalised.push(
-    new Addon(MOTOR_CURRENT_NAME, currAddonSub)
-  );
+  addonsNormalised.push(new Addon(MOTOR_POSITION_NAME, posAddonSub));
+  addonsNormalised.push(new Addon(MOTOR_CURRENT_NAME, currAddonSub));
 
   return addonsNormalised;
 }
@@ -67,7 +63,26 @@ export default function getAllAddonsList(
   servos: ROSSerialSmartServos,
   accel: ROSSerialIMU
 ) {
-  return getAddonsList(addons)
-    .concat(getServosList(servos))
-    .concat(getAccelList(accel));
+  let addons_: Addon[] = [];
+  let servos_: Addon[] = [];
+  let accel_: Addon[] = [];
+  try {
+    addons_ = getAddonsList(addons);
+  } catch (e) {
+    console.log(e);
+  }
+
+  try {
+    servos_ = getServosList(servos);
+  } catch (e) {
+    console.log(e);
+  }
+
+  try {
+    accel_ = getAccelList(accel);
+  } catch (e) {
+    console.log(e);
+  }
+
+  return addons_.concat(servos_).concat(accel_);
 }

@@ -1,4 +1,5 @@
 .container {
     grid-area: addons-list;
-    overflow-y: scroll
+    overflow-y: scroll;
+    justify-self: left;
 }

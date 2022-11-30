@@ -18,13 +18,14 @@ export default function Graph({ data, maxDataLen, autoScrollEnabled}: GraphProps
         y: data[traceKey as TraceIdType].y,
         type: "scatter",
         mode: "lines",
-        name: traceKey.split("=>")[1]
+        name: traceKey.split("=>")[0] === "Motor Position" ? "Postion " + traceKey.split("=>")[1] : traceKey.split("=>")[1]
       };
       traces.push(trace);
     } catch (e) {}
   }
   return (
     <Plot
+      style={{justifySelf: "center", maxWidth: "66vw"}}
       key={new Date().getTime()}
       data={traces}
       layout={{

@@ -12,6 +12,7 @@ import AddonsList from "../AddonsList";
 import Graph from "../Graph";
 import GraphControls from "../GraphControls";
 import styles from "./styles.module.css";
+import { CSVLink } from "react-csv";
 
 interface GraphAreaProps {
   graphId: string;
@@ -28,11 +29,14 @@ export type GraphDataType = {
   [traceTitle: TraceIdType]: TraceData;
 };
 
+type CsvData = string[][];
+
 export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
   const [refreshGraphArea, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
+  const [csvData, setCsvData] = useState<CsvData>([]);
   const graphData = useRef<GraphDataType>({});
   const maxDataLen = useRef<number>(0);
   const isTracking = useRef<boolean>(false);
@@ -179,6 +183,20 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     setRefreshGraphArea((old) => old + 1);
   };
 
+  const exportCsvHandler = () => {
+    // transform graph data to csv data
+    const csvLines: CsvData = [];
+    for (const traceKey in graphData.current) {
+      csvLines.push(traceKey.split("=>"));
+      csvLines.push(["x", "y"]);
+      for (let i = 0; i < graphData.current[traceKey as TraceIdType].x.length; i++) {
+        csvLines.push([graphData.current[traceKey as TraceIdType].x[i].toString(), graphData.current[traceKey as TraceIdType].y[i].toString()]);
+      }
+  }
+  setCsvData(csvLines);
+  return true;
+}
+
   return (
     <div className={styles.graphArea}>
       <AddonsList addons={addons} />
@@ -201,8 +219,11 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
         endOptions={endOptions.current}
         isTracking={isTracking.current}
       />
-      <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
-        X
+      <div className={styles.rightPanel}>
+        <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
+          X
+        </div>
+        <CSVLink data={csvData} onClick={exportCsvHandler}>Export CSV</CSVLink>
       </div>
     </div>
   );
@@ -212,7 +233,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
 const getMaxDataLen = (data: GraphDataType) => {
   let mxDataLen = 1;
   for (const traceKey in data) {
-    if (data[traceKey as TraceIdType].x.length > 0)
+    if (data[traceKey as TraceIdType].x.length > mxDataLen)
       mxDataLen = data[traceKey as TraceIdType].x.length;
   }
   return mxDataLen;

@@ -1,7 +1,7 @@
 .graphArea {
     display: grid;
-    grid-template-areas: "addons-list graph close-graph" "addons-list graph-controls .";
-    grid-template-columns: .25fr .7fr min-content;
+    grid-template-areas: "addons-list graph right-panel" "addons-list graph-controls .";
+    /* grid-template-columns: .25fr .7fr min-content; */
     grid-template-rows: 1fr min-content;
     row-gap: 1rem;
     border-top: 2px solid black;
@@ -11,5 +11,9 @@
 }
 
 .closeGraph {
-    grid-area: close-graph
+    cursor: pointer;
+}
+
+.rightPanel {
+    grid-area: right-panel
 }

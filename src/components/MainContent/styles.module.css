@@ -16,3 +16,11 @@
     background-color: lightgray;
     cursor: pointer;
 }
+
+.martyConnectedFallback {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2rem;
+    background-color: lightcoral;
+    padding: 1rem;
+}
