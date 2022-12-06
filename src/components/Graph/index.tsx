@@ -4,12 +4,11 @@ import Plot from "react-plotly.js";
 
 interface GraphProps {
   data: GraphDataType;
-  maxDataLen: number;
+  maxDataXValue: number;
   autoScrollEnabled: boolean;
 }
 
-export default function Graph({ data, maxDataLen, autoScrollEnabled}: GraphProps) {
-    
+export default function Graph({ data, maxDataXValue, autoScrollEnabled}: GraphProps) {
   const traces: TraceData[] = [];
   for (const traceKey in data) {
     try {
@@ -36,7 +35,7 @@ export default function Graph({ data, maxDataLen, autoScrollEnabled}: GraphProps
           zeroline: false,
           showgrid: false,
           title: "Time (seconds)",
-          range: (maxDataLen > 50 && autoScrollEnabled) ? [maxDataLen -50, maxDataLen] : [],
+          range: (maxDataXValue > 50 && autoScrollEnabled) ? [maxDataXValue -50, maxDataXValue] : [],
         },
         yaxis: {
           linecolor: "black",

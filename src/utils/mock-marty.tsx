@@ -10,7 +10,7 @@ export default class MockMarty {
     console.log("initialising mock Marty");
     setInterval(() => {
       this._updateSensors();
-    }, 1000);
+    }, 300);
   }
 
   _updateSensors() {

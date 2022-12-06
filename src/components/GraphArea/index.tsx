@@ -38,7 +38,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
   const [csvData, setCsvData] = useState<CsvData>([]);
   const graphData = useRef<GraphDataType>({});
-  const maxDataLen = useRef<number>(0);
+  const maxDataXValue = useRef<number>(0);
   const isTracking = useRef<boolean>(false);
   const hasStartRuleMet = useRef<boolean>(false);
   const hasEndRuleMet = useRef<boolean>(false);
@@ -133,7 +133,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       startDisplayingTime.current = new Date().getTime();
     }
     
-    maxDataLen.current = getMaxDataLen(graphData.current);
+    maxDataXValue.current = getMaxDataXValue(graphData.current);
     const traceId:TraceIdType = `${evt.whoAmI}=>${evt.addonInput}`;
     const newTimestamp =  (new Date().getTime() -startDisplayingTime.current) / 1000;
     if (graphData.current.hasOwnProperty(traceId)) {
@@ -155,7 +155,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     for (const traceKey in graphData.current) {
       delete graphData.current[traceKey as TraceIdType];
     }
-    maxDataLen.current = 0;
+    maxDataXValue.current = 0;
     hasStartRuleMet.current = false;
     hasEndRuleMet.current = false;
     startDisplayingTime.current = null;
@@ -207,7 +207,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       <AddonsList addons={addons} />
       <Graph
         data={graphData.current}
-        maxDataLen={maxDataLen.current}
+        maxDataXValue={maxDataXValue.current}
         autoScrollEnabled={autoScrollEnabled}
       />
       <GraphControls
@@ -235,11 +235,12 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
 }
 
 
-const getMaxDataLen = (data: GraphDataType) => {
-  let mxDataLen = 1;
+const getMaxDataXValue = (data: GraphDataType) => {
+  let mxDataXValue = 1;
   for (const traceKey in data) {
-    if (data[traceKey as TraceIdType].x.length > mxDataLen)
-      mxDataLen = data[traceKey as TraceIdType].x.length;
+    const currLen = data[traceKey as TraceIdType].x.length;
+    if (data[traceKey as TraceIdType].x[currLen - 1] > mxDataXValue)
+      mxDataXValue = data[traceKey as TraceIdType].x[currLen - 1];
   }
-  return mxDataLen;
+  return mxDataXValue;
 }
