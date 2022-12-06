@@ -1,6 +1,6 @@
 import Addon from "../../models/addons/Addon";
 import {
-  START_OPTIONS_BY_WHOAMI_AND_NAME,
+  get_OPTIONS_BY_WHOAMI_AND_NAME,
   END_OPTIONS_BY_WHOAMI_AND_NAME,
 } from "../constants/start-end-rules";
 
@@ -11,7 +11,7 @@ export type DropdownOptionsInterface = [
   string,
   string,
   string,
-  (val: number) => boolean,
+  (val: number) => boolean
 ];
 
 export const getRuleOptions = (addons: Addon[], rule: "start" | "end") => {
@@ -27,30 +27,19 @@ export const getRuleOptions = (addons: Addon[], rule: "start" | "end") => {
   for (const addon of addons) {
     for (const addonInput of addon.addonInputs) {
       if (addonInput.selected) {
-        try {
-          let specificOptionsForThatAddonInput;
-          if (rule === "start") {
-            specificOptionsForThatAddonInput =
-              START_OPTIONS_BY_WHOAMI_AND_NAME[addon.whoAmI][addonInput.name];
-          } else {
-            specificOptionsForThatAddonInput =
-              END_OPTIONS_BY_WHOAMI_AND_NAME[addon.whoAmI][addonInput.name];
-          }
-          specificOptionsForThatAddonInput.forEach((opt) => {
-            options.push([
-              addon.whoAmI,
-              addonInput.name,
-              opt.ruleStr,
-              opt.ruleFunc,
-            ]);
-          });
-        } catch (e) {
-          console.log(
-            `No specific ${rule} options for`,
+        const specificOptionsForThatAddonInput = get_OPTIONS_BY_WHOAMI_AND_NAME(
+          rule,
+          addon.whoAmI,
+          addonInput.name
+        );
+        specificOptionsForThatAddonInput.forEach((opt) => {
+          options.push([
             addon.whoAmI,
-            addonInput.name
-          );
-        }
+            addonInput.name,
+            opt.ruleStr,
+            opt.ruleFunc,
+          ]);
+        });
       }
     }
   }

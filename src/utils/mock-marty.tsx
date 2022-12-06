@@ -125,6 +125,18 @@ export default class MockMarty {
             RightIRFootVal: Math.random(),
           },
         },
+        {
+          id: 35,
+          deviceTypeID: 0,
+          whoAmI: "IRFoot",
+          name: "LeftIRFoot",
+          status: 128,
+          vals: {
+            LeftIRFootTouch: true,
+            LeftIRFootAir: true,
+            LeftIRFootVal: Math.random(),
+          },
+        },
       ],
     });
   }
