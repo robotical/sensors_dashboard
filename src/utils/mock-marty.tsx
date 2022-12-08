@@ -110,7 +110,7 @@ export default class MockMarty {
             LeftColorSensorGreen: Math.random(),
             LeftColorSensorBlue: Math.random(),
             LeftColorSensorTouch: true,
-            LeftColorSensorAir: true,
+            LeftColorSensorAir: Math.random() > .5,
           },
         },
         {
@@ -121,7 +121,7 @@ export default class MockMarty {
           status: 128,
           vals: {
             RightIRFootTouch: true,
-            RightIRFootAir: true,
+            RightIRFootAir: Math.random() > .5,
             RightIRFootVal: Math.random(),
           },
         },

@@ -58,6 +58,8 @@ export class Marty2 extends EventDispatcher {
             this.dispatchEvent({
               type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
               value: value,
+              // @ts-ignore
+              air: addon.vals[addon.name+"Air"],
               whoAmI: addon.whoAmI,
               addonInput: nameOfAddonInput,
             });

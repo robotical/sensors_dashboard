@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import mv2Dashboard from "../../app-bridge/mv2-rn";
-import GraphArea from "../GraphArea";
+import GraphArea from "../GraphAreaLogisticRegression";
 import styles from "./styles.module.css";
 
 interface GraphObj {
@@ -13,10 +13,7 @@ export default function MainContent() {
   const refresh = useState(0)[1];
 
   const removeGraph = (graphId: string) => {
-    console.log(graphs.current);
-    console.log(graphId);
     const graphsUpdated = graphs.current.filter((graph) => graph.graphId !== graphId);
-    console.log(graphsUpdated);
     graphs.current = graphsUpdated;
     refresh(old => old+1);
   };
