@@ -44,7 +44,10 @@ export class Marty2 extends EventDispatcher {
 
   setAddons(addons: string) {
     try {
-      this.addons = JSON.parse(addons).addons;
+      // rename dubplicated addons
+      const addonsDupl: ROSSerialAddOnStatus[] = JSON.parse(addons).addons;
+      checkForDoubleAddons(addonsDupl);
+      this.addons = addonsDupl;
       for (const addon of this.addons) {
         if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
         for (const valKey in addon.vals) {
@@ -201,3 +204,28 @@ export class Marty2 extends EventDispatcher {
 
 const mv2Dashboard = new Marty2();
 export default mv2Dashboard;
+
+
+
+const checkForDoubleAddons = (addons: ROSSerialAddOnStatus[]) => {
+  /**
+   * Checking if there exist double addons (2 IRFoot, or 2 coloursensors etc)
+   * and renames them in place to IRFoot1, IRFoot2 and so on
+   */
+  const addonsMap: { [key: string]: ROSSerialAddOnStatus[] } = {};
+  for (const addon of addons) {
+    if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
+    if (!addonsMap.hasOwnProperty(addon.whoAmI)) {
+      addonsMap[addon.whoAmI] = [];
+    }
+    addonsMap[addon.whoAmI].push(addon);
+  }
+
+  for (const addonWhoAmIKey in addonsMap) {
+    const addonsArr = addonsMap[addonWhoAmIKey];
+    if (addonsArr.length < 2) continue;
+    for (let i = 0; i < addonsArr.length; i++) {
+      addonsArr[i].whoAmI = addonsArr[i].whoAmI + i;
+    }
+  }
+};
