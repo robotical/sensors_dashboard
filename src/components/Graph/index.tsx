@@ -1,6 +1,7 @@
 import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
 import Plot from "react-plotly.js";
+import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/trace-name";
 
 interface GraphProps {
   data: GraphDataType;
@@ -12,12 +13,16 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled}: GraphPr
   const traces: TraceData[] = [];
   for (const traceKey in data) {
     try {
+      const traceName = motorPosDifferentiation(traceKey);
       const trace = {
         x: data[traceKey as TraceIdType].x,
         y: data[traceKey as TraceIdType].y,
         type: "scatter",
         mode: "lines",
-        name: traceKey.split("=>")[0] === "Motor Position" ? "Postion " + traceKey.split("=>")[1] : traceKey.split("=>")[1]
+        name: traceName,
+        line: {
+          color: rgbColorTraceName(traceName)
+        }
       };
       traces.push(trace);
     } catch (e) {}

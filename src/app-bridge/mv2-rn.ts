@@ -23,6 +23,7 @@ export class Marty2 extends EventDispatcher {
   public battRemainCapacityPercent: number;
   public rssi: number;
   public isConnected: boolean;
+  public isConnecting: boolean;
   public martyName: string;
   public addons: ROSSerialAddOnStatus[] = [];
   public servos: ROSSerialSmartServos | null = null;
@@ -39,6 +40,7 @@ export class Marty2 extends EventDispatcher {
     this.battRemainCapacityPercent = 0;
     this.rssi = 0;
     this.isConnected = false;
+    this.isConnecting = false;
     this.martyName = "";
   }
 
@@ -53,7 +55,7 @@ export class Marty2 extends EventDispatcher {
         for (const valKey in addon.vals) {
           // @ts-ignore
           const value = addon.vals[valKey];
-          if (typeof value === "number") {
+          // if (typeof value === "number") {
             const nameOfAddonInput = valKey.replace(addon.name, "");
             this.dispatchEvent({
               type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
@@ -61,7 +63,7 @@ export class Marty2 extends EventDispatcher {
               whoAmI: addon.whoAmI,
               addonInput: nameOfAddonInput,
             });
-          }
+          // }
         }
       }
     } catch (e) {
@@ -148,27 +150,24 @@ export class Marty2 extends EventDispatcher {
       });
     }
   }
+  
+  setIsConnecting(isConnecting: boolean) {
+    if (isConnecting !== this.isConnecting) {
+      this.isConnecting = isConnecting;
+      this.dispatchEvent({
+        type: "onIsConnectingChange",
+        isConnected: this.isConnecting,
+      });
+  }
+}
 
   setIsConnected(isConnected: boolean) {
     if (isConnected !== this.isConnected) {
       this.isConnected = isConnected;
-      // if we just got connected, we hold off
-      // before sending the event so we have time
-      // to populate the addons
-      if (this.isConnected) {
-        const tmout = setTimeout(() => {
-          this.dispatchEvent({
-            type: "onIsConnectedChange",
-            isConnected: this.isConnected,
-          });
-          clearTimeout(tmout);
-        }, 5000);
-      } else {
-        this.dispatchEvent({
-          type: "onIsConnectedChange",
-          isConnected: this.isConnected,
-        });
-      }
+      this.dispatchEvent({
+        type: "onIsConnectedChange",
+        isConnected: this.isConnected,
+      });
     }
   }
 

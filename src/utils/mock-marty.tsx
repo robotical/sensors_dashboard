@@ -2,8 +2,12 @@ import { Marty2 } from "../app-bridge/mv2-rn";
 
 export default class MockMarty {
   mv2: Marty2;
+  isConnected: boolean;
+  isConnecting: boolean;
   constructor(mv2: Marty2) {
     this.mv2 = mv2;
+    this.isConnecting = false;
+    this.isConnected = false;
   }
 
   init() {
@@ -11,6 +15,14 @@ export default class MockMarty {
     setInterval(() => {
       this._updateSensors();
     }, 300);
+
+    this.isConnecting = true;
+    setTimeout(() => {
+      this.isConnected = true;
+      this.isConnecting = false;
+    }, 5000);
+
+
   }
 
   _updateSensors() {
@@ -19,7 +31,8 @@ export default class MockMarty {
     this.mv2.setAddons(this.createAddons());
     this.mv2.setAccel(this.createAccel());
     this.mv2.setServos(this.createServos());
-    this.mv2.setIsConnected(true);
+    this.mv2.setIsConnected(this.isConnected);
+    this.mv2.setIsConnecting(this.isConnecting);
     // TODO 2022 - can rssi be got from WebBLE connection?
     this.mv2.setRSSI(Math.random() * -200);
   }
@@ -109,8 +122,8 @@ export default class MockMarty {
             LeftColorSensorRed: Math.random(),
             LeftColorSensorGreen: Math.random(),
             LeftColorSensorBlue: Math.random(),
-            LeftColorSensorTouch: true,
-            LeftColorSensorAir: true,
+            LeftColorSensorTouch: Math.random() > .5,
+            LeftColorSensorAir: Math.random() > .5,
           },
         },
         {
@@ -120,8 +133,8 @@ export default class MockMarty {
           name: "RightIRFoot",
           status: 128,
           vals: {
-            RightIRFootTouch: true,
-            RightIRFootAir: true,
+            RightIRFootTouch: Math.random() > .5,
+            RightIRFootAir: Math.random() > .5,
             RightIRFootVal: Math.random(),
           },
         },
@@ -132,8 +145,8 @@ export default class MockMarty {
           name: "LeftIRFoot",
           status: 128,
           vals: {
-            LeftIRFootTouch: true,
-            LeftIRFootAir: true,
+            LeftIRFootTouch: Math.random() > .5,
+            LeftIRFootAir: Math.random() > .5,
             LeftIRFootVal: Math.random(),
           },
         },

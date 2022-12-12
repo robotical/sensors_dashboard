@@ -24,10 +24,10 @@ function getAddonsList(addons: ROSSerialAddOnStatus[]) {
     for (const valKey in addon.vals) {
       // @ts-ignore
       const value = addon.vals[valKey];
-      if (typeof value === "number") {
+      // if (typeof value === "number") {
         const addonInputName = valKey.replace(addon.name, "");
         subAddons.push(new AddonSub(addonInputName, value));
-      }
+      // }
     }
     addonsNormalised.push(new Addon(addon.whoAmI, subAddons));
   }
