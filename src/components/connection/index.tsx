@@ -7,6 +7,7 @@ import styles from "./styles.module.css";
 
 const ConnectButton = () => {
   const [isConnected, setIsConnected] = useState(mv2Dashboard.isConnected);
+  const [isConnecting, setIsConnecting] = useState(mv2Dashboard.isConnecting);
 
   useEffect(() => {
     mv2Dashboard.addEventListener(
@@ -14,11 +15,21 @@ const ConnectButton = () => {
       "",
       onMartyConnectedChanged
     );
+    mv2Dashboard.addEventListener(
+      "onIsConnectingChange",
+      "",
+      onMartyConnectingChanged
+    );
     return () => {
       mv2Dashboard.removeEventListener(
         "onIsConnectedChange",
         "",
         onMartyConnectedChanged
+      );
+      mv2Dashboard.removeEventListener(
+        "onIsConnectingChange",
+        "",
+        onMartyConnectingChanged
       );
     };
   }, []);
@@ -27,6 +38,12 @@ const ConnectButton = () => {
     console.log("got connected event");
     setIsConnected(mv2Dashboard.isConnected);
   };
+
+  const onMartyConnectingChanged = () => {
+    console.log("got connecting event");
+    setIsConnecting(mv2Dashboard.isConnecting);
+  };
+
 
   const onClickConnect = async () => {
     console.log("connecting")
@@ -41,10 +58,10 @@ const ConnectButton = () => {
 
   return (
     <div className={styles.connectButtonContainer}>
-      {isConnected ? (
+      {isConnected && !isConnecting ? (
         <ButtonDisconn onClick={onClickDisconnect} />
       ) : (
-        <ButtonConn onClick={onClickConnect} />
+        <ButtonConn onClick={onClickConnect} isConnecting={isConnecting} />
       )}
     </div>
   );

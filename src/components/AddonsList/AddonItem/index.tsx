@@ -8,6 +8,7 @@ import ExpandMore from "@mui/icons-material/ExpandMore";
 import { useState } from "react";
 import AddonSubItem from "./AddonSubItem";
 import Addon from "../../../models/addons/Addon";
+import { useRef } from "react";
 
 interface AddonItemProps {
   addon: Addon;
@@ -15,18 +16,29 @@ interface AddonItemProps {
 
 export default function AddonItem({ addon }: AddonItemProps) {
   const [open, setOpen] = useState(false);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   const handleClick = () => {
+    if (!open) {
+      if (listRef.current) {
+        setTimeout(() => {
+            listRef.current?.scrollIntoView({ behavior: "smooth" });
+        },500)
+      }
+    }
     setOpen(!open);
   };
 
   return (
     <>
-      <ListItemButton onClick={handleClick}>
+      <ListItemButton onClick={handleClick} ref={listRef}>
         {/* <ListItemIcon>
           <InboxIcon />
         </ListItemIcon> */}
-        <ListItemText primary={addon.whoAmI} primaryTypographyProps={{fontSize: '16px'}}  />
+        <ListItemText
+          primary={addon.whoAmI}
+          primaryTypographyProps={{ fontSize: "16px" }}
+        />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
@@ -35,7 +47,7 @@ export default function AddonItem({ addon }: AddonItemProps) {
           dense
         >
           {addon.addonInputs.map((addonInput, idx) => {
-            return <AddonSubItem addonSubItem={addonInput} key={idx}/>;
+            return <AddonSubItem addonSubItem={addonInput} key={idx} />;
           })}
         </List>
       </Collapse>

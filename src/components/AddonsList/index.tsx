@@ -9,6 +9,7 @@ interface AddonsListProps {
 }
 
 export default function AddonsList({addons}: AddonsListProps) {
+
   return (
     <div className={styles.container}>
       <List

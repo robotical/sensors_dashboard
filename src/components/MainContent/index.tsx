@@ -9,7 +9,8 @@ interface GraphObj {
 }
 
 export default function MainContent() {
-  const [isMartyConnected, setIsMartyConnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(mv2Dashboard.isConnected);
+  const [isConnecting, setIsConnecting] = useState(mv2Dashboard.isConnecting);
   const refresh = useState(0)[1];
 
   const removeGraph = (graphId: string) => {
@@ -34,12 +35,16 @@ export default function MainContent() {
     },
   ]);
 
-
   useEffect(() => {
     mv2Dashboard.addEventListener(
       "onIsConnectedChange",
       "",
       onMartyConnectedChanged
+    );
+    mv2Dashboard.addEventListener(
+      "onIsConnectingChange",
+      "",
+      onMartyConnectingChanged
     );
     return () => {
       mv2Dashboard.removeEventListener(
@@ -47,11 +52,22 @@ export default function MainContent() {
         "",
         onMartyConnectedChanged
       );
+      mv2Dashboard.removeEventListener(
+        "onIsConnectingChange",
+        "",
+        onMartyConnectingChanged
+      );
     };
   }, []);
 
   const onMartyConnectedChanged = () => {
-    setIsMartyConnected(mv2Dashboard.isConnected);
+    console.log("got connected event");
+    setIsConnected(mv2Dashboard.isConnected);
+  };
+
+  const onMartyConnectingChanged = () => {
+    console.log("got connecting event");
+    setIsConnecting(mv2Dashboard.isConnecting);
   };
 
   const addGraphHandler = () => {
@@ -72,8 +88,12 @@ export default function MainContent() {
     refresh(old => old+1);
   };
 
-  if (!isMartyConnected) {
-    return <div className={styles.martyConnectedFallback}>Please connect to your Marty first</div>;
+  if (!isConnected || isConnecting) {
+    if (isConnecting) {
+      return <div className={styles.martyConnectedFallback}>Connecting...</div>;
+    } else {
+      return <div className={styles.martyConnectedFallback}>Please connect to your Marty first</div>;
+    }
   }
 
   return (
