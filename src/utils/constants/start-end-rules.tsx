@@ -51,7 +51,7 @@ const START_OPTIONS_BY_WHOAMI_AND_NAME: OptionsInterface = {
       {
         ruleStr: IRFOOT_VAL_BIGGER_THAN_20,
         ruleFunc: (val: number) => val > 20,
-      },
+      }
     ],
   },
   Accelerometer: {

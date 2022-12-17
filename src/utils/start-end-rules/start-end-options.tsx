@@ -3,6 +3,8 @@ import {
   get_OPTIONS_BY_WHOAMI_AND_NAME,
   END_OPTIONS_BY_WHOAMI_AND_NAME,
 } from "../constants/start-end-rules";
+import { spacebarIsPressedRule, spacebarRuleCleanup } from "./key-press-rules/spacebar-start-rule";
+import { qIsPressedRule, qRuleCleanup } from "./key-press-rules/q-end-rule";
 
 /**
  * @elems whoAmI, addonInputName, ruleStr, ruleFunc
@@ -11,7 +13,13 @@ export type DropdownOptionsInterface = [
   string,
   string,
   string,
-  (val: number) => boolean
+  (val: number) => boolean, // rule function
+] | [
+  string,
+  string,
+  string,
+  (val: number) => boolean, // rule function
+  () => void // cleanup function
 ];
 
 export const getRuleOptions = (addons: Addon[], rule: "start" | "end") => {
@@ -22,6 +30,21 @@ export const getRuleOptions = (addons: Addon[], rule: "start" | "end") => {
       rule === "start" ? "Start is pressed" : "Pause is pressed",
       (val: number) => rule === "start",
     ],
+    rule === "start"
+      ? [
+          "default",
+          "spacebar",
+          "Spacebar is pressed",
+          (val: number) => spacebarIsPressedRule(val),
+          () => spacebarRuleCleanup()
+        ]
+      : [
+          "default",
+          "q",
+          "Q is pressed",
+          (val: number) => qIsPressedRule(val),
+          () => qRuleCleanup()
+        ],
   ];
 
   for (const addon of addons) {

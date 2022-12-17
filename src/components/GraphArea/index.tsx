@@ -71,8 +71,15 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     setRefreshGraphArea((oldV) => oldV + 1);
     return () => {
       removeAddonsListeners(addons);
+      cleanupStartEndRules();
     };
   }, [refreshAddons]);
+
+  const cleanupStartEndRules = () => {
+    console.log("cleaning rules");
+    startSelectedOption.current[4] && startSelectedOption.current[4](); // cleanup rule
+    endSelectedOption.current[4] && endSelectedOption.current[4](); // cleanup rule
+  };
 
   const addSelectedListener = (addonsArr: Addon[]) => {
     for (const addon of addonsArr) {
@@ -158,6 +165,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     }
     maxDataXValue.current = 0;
     hasStartRuleMet.current = false;
+    cleanupStartEndRules();
     hasEndRuleMet.current = false;
     startDisplayingTime.current = null;
     setRefreshGraphArea((old) => old + 1);
@@ -181,6 +189,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
 
   const onRuleOptionChange = (selectedOption: DropdownOptionsInterface, rule: "start" | "end") => {
     if (isTracking.current) return; // changing rule won't affect graph if it's currently traking 
+    cleanupStartEndRules();
     if (rule === "start") {
       startSelectedOption.current = selectedOption;
     } else {
