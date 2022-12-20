@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <div className={styles.header}>
       <Connection />
-      <div className={styles.title}>Marty Sensors Dashboard</div>
+      <div className={styles.title}>Dashboard</div>
       <button
         className={styles.helpButton}
         onClick={() =>
