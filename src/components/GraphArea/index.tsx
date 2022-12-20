@@ -13,6 +13,7 @@ import Graph from "../Graph";
 import GraphControls from "../GraphControls";
 import styles from "./styles.module.css";
 import { CSVLink } from "react-csv";
+import {getCSVTitle, prepareCSVData, prepareTitles} from "../../utils/export-csv";
 
 interface GraphAreaProps {
   graphId: string;
@@ -29,7 +30,7 @@ export type GraphDataType = {
   [traceTitle: TraceIdType]: TraceData;
 };
 
-type CsvData = string[][];
+type CsvData = (number | string)[][];
 
 export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
@@ -70,8 +71,15 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     setRefreshGraphArea((oldV) => oldV + 1);
     return () => {
       removeAddonsListeners(addons);
+      cleanupStartEndRules();
     };
   }, [refreshAddons]);
+
+  const cleanupStartEndRules = () => {
+    console.log("cleaning rules");
+    startSelectedOption.current[4] && startSelectedOption.current[4](); // cleanup rule
+    endSelectedOption.current[4] && endSelectedOption.current[4](); // cleanup rule
+  };
 
   const addSelectedListener = (addonsArr: Addon[]) => {
     for (const addon of addonsArr) {
@@ -157,6 +165,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     }
     maxDataXValue.current = 0;
     hasStartRuleMet.current = false;
+    cleanupStartEndRules();
     hasEndRuleMet.current = false;
     startDisplayingTime.current = null;
     setRefreshGraphArea((old) => old + 1);
@@ -180,6 +189,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
 
   const onRuleOptionChange = (selectedOption: DropdownOptionsInterface, rule: "start" | "end") => {
     if (isTracking.current) return; // changing rule won't affect graph if it's currently traking 
+    cleanupStartEndRules();
     if (rule === "start") {
       startSelectedOption.current = selectedOption;
     } else {
@@ -188,17 +198,12 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     setRefreshGraphArea((old) => old + 1);
   };
 
-  const exportCsvHandler = () => {
+  const exportCsvHandler = async () => {
     // transform graph data to csv data
-    const csvLines: CsvData = [];
-    for (const traceKey in graphData.current) {
-      csvLines.push(traceKey.split("=>"));
-      csvLines.push(["x", "y"]);
-      for (let i = 0; i < graphData.current[traceKey as TraceIdType].x.length; i++) {
-        csvLines.push([graphData.current[traceKey as TraceIdType].x[i].toString(), graphData.current[traceKey as TraceIdType].y[i].toString()]);
-      }
-  }
-  setCsvData(csvLines);
+  const preparedCsvData = await prepareCSVData(graphData.current);
+  const titles = prepareTitles(graphData.current, "Time (s)");
+
+  setCsvData([titles, ...preparedCsvData]);
   return true;
 }
 
@@ -228,7 +233,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
         <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
           X
         </div>
-        <CSVLink data={csvData} onClick={exportCsvHandler}>Export CSV</CSVLink>
+        <CSVLink data={csvData} onClick={exportCsvHandler} filename={getCSVTitle(graphData.current)}>Export CSV</CSVLink>
       </div>
     </div>
   );

@@ -33,6 +33,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled}: GraphPr
       key={new Date().getTime()}
       data={traces}
       layout={{
+        showlegend: true,
         xaxis: {
           linecolor: "black",
           linewidth: 2,

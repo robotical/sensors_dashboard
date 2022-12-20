@@ -44,27 +44,6 @@ export default function GraphControls({
 }: GraphControlsProps) {
   return (
     <div className={styles.container}>
-      <div className={styles.playPauseContainer}>
-        <div className={styles.graphControlsSVGContainer} onClick={onClickPlay}>
-          {isTracking ? <RecordingSVG /> : <PlaySVG />}
-        </div>
-        <div
-          className={styles.graphControlsSVGContainer}
-          onClick={onClickPause}
-        >
-          <PauseSVG />
-        </div>
-
-        <div className={styles.graphControlsSVGContainer} onClick={onClickStop}>
-          <StopSVG />
-        </div>
-      </div>
-
-      <div className={styles.autoScrollContainer}>
-        <p>Auto-scroll?</p>
-        <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
-      </div>
-
       <div className={styles.startEndRules}>
         <Dropdown
           rule="start"
@@ -80,6 +59,27 @@ export default function GraphControls({
           options={endOptions}
           selectedOption={endSelectedOption}
         />
+      </div>
+
+      <div className={styles.autoScrollContainer}>
+        <p>Auto-scroll?</p>
+        <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
+      </div>
+
+      <div className={styles.playPauseContainer}>
+        <div className={styles.graphControlsSVGContainer} onClick={onClickPlay}>
+          {isTracking ? <RecordingSVG /> : <PlaySVG />}
+        </div>
+        <div
+          className={styles.graphControlsSVGContainer}
+          onClick={onClickPause}
+        >
+          <PauseSVG />
+        </div>
+
+        <div className={styles.graphControlsSVGContainer} onClick={onClickStop}>
+          <StopSVG />
+        </div>
       </div>
     </div>
   );

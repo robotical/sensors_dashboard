@@ -14,10 +14,7 @@ export default function MainContent() {
   const refresh = useState(0)[1];
 
   const removeGraph = (graphId: string) => {
-    console.log(graphs.current);
-    console.log(graphId);
     const graphsUpdated = graphs.current.filter((graph) => graph.graphId !== graphId);
-    console.log(graphsUpdated);
     graphs.current = graphsUpdated;
     refresh(old => old+1);
   };
@@ -84,7 +81,6 @@ export default function MainContent() {
       ),
     });
     graphs.current = graphsUpdated;
-    console.log(graphsUpdated);
     refresh(old => old+1);
   };
 
