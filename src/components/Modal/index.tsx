@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import Logo from "../Logo";
 
 import styles from "./styles.module.css";
+import mv2Dashboard from "../../app-bridge/mv2-rn";
 
 type ModalPropsTypes = {
   children: React.ReactChild | null;
@@ -51,9 +52,14 @@ function Modal({
     }, 700);
   };
 
+  const modalStyleInModalState = !!mv2Dashboard.isModal ? { width: "100%", height: "100%"} : { };
+
   const modalContent = showModal ? (
     <div className={styles.styledModalOverlay}>
-      <div className={[styles.styledModal, closing ? styles.styleModalLeaveToTop : styles.styleModalComeInFromTop].join(" ")}>
+      <div 
+        className={[styles.styledModal, closing ? styles.styleModalLeaveToTop : styles.styleModalComeInFromTop].join(" ")}
+        style={modalStyleInModalState}
+      >
         <div className={styles.styledModalHeader}></div>
         {withLogo && <div className={styles.modalLogoContainer}><Logo /></div>}
         {title && <h2 className={styles.styledTitle}>{title}</h2>}

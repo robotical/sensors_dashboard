@@ -28,6 +28,7 @@ export class Marty2 extends EventDispatcher {
   public addons: ROSSerialAddOnStatus[] = [];
   public servos: ROSSerialSmartServos | null = null;
   public accel: ROSSerialIMU | null = null;
+  public isModal: boolean = false;
 
   commandPromise: {
     resolve: (value: unknown) => void;
@@ -53,7 +54,6 @@ export class Marty2 extends EventDispatcher {
       for (const addon of this.addons) {
         if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
         for (const valKey in addon.vals) {
-          // @ts-ignore
           const value = addon.vals[valKey];
           // if (typeof value === "number") {
             const nameOfAddonInput = valKey.replace(addon.name, "");
@@ -181,6 +181,10 @@ export class Marty2 extends EventDispatcher {
       // eslint-disable-next-line no-console
       console.log(`Error sending to react native: ${err}`);
     }
+  }
+
+  setIsModal(isModal: boolean) {
+    this.isModal = isModal;
   }
 
   /**
