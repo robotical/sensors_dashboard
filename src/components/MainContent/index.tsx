@@ -9,7 +9,11 @@ interface GraphObj {
   element: React.ReactNode;
 }
 
-export default function MainContent() {
+type Props = {
+  mainRef: React.RefObject<HTMLDivElement>;
+}
+
+export default function MainContent({ mainRef }: Props) {
   const [isConnected, setIsConnected] = useState(mv2Dashboard.isConnected);
   const [isConnecting, setIsConnecting] = useState(mv2Dashboard.isConnecting);
   const refresh = useState(0)[1];
@@ -25,6 +29,7 @@ export default function MainContent() {
       graphId: "GRAPH_ID",
       element: (
         <GraphArea
+          mainRef={mainRef}
           graphId={"GRAPH_ID"}
           removeGraph={removeGraph}
           key={"GRAPH_ID"}
@@ -75,6 +80,7 @@ export default function MainContent() {
       graphId: GRAPH_ID,
       element: (
         <GraphArea
+          mainRef={mainRef}
           graphId={GRAPH_ID}
           removeGraph={removeGraph}
           key={GRAPH_ID}

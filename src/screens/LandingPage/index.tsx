@@ -1,7 +1,7 @@
 import Header from "../../components/Header";
 import MainContent from "../../components/MainContent";
 import styles from "./styles.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ModalEventTopics,
   ModalStateData,
@@ -13,6 +13,8 @@ import Modal from "../../components/Modal";
 export default function LandingPage() {
   const [modalData, setModalData] = useState<null | ModalStateData>(null);
   const [shouldCloseModal, setShouldCloseModal] = useState(false);
+
+  const mainRef = useRef<HTMLDivElement>(null);
 
   const modalSubscriptionHelper = {
     notify(eventTopic: ModalEventTopics, eventData: ModalStateData) {
@@ -54,9 +56,9 @@ export default function LandingPage() {
         </Modal>
       }
       <main id="modal-main-container"></main>
-      <main className={styles.mainContainer}>
+      <main className={styles.mainContainer} ref={mainRef}>
         <Header />
-        <MainContent />
+        <MainContent mainRef={mainRef}/>
       </main>
     </>
   );

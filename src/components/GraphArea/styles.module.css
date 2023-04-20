@@ -24,7 +24,7 @@
     cursor: pointer;
 }
 
-@media (max-width: 500px) {
+@container (max-width: 500px) {
     .graphArea {
         grid-template-columns: 1fr;
     }

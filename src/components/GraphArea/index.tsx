@@ -19,6 +19,7 @@ import { FaTimes, FaFileCsv } from "react-icons/fa";
 interface GraphAreaProps {
   graphId: string;
   removeGraph: (graphId: string) => void;
+  mainRef: React.RefObject<HTMLDivElement>;
 }
 
 export interface TraceData {
@@ -33,7 +34,7 @@ export type GraphDataType = {
 
 type CsvData = (number | string)[][];
 
-export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
+export default function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
   const [refreshGraphArea, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
@@ -233,6 +234,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     <div className={styles.graphArea}>
       <AddonsList addons={addons} />
       <Graph
+        mainRef={mainRef}
         data={graphData.current}
         maxDataXValue={maxDataXValue.current}
         autoScrollEnabled={autoScrollEnabled}

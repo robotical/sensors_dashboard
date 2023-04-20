@@ -6,7 +6,7 @@
   align-items: center;
 }
 
-@media (max-width: 500px) {
+@container (max-width: 500px) {
   .container {
       grid-column: 1;
   }

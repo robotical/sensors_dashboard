@@ -1,18 +1,18 @@
 import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
 import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/trace-name";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Plot from "react-plotly.js";
-import { useMediaQuery } from 'react-responsive';
-import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE, WHITE } from "../../styles/colors";
+import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE } from "../../styles/colors";
 
 interface GraphProps {
   data: GraphDataType;
   maxDataXValue: number;
   autoScrollEnabled: boolean;
+  mainRef: React.RefObject<HTMLDivElement>;
 }
 
-export default function Graph({ data, maxDataXValue, autoScrollEnabled }: GraphProps) {
+export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef }: GraphProps) {
   const [plotLayout, setPlotLayout] = useState<Partial<Plotly.Layout>>({
     showlegend: true,
     xaxis: {
@@ -77,25 +77,30 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled }: GraphP
   }
   );
 
-  const hideControls = useMediaQuery({ query: '(max-width: 500px)' });
-  const shouldNotResize = useMediaQuery({ query: '(max-width: 500px)' });
-
   useEffect(() => {
-    const handleResize = () => {
-      if (shouldNotResize && !hideControls) return;
-      setPlotLayout((oldV) => {
-        return {
-          ...oldV,
-          width: window.innerWidth * (hideControls ? 1 : .66),
-        }
-      });
+    if (!mainRef.current) return;
+
+    const handleResize = (entries: any) => {
+
+      for (let entry of entries) {
+        const { width } = entry.contentRect;
+        const hideControls = width < 500;
+        setPlotLayout((oldV) => {
+          return {
+            ...oldV,
+            width: width * (hideControls ? 1 : 0.66),
+          };
+        });
+      }
     };
-    window.addEventListener("resize", handleResize);
+
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(mainRef.current);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
     };
-  }, [hideControls, shouldNotResize]);
+  }, [mainRef]);
 
   const traces: TraceData[] = [];
   for (const traceKey in data) {
