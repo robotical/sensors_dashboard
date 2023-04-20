@@ -50,19 +50,27 @@ export class Marty2 extends EventDispatcher {
       // rename dubplicated addons
       const addonsDupl: ROSSerialAddOnStatus[] = JSON.parse(addons).addons;
       checkForDoubleAddons(addonsDupl);
+      // if the number of the old addons is different from the new one, we dispatch
+      // an event to update the addons list in the GUI
+      if (this.addons.length !== addonsDupl.length) {
+        this.dispatchEvent({
+          type: "onAddonsChange",
+          addons: addonsDupl,
+        });
+      }
       this.addons = addonsDupl;
       for (const addon of this.addons) {
         if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
         for (const valKey in addon.vals) {
           const value = addon.vals[valKey];
           // if (typeof value === "number") {
-            const nameOfAddonInput = valKey.replace(addon.name, "");
-            this.dispatchEvent({
-              type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
-              value: value,
-              whoAmI: addon.whoAmI,
-              addonInput: nameOfAddonInput,
-            });
+          const nameOfAddonInput = valKey.replace(addon.name, "");
+          this.dispatchEvent({
+            type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
+            value: value,
+            whoAmI: addon.whoAmI,
+            addonInput: nameOfAddonInput,
+          });
           // }
         }
       }
@@ -150,7 +158,7 @@ export class Marty2 extends EventDispatcher {
       });
     }
   }
-  
+
   setIsConnecting(isConnecting: boolean) {
     if (isConnecting !== this.isConnecting) {
       this.isConnecting = isConnecting;
@@ -158,8 +166,8 @@ export class Marty2 extends EventDispatcher {
         type: "onIsConnectingChange",
         isConnected: this.isConnecting,
       });
+    }
   }
-}
 
   setIsConnected(isConnected: boolean) {
     if (isConnected !== this.isConnected) {

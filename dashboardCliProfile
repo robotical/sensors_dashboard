@@ -32,6 +32,6 @@ buildAllAndCpToPhoneApp () {
 }
 
 cpToPhoneApp () {
-    rm -rf $PhoneAppHome/assets/www/sensors-dashboard-build/*
-    cp -r $dashHome/build/* $PhoneAppHome/assets/www/sensors-dashboard-build
+    rm -rf $PhoneAppHome/assets/www/sensorsDashboard-build/*
+    cp -r $dashHome/build/* $PhoneAppHome/assets/www/sensorsDashboard-build
 }

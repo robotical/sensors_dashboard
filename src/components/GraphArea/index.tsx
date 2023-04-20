@@ -13,7 +13,7 @@ import Graph from "../Graph";
 import GraphControls from "../GraphControls";
 import styles from "./styles.module.css";
 import { CSVLink } from "react-csv";
-import {getCSVTitle, prepareCSVData, prepareTitles} from "../../utils/export-csv";
+import { getCSVTitle, prepareCSVData, prepareTitles } from "../../utils/export-csv";
 
 interface GraphAreaProps {
   graphId: string;
@@ -36,6 +36,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
   const [refreshGraphArea, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
+  const [refreshAddonsList, setRefreshAddonsList] = useState(0);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
   const [csvData, setCsvData] = useState<CsvData>([]);
   const graphData = useRef<GraphDataType>({});
@@ -50,6 +51,26 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
   const startDisplayingTime = useRef<number | null>(null);
 
   useEffect(() => {
+    mv2Dashboard.addEventListener(
+      "onAddonsChange",
+      "",
+      onAddonsChange
+    );
+    return () => {
+      mv2Dashboard.removeEventListener(
+        "onAddonsChange",
+        "",
+        onAddonsChange
+      );
+    };
+  }, []);
+
+  const onAddonsChange = () => {
+    setRefreshAddons((oldV) => oldV + 1);
+    setRefreshAddonsList((oldV) => oldV + 1);
+  };
+
+  useEffect(() => {
     const normalisedAddons = getAllAddonsList(
       mv2Dashboard.addons,
       mv2Dashboard.servos!,
@@ -57,7 +78,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     );
     addSelectedListener(normalisedAddons);
     setAddons(normalisedAddons);
-  }, []);
+  }, [refreshAddonsList]);
 
   useEffect(() => {
     removeAddonsListeners(addons);
@@ -98,13 +119,13 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       for (const addonInput of addon.addonInputs) {
         if (addonInput.selected) {
           mv2Dashboard.addEventListener(
-            `on${addon.whoAmI+"=>"+addonInput.name}Change`,
+            `on${addon.whoAmI + "=>" + addonInput.name}Change`,
             graphId,
             onAddonChange
           );
         } else {
           mv2Dashboard.removeEventListener(
-            `on${addon.whoAmI+"=>"+addonInput.name}Change`,
+            `on${addon.whoAmI + "=>" + addonInput.name}Change`,
             graphId,
             onAddonChange
           );
@@ -117,7 +138,7 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
     for (const addon of addns) {
       for (const addonInput of addon.addonInputs) {
         mv2Dashboard.removeEventListener(
-          `on${addon.whoAmI+"=>"+addonInput.name}Change`,
+          `on${addon.whoAmI + "=>" + addonInput.name}Change`,
           graphId,
           onAddonChange
         );
@@ -137,13 +158,13 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       return;
     }
 
-    if (!startDisplayingTime.current)  {
+    if (!startDisplayingTime.current) {
       startDisplayingTime.current = new Date().getTime();
     }
-    
+
     maxDataXValue.current = getMaxDataXValue(graphData.current);
-    const traceId:TraceIdType = `${evt.whoAmI}=>${evt.addonInput}`;
-    const newTimestamp =  (new Date().getTime() -startDisplayingTime.current) / 1000;
+    const traceId: TraceIdType = `${evt.whoAmI}=>${evt.addonInput}`;
+    const newTimestamp = (new Date().getTime() - startDisplayingTime.current) / 1000;
     if (graphData.current.hasOwnProperty(traceId)) {
       graphData.current[traceId].x.push(
         +newTimestamp.toFixed(2)
@@ -200,12 +221,12 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
 
   const exportCsvHandler = async () => {
     // transform graph data to csv data
-  const preparedCsvData = await prepareCSVData(graphData.current);
-  const titles = prepareTitles(graphData.current, "Time (s)");
+    const preparedCsvData = await prepareCSVData(graphData.current);
+    const titles = prepareTitles(graphData.current, "Time (s)");
 
-  setCsvData([titles, ...preparedCsvData]);
-  return true;
-}
+    setCsvData([titles, ...preparedCsvData]);
+    return true;
+  }
 
   return (
     <div className={styles.graphArea}>

@@ -14,7 +14,7 @@ export default class MockMarty {
     console.log("initialising mock Marty");
     setInterval(() => {
       this._updateSensors();
-    }, 300);
+    }, 1000);
 
     this.isConnecting = true;
     setTimeout(() => {
@@ -22,6 +22,9 @@ export default class MockMarty {
       this.isConnecting = false;
     }, 5000);
 
+    setTimeout(() => {
+      this.mv2.setAddons('{"addons": []}');
+    }, 7000);
 
   }
 
