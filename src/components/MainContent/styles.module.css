@@ -1,19 +1,25 @@
 .container {
     display: grid;
     justify-content: center;
-    margin-top: 2rem;
+    align-content: center;
+    position: absolute;
+    top: 20px;
+    right: 20px;  
+    width: 40px;
+    height: 40px;
 }
 
 .graphsArea {
     display: grid;
     grid-auto-rows: minmax(40vh, 40vh);
-
 }
 
 .addGraphBtn {
     display: inline-block;
     padding: 1rem 2rem;
-    background-color: lightgray;
+    background-color: var(--colour-primary);
+    border-radius: 50%;
+    color: white;
     cursor: pointer;
 }
 

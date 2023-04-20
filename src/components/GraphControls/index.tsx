@@ -1,11 +1,8 @@
 import styles from "./styles.module.css";
-import { ReactComponent as PlaySVG } from "../../assets/graph-controls/play.svg";
-import { ReactComponent as PauseSVG } from "../../assets/graph-controls/pause.svg";
-import { ReactComponent as StopSVG } from "../../assets/graph-controls/stop.svg";
-import { ReactComponent as RecordingSVG } from "../../assets/graph-controls/recording.svg";
 import { Checkbox } from "@mui/material";
 import Dropdown from "../Dropdown";
 import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-options";
+import { FaSort, FaPlay, FaPause, FaStop, FaDotCircle } from "react-icons/fa";
 
 interface GraphControlsProps {
   onClickPlay: () => void;
@@ -63,22 +60,23 @@ export default function GraphControls({
 
       <div className={styles.autoScrollContainer}>
         <p>Auto-scroll?</p>
+        <FaSort />
         <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
       </div>
 
       <div className={styles.playPauseContainer}>
         <div className={styles.graphControlsSVGContainer} onClick={onClickPlay}>
-          {isTracking ? <RecordingSVG /> : <PlaySVG />}
+          {isTracking ? <FaDotCircle /> : <FaPlay />}
         </div>
         <div
           className={styles.graphControlsSVGContainer}
           onClick={onClickPause}
         >
-          <PauseSVG />
+          <FaPause />
         </div>
 
         <div className={styles.graphControlsSVGContainer} onClick={onClickStop}>
-          <StopSVG />
+          <FaStop />
         </div>
       </div>
     </div>

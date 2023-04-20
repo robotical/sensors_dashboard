@@ -1,5 +1,12 @@
 .container {
-    grid-area: addons-list;
+    grid-row: 1;
+    grid-column: 1;
     overflow-y: scroll;
     justify-self: left;
+}
+
+@media (max-width: 500px) {
+    .container {
+        display: none;
+    }
 }

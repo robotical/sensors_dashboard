@@ -1,9 +1,17 @@
 .container {
-  grid-area: graph-controls;
+  grid-row: 2;
+  grid-column: 2;
   display: flex;
   justify-content: space-around;
   align-items: center;
 }
+
+@media (max-width: 500px) {
+  .container {
+      grid-column: 1;
+  }
+}
+
 .playPauseContainer {
   display: flex;
   column-gap: 1rem;

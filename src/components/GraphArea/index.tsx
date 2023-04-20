@@ -14,6 +14,7 @@ import GraphControls from "../GraphControls";
 import styles from "./styles.module.css";
 import { CSVLink } from "react-csv";
 import { getCSVTitle, prepareCSVData, prepareTitles } from "../../utils/export-csv";
+import { FaTimes, FaFileCsv } from "react-icons/fa";
 
 interface GraphAreaProps {
   graphId: string;
@@ -252,9 +253,9 @@ export default function GraphArea({ graphId, removeGraph }: GraphAreaProps) {
       />
       <div className={styles.rightPanel}>
         <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
-          X
+          <FaTimes />
         </div>
-        <CSVLink data={csvData} onClick={exportCsvHandler} filename={getCSVTitle(graphData.current)}>Export CSV</CSVLink>
+        <CSVLink data={csvData} onClick={exportCsvHandler} filename={getCSVTitle(graphData.current)}><FaFileCsv fill="black"/></CSVLink>
       </div>
     </div>
   );

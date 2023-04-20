@@ -1,7 +1,10 @@
 import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
-import Plot from "react-plotly.js";
 import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/trace-name";
+import { useEffect, useRef, useState } from "react";
+import Plot from "react-plotly.js";
+import { useMediaQuery } from 'react-responsive';
+import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE, WHITE } from "../../styles/colors";
 
 interface GraphProps {
   data: GraphDataType;
@@ -9,7 +12,91 @@ interface GraphProps {
   autoScrollEnabled: boolean;
 }
 
-export default function Graph({ data, maxDataXValue, autoScrollEnabled}: GraphProps) {
+export default function Graph({ data, maxDataXValue, autoScrollEnabled }: GraphProps) {
+  const [plotLayout, setPlotLayout] = useState<Partial<Plotly.Layout>>({
+    showlegend: true,
+    xaxis: {
+      linecolor: MAIN_BLUE,
+      linewidth: 2,
+      mirror: true,
+      zeroline: false,
+      showgrid: true,
+      gridcolor: AQUA_BLUE_025,
+      title: {
+        text: "Time (seconds)",
+        font: {
+          family: 'Arial, sans-serif',
+          size: 16,
+          color: MAIN_BLUE
+        }
+      },
+      tickfont: {
+        family: 'Arial, sans-serif',
+        size: 12,
+        color: MAIN_BLUE
+      },
+      range: (maxDataXValue > 50 && autoScrollEnabled) ? [maxDataXValue - 50, maxDataXValue] : [],
+    },
+    yaxis: {
+      linecolor: MAIN_BLUE,
+      linewidth: 2,
+      mirror: true,
+      zeroline: false,
+      showgrid: true,
+      gridcolor: AQUA_BLUE_025,
+      title: {
+        text: "Sensor value",
+        font: {
+          family: 'Arial, sans-serif',
+          size: 16,
+          color: MAIN_BLUE
+        }
+      },
+      tickfont: {
+        family: 'Arial, sans-serif',
+        size: 12,
+        color: MAIN_BLUE
+      }
+    },
+    margin: {
+      l: 60,
+      r: 40,
+      b: 60,
+      t: 40,
+      pad: 4,
+    },
+    plot_bgcolor: PALE_WHITE,
+    // paper_bgcolor: WHITE,
+    legend: {
+      font: {
+        family: 'Arial, sans-serif',
+        size: 12,
+        color: MAIN_BLUE
+      }
+    }
+  }
+  );
+
+  const hideControls = useMediaQuery({ query: '(max-width: 500px)' });
+  const shouldNotResize = useMediaQuery({ query: '(max-width: 500px)' });
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (shouldNotResize && !hideControls) return;
+      setPlotLayout((oldV) => {
+        return {
+          ...oldV,
+          width: window.innerWidth * (hideControls ? 1 : .66),
+        }
+      });
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [hideControls, shouldNotResize]);
+
   const traces: TraceData[] = [];
   for (const traceKey in data) {
     try {
@@ -25,42 +112,14 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled}: GraphPr
         }
       };
       traces.push(trace);
-    } catch (e) {}
+    } catch (e) { }
   }
   return (
     <Plot
-      style={{justifySelf: "center", maxWidth: "66vw"}}
+      className={styles.graph}
       key={new Date().getTime()}
       data={traces}
-      layout={{
-        showlegend: true,
-        xaxis: {
-          linecolor: "black",
-          linewidth: 2,
-          mirror: true,
-          zeroline: false,
-          showgrid: false,
-          title: "Time (seconds)",
-          range: (maxDataXValue > 50 && autoScrollEnabled) ? [maxDataXValue -50, maxDataXValue] : [],
-        },
-        yaxis: {
-          linecolor: "black",
-          linewidth: 2,
-          mirror: true,
-          zeroline: false,
-          showgrid: false,
-          title: "Sensor value"
-        },
-        margin: {
-          l: 50,
-          r: 50,
-          b: 50,
-          t: 50,
-          pad: 4,
-        },
-        // plot_bgcolor: "#444",
-        paper_bgcolor: "#eee",
-      }}
+      layout={plotLayout}
     />
   );
 }

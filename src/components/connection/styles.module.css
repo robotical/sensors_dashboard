@@ -2,6 +2,7 @@
     background-color: var(--colour-BLUE_LIGHT_3);
     border-radius: 5px;
     margin: 1rem;
+    min-width: 150px;
 }
 
 

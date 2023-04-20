@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import mv2Dashboard from "../../app-bridge/mv2-rn";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
+import { FaPlus, FaChartLine } from "react-icons/fa";
 
 interface GraphObj {
   graphId: string;
@@ -101,10 +102,9 @@ export default function MainContent() {
       </div>
         <div className={styles.container}>
           <div onClick={addGraphHandler} className={styles.addGraphBtn}>
-            Add Graph
+            <FaPlus /><FaChartLine />
           </div>
         </div>
-      )
     </>
   );
 }

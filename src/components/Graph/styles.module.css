@@ -1,0 +1,10 @@
+.graph {
+    grid-row: 1;
+    grid-column: 2;
+}
+
+@media (max-width: 500px) {
+    .graph {
+        grid-column: 1;
+    }
+}

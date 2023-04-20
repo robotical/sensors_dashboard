@@ -44,8 +44,7 @@ export default function LandingPage() {
   };
   return (
     <>
-      {!!modalData?.modalContent && (
-        <Modal
+      {!!modalData?.modalContent && <Modal
           title={modalData ? modalData.modalTitle : ""}
           modalResetter={resetModal}
           shouldCloseModal={shouldCloseModal}
@@ -53,7 +52,7 @@ export default function LandingPage() {
         >
           {modalData && modalData.modalContent && <modalData.modalContent />}
         </Modal>
-      )}
+      }
       <main id="modal-main-container"></main>
       <main className={styles.mainContainer}>
         <Header />
