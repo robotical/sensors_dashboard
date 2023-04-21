@@ -3,7 +3,7 @@ import { Checkbox } from "@mui/material";
 import Dropdown from "../Dropdown";
 import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-options";
 import { FaSort, FaPlay, FaPause, FaStop, FaDotCircle } from "react-icons/fa";
-import { Tooltip } from "react-tooltip";
+import { Tooltip as ReactTooltip } from "react-tooltip";
 
 interface GraphControlsProps {
   onClickPlay: () => void;
@@ -67,7 +67,7 @@ export default function GraphControls({
         <FaSort />
         <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
       </div>
-      <Tooltip id="auto-scroll-tooltip" />
+      <ReactTooltip id="auto-scroll-tooltip" />
 
       <div className={styles.playPauseContainer}>
         <div className={styles.graphControlsSVGContainer} onClick={onClickPlay}>
