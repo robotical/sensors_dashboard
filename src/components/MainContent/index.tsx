@@ -3,7 +3,7 @@ import mv2Dashboard from "../../app-bridge/mv2-rn";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
 import { FaPlus, FaChartLine } from "react-icons/fa";
-import { Tooltip as ReactTooltip } from 'react-tooltip'
+// import { Tooltip as ReactTooltip } from 'react-tooltip'
 
 interface GraphObj {
   graphId: string;
@@ -116,7 +116,7 @@ function MainContent({ mainRef }: Props) {
         >
           <FaPlus /><FaChartLine />
         </div>
-        <ReactTooltip id="add-new-graph-tootltip" />
+        {/* <ReactTooltip id="add-new-graph-tootltip" /> */}
       </div>
     </>
   );
