@@ -192,7 +192,13 @@ export class Marty2 extends EventDispatcher {
   }
 
   setIsModal(isModal: boolean) {
-    this.isModal = isModal;
+    if (isModal !== this.isModal) {
+      this.isModal = isModal;
+      this.dispatchEvent({
+        type: "onIsModalChange",
+        isModal: this.isModal,
+      });
+    }
   }
 
   /**
