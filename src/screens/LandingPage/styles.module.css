@@ -6,3 +6,16 @@
     overflow-y: scroll;
     container-type: inline-size; 
 }
+
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.mainContainer::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .mainContainer {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
