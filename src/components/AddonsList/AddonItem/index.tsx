@@ -47,7 +47,7 @@ export default function AddonItem({ addon, parentRef }: AddonItemProps) {
         </ListItemIcon> */}
         <ListItemText
           primary={addon.whoAmI}
-          primaryTypographyProps={{ fontSize: "16px" }}
+          primaryTypographyProps={{ fontSize: "16px", fontFamily: "Lato Regular" }}
         />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItemButton>

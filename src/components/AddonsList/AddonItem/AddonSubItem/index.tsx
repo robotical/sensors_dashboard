@@ -32,7 +32,7 @@ export default function AddonSubItem({addonSubItem}: AddonSubItemProps) {
               />
             </ListItemIcon>
             <ListItemText
-              primaryTypographyProps={{fontSize: '12px'}}
+              primaryTypographyProps={{fontSize: '12px', fontFamily: 'Lato Regular'}}
               id={labelId}
               primary={addonSubItem.name}
             />

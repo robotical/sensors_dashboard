@@ -4,8 +4,16 @@ import {
   ListSubheader,
   MenuItem,
   TextField,
+  ThemeProvider,
+  createTheme,
 } from "@mui/material";
 import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-options";
+
+const CustomFontTheme = createTheme({
+  typography: {
+    fontFamily: "Lato Regular"
+  }
+});
 
 interface DropdownProps {
   label: string;
@@ -53,27 +61,29 @@ export default function Dropdown({
     ]);
   }
 
-
   return (
-    <FormControl fullWidth>
-      {!selectedOption && (
-        <InputLabel id="demo-simple-select-label">{label}</InputLabel>
-      )}
-      <TextField
-        id="standard-select-currency"
-        select
-        label={label}
-        value={selectedOption}
-        onChange={(e) =>
-          onChange(
-            (e.target.value as unknown) as DropdownOptionsInterface,
-            rule
-          )
-        }
-        size="small"
-      >
-        {optionsJSX}
-      </TextField>
-    </FormControl>
+    <ThemeProvider theme={CustomFontTheme}>
+      <FormControl fullWidth>
+        {!selectedOption && (
+          <InputLabel id="demo-simple-select-label"
+          >{label}</InputLabel>
+        )}
+        <TextField
+          id="standard-select-currency"
+          select
+          label={label}
+          value={selectedOption}
+          onChange={(e) =>
+            onChange(
+              (e.target.value as unknown) as DropdownOptionsInterface,
+              rule
+            )
+          }
+          size="small"
+        >
+          {optionsJSX}
+        </TextField>
+      </FormControl>
+    </ThemeProvider>
   );
 }

@@ -15,6 +15,7 @@ import styles from "./styles.module.css";
 import { CSVLink } from "react-csv";
 import { getCSVTitle, prepareCSVData, prepareTitles } from "../../utils/export-csv";
 import { FaTimes, FaFileCsv } from "react-icons/fa";
+import { Tooltip } from 'react-tooltip';
 
 interface GraphAreaProps {
   graphId: string;
@@ -255,10 +256,20 @@ export default function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaPr
       />
       <div className={styles.rightPanel}>
         <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
-          <FaTimes />
+          <FaTimes
+            data-tooltip-id="close-graph-tooltip"
+            data-tooltip-content="Close graph"
+
+          />
         </div>
-        <CSVLink data={csvData} onClick={exportCsvHandler} filename={getCSVTitle(graphData.current)}><FaFileCsv fill="black"/></CSVLink>
+        <CSVLink
+          data-tooltip-id="export-csv-tooltip"
+          data-tooltip-content="Export data to CSV"
+          data={csvData} onClick={exportCsvHandler} filename={getCSVTitle(graphData.current)}><FaFileCsv fill="black" /></CSVLink>
       </div>
+      <Tooltip id="close-graph-tooltip" />
+      <Tooltip id="export-csv-tooltip" />
+
     </div>
   );
 }

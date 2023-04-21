@@ -3,6 +3,7 @@ import mv2Dashboard from "../../app-bridge/mv2-rn";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
 import { FaPlus, FaChartLine } from "react-icons/fa";
+import { Tooltip } from 'react-tooltip'
 
 interface GraphObj {
   graphId: string;
@@ -21,7 +22,7 @@ export default function MainContent({ mainRef }: Props) {
   const removeGraph = (graphId: string) => {
     const graphsUpdated = graphs.current.filter((graph) => graph.graphId !== graphId);
     graphs.current = graphsUpdated;
-    refresh(old => old+1);
+    refresh(old => old + 1);
   };
 
   const graphs = useRef<GraphObj[]>([
@@ -88,7 +89,7 @@ export default function MainContent({ mainRef }: Props) {
       ),
     });
     graphs.current = graphsUpdated;
-    refresh(old => old+1);
+    refresh(old => old + 1);
   };
 
   if (!isConnected || isConnecting) {
@@ -106,11 +107,17 @@ export default function MainContent({ mainRef }: Props) {
           return graphArea.element;
         })}
       </div>
-        <div className={styles.container}>
-          <div onClick={addGraphHandler} className={styles.addGraphBtn}>
-            <FaPlus /><FaChartLine />
-          </div>
+      <div className={styles.container}>
+        <div
+          onClick={addGraphHandler}
+          className={styles.addGraphBtn}
+          data-tooltip-id="add-new-graph-tootltip"
+          data-tooltip-content="Add new graph"
+        >
+          <FaPlus /><FaChartLine />
         </div>
+        <Tooltip id="add-new-graph-tootltip" />
+      </div>
     </>
   );
 }

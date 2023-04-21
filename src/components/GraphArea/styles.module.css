@@ -11,6 +11,8 @@
 }
 
 .rightPanel {
+    height: fit-content;
+    width: fit-content;
     grid-row: 1;
     grid-column: 2;
     display: flex;

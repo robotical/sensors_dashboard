@@ -1,13 +1,14 @@
 .howToUseModalContainer {
     max-width: 90vw;
     display: grid;
-    row-gap: 1rem;
+    /* row-gap: 1rem; */
 }
 
 .howToUseModalTextTitle {
+    margin-top: 1.5rem;
     font-size: 2rem;
     font-weight: bolder;
-    font-family: 'Lato Bold';
+    font-family: 'BigNoodleTitling Regular';
 }
 
 .howToUseModalImg {
@@ -22,4 +23,10 @@
 .closeButton {
     justify-self: center;
     padding: 0.5rem 1rem;
+    background-color: var(--colour-primary);
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    outline: none;
+    border: none;
 }

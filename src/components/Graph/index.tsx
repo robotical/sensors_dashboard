@@ -25,13 +25,13 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
       title: {
         text: "Time (seconds)",
         font: {
-          family: 'Arial, sans-serif',
+          family: 'Lato Regular',
           size: 16,
           color: MAIN_BLUE
         }
       },
       tickfont: {
-        family: 'Arial, sans-serif',
+        family: 'Lato Regular',
         size: 12,
         color: MAIN_BLUE
       },
@@ -47,13 +47,13 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
       title: {
         text: "Sensor value",
         font: {
-          family: 'Arial, sans-serif',
+          family: 'Lato Regular',
           size: 16,
           color: MAIN_BLUE
         }
       },
       tickfont: {
-        family: 'Arial, sans-serif',
+        family: 'Lato Regular',
         size: 12,
         color: MAIN_BLUE
       }
@@ -69,7 +69,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
     // paper_bgcolor: WHITE,
     legend: {
       font: {
-        family: 'Arial, sans-serif',
+        family: 'Lato Regular',
         size: 12,
         color: MAIN_BLUE
       }

@@ -1,8 +1,9 @@
-import marty2Instance, {Marty2} from "./app-bridge/mv2-rn";
+import marty2Instance, { Marty2 } from "./app-bridge/mv2-rn";
 import LandingPage from "./screens/LandingPage";
 import "./styles/typography.css";
 import './index.css';
 import MockMarty from "./utils/mock-marty";
+import 'react-tooltip/dist/react-tooltip.css'
 
 // extending the existing window interface to tell it about our new property mv2
 declare global {
@@ -10,7 +11,7 @@ declare global {
 }
 
 window.mv2Dashboard = marty2Instance;
-// new MockMarty(marty2Instance).init();
+new MockMarty(marty2Instance).init();
 function App() {
   return (
     <LandingPage />
