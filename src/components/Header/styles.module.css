@@ -8,8 +8,9 @@
 .title {
   position: absolute;
   top: 4rem;
-  left: 0;
-  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
   font-size: 4rem;
   text-align: center;
   font-family: "BigNoodleTitling Regular";

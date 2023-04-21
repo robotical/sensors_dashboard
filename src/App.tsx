@@ -11,7 +11,7 @@ declare global {
 }
 
 window.mv2Dashboard = marty2Instance;
-new MockMarty(marty2Instance).init();
+// new MockMarty(marty2Instance).init();
 function App() {
   return (
     <LandingPage />

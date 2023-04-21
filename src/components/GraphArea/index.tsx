@@ -269,7 +269,6 @@ export default function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaPr
       </div>
       <Tooltip id="close-graph-tooltip" />
       <Tooltip id="export-csv-tooltip" />
-
     </div>
   );
 }

@@ -1,12 +1,18 @@
 .container {
-    grid-row: 1;
-    grid-column: 1;
-    overflow-y: scroll;
-    justify-self: left;
+  grid-row: 1;
+  grid-column: 1;
+  overflow-y: scroll;
+  justify-self: left;
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+.container::-webkit-scrollbar {
+  display: none; /* For Chrome, Safari, and Opera */
 }
 
 @container (max-width: 500px) {
-    .container {
-        display: none;
-    }
+  .container {
+    display: none;
+  }
 }
