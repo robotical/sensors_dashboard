@@ -16,12 +16,22 @@
 
 .addGraphBtn {
     display: inline-block;
+    display: grid;
+    align-items: center;
+    justify-items: center;
     padding: 1rem 2rem;
     background-color: var(--colour-primary);
     border-radius: 50%;
     color: white;
     cursor: pointer;
 }
+@container (max-width: 500px) {
+    .addGraphBtn {
+      width: 30px;
+      height: 30px;
+    }
+  }
+  
 
 .martyConnectedFallback {
     text-align: center;

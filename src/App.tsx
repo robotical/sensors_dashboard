@@ -3,7 +3,6 @@ import LandingPage from "./screens/LandingPage";
 import "./styles/typography.css";
 import './index.css';
 import MockMarty from "./utils/mock-marty";
-import 'react-tooltip/dist/react-tooltip.css'
 
 // extending the existing window interface to tell it about our new property mv2
 declare global {
