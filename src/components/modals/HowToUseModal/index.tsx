@@ -12,8 +12,7 @@ export default function HowToUseModal() {
       </p>
 
       <p className={styles.howToUseModalTextParagraph}>
-        Upon connecting to your Marty, you'll see an empty graph appear. On the left side, there's a list of sensors. Each sensor can be expanded to reveal its input streams. For instance, the color sensor has four input streams: Red, Green, Blue, and Clear.
-      </p>
+      Upon connecting to your Marty, you'll see an empty graph appear. On the left side, there's a list of sensors. Each sensor can be expanded to reveal its input streams. For instance, the color sensor has four input streams: Red, Green, Blue, and Clear. To add another graph, you will need to click on the button in the top right corner of the screen. This will create a new, empty graph for you to customize and configure with the input streams from the available sensors.      </p>
 
       <p className={styles.howToUseModalTextTitle}>Recording Data</p>
       <p className={styles.howToUseModalTextParagraph}>
