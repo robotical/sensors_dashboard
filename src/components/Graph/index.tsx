@@ -1,7 +1,7 @@
 import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
 import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/trace-name";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Plot from "react-plotly.js";
 import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE } from "../../styles/colors";
 
@@ -11,9 +11,13 @@ interface GraphProps {
   autoScrollEnabled: boolean;
   mainRef: React.RefObject<HTMLDivElement>;
 }
-
+const SCROLL_THRESHOLD = 5;
 export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef }: GraphProps) {
-  const [plotLayout, setPlotLayout] = useState<Partial<Plotly.Layout>>({
+  const [plotWidth, setPlotWidth] = useState<number | undefined>(undefined);
+  
+  const shouldScroll = useMemo(() => maxDataXValue > SCROLL_THRESHOLD && autoScrollEnabled, [maxDataXValue, autoScrollEnabled]);
+
+  const plotLayout = useMemo(() => ({
     showlegend: true,
     xaxis: {
       linecolor: MAIN_BLUE,
@@ -35,7 +39,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
         size: 12,
         color: MAIN_BLUE
       },
-      range: (maxDataXValue > 50 && autoScrollEnabled) ? [maxDataXValue - 50, maxDataXValue] : [],
+      range: shouldScroll ? [maxDataXValue - SCROLL_THRESHOLD, maxDataXValue] : undefined,
     },
     yaxis: {
       linecolor: MAIN_BLUE,
@@ -73,24 +77,18 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
         size: 12,
         color: MAIN_BLUE
       }
-    }
-  }
-  );
+    },
+    width: plotWidth
+  }), [maxDataXValue, autoScrollEnabled, plotWidth]);
 
   useEffect(() => {
     if (!mainRef.current) return;
 
     const handleResize = (entries: any) => {
-
       for (let entry of entries) {
         const { width } = entry.contentRect;
         const hideControls = width < 500;
-        setPlotLayout((oldV) => {
-          return {
-            ...oldV,
-            width: width * (hideControls ? 1 : 0.66),
-          };
-        });
+        setPlotWidth(width * (hideControls ? 1 : 0.66));
       }
     };
 
@@ -119,6 +117,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
       traces.push(trace);
     } catch (e) { }
   }
+
   return (
     <Plot
       className={styles.graph}
