@@ -1,0 +1,23 @@
+.howToUseModalContainer {
+    max-width: 90vw;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    /* row-gap: 1rem; */
+}
+
+.howToUseModalTextTitle {
+    margin-top: 1.5rem;
+    font-size: 2rem;
+    font-weight: bolder;
+    font-family: 'BigNoodleTitling Regular';
+}
+
+.howToUseModalImg {
+    max-width: 100%;
+    justify-self: center;
+}
+
+.howToUseModalTextParagraph {
+    line-height: 1.5;
+}

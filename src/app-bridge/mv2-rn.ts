@@ -5,6 +5,7 @@ import {
 } from "@robotical/ricjs";
 import EXCLUDED_ADDONS from "../utils/constants/excluded-addons";
 import SERVO_NAMES_MAP from "../utils/constants/servo-names";
+import addonNamesMap from "../utils/constants/addons-names";
 import {
   ACCELEROMETER_NAME,
   ACCELEROMETER_NAME_Y,
@@ -14,6 +15,7 @@ import {
   MOTOR_POSITION_NAME,
 } from "../utils/types/addon-names";
 import EventDispatcher from "./EventDispatcher";
+import renameValueLabel from "../utils/rename-value-label";
 
 /* 
 We initialise this class in app.tsx, and making it globally 
@@ -49,6 +51,7 @@ export class Marty2 extends EventDispatcher {
     try {
       // rename dubplicated addons
       const addonsDupl: ROSSerialAddOnStatus[] = JSON.parse(addons).addons;
+      
       checkForDoubleAddons(addonsDupl);
       // if the number of the old addons is different from the new one, we dispatch
       // an event to update the addons list in the GUI
@@ -64,7 +67,8 @@ export class Marty2 extends EventDispatcher {
         for (const valKey in addon.vals) {
           const value = addon.vals[valKey];
           // if (typeof value === "number") {
-          const nameOfAddonInput = valKey.replace(addon.name, "");
+          const nameOfAddonInput = renameValueLabel(valKey, addon.name);
+          
           this.dispatchEvent({
             type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
             value: value,

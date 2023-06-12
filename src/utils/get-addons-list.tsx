@@ -15,6 +15,7 @@ import {
 } from "./types/addon-names";
 import EXCLUDED_ADDONS from "./constants/excluded-addons";
 import SERVO_NAMES_MAP from "./constants/servo-names";
+import renameValueLabel from "./rename-value-label";
 
 function getAddonsList(addons: ROSSerialAddOnStatus[]) {
   const addonsNormalised = [];
@@ -25,7 +26,7 @@ function getAddonsList(addons: ROSSerialAddOnStatus[]) {
       // @ts-ignore
       const value = addon.vals[valKey];
       // if (typeof value === "number") {
-        const addonInputName = valKey.replace(addon.name, "");
+        const addonInputName = renameValueLabel(valKey, addon.name);
         subAddons.push(new AddonSub(addonInputName, value));
       // }
     }

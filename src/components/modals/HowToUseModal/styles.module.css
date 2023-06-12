@@ -1,32 +1,62 @@
 .howToUseModalContainer {
-    max-width: 90vw;
-    display: grid;
-    /* row-gap: 1rem; */
+  width: 90vw;
+  display: grid;
+  row-gap: 1rem;
+}
+.tabWindow {
+  width: 400px;
+  height: 300px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  box-sizing: border-box;
+  background-color: #fff;
 }
 
-.howToUseModalTextTitle {
-    margin-top: 1.5rem;
-    font-size: 2rem;
-    font-weight: bolder;
-    font-family: 'BigNoodleTitling Regular';
+.tabs {
+  display: flex;
+  justify-content: start;
+  border-bottom: 1px solid #ddd;
 }
 
-.howToUseModalImg {
-    max-width: 100%;
-    justify-self: center;
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 5px;
+  outline: none;
 }
 
-.howToUseModalTextParagraph {
-    line-height: 1.5;
+button:hover {
+  background-color: #f1f1f1;
+}
+
+button:active {
+  background-color: #ddd;
+}
+
+.activeTab {
+  border-top: 2px solid #4d90fe;
+  border-bottom: 2px solid white;
+  margin-bottom: -1px;
+}
+
+.tabContent {
+  height: calc(100% - 60px);
+  padding: 10px;
+  box-sizing: border-box;
+  height: 50vh;
+  overflow: scroll;
 }
 
 .closeButton {
-    justify-self: center;
-    padding: 0.5rem 1rem;
-    background-color: var(--colour-primary);
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-    outline: none;
-    border: none;
+  justify-self: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--colour-primary);
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  outline: none;
+  border: none;
 }
