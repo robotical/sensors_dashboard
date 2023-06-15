@@ -9,29 +9,30 @@ export default function Terminology() {
       <p className={styles.howToUseModalTextTitle}>
         Obstacle (IR Foot) Sensor
       </p>
-      <p className={styles.terminologyKey}><b>Obstacle Sensor </b> the analogue value of the obstacle sense IR receiver with its IR emitter turned on. It is calculated as ir_led - ir_ambient - ir_bleed</p>
-      <p className={styles.terminologyKey}><b>Obstacle Detected? </b> a thresholded version of “Touch_IR” which gives a binary determination of whether an obstacle is present or not</p>
-      <p className={styles.terminologyKey}><b>Ambient IR - Front </b> the analogue value of the obstacle sense IR receiver with its IR emitter turned off</p>
-      <p className={styles.terminologyKey}><b>Ground Sensor </b> the analogue value of the ground sense IR receiver with its IR emitter turned on. It is calculated as ir_led - ir_ambient - ir_bleed</p>
-      <p className={styles.terminologyKey}><b>Foot In Air? </b> a thresholded and flipped version of “Air_IR, which gives a binary determination of whether the foot is in the air</p>
-      <p className={styles.terminologyKey}><b>Ambient IR - Bottom </b> the analogue value of the ground sense IR receiver with its IR emitter turned off</p>
+      <p className={styles.terminologyKey}><b>Obstacle Sensor </b> The intensity of IR light reflected back to the sensor from an obstacle</p>
+      <p className={styles.terminologyKey}><b>Obstacle Detected? </b> The sensor’s best guess as to whether an obstacle is present. 1 = obstacle, 0 = no obstacle</p>
+      <p className={styles.terminologyKey}><b>Ambient IR - Front </b> The intensity of IR light received by the obstacle sensor from elsewhere - this will be higher in sunlight!</p>
+      <p className={styles.terminologyKey}><b>Ground Sensor </b> The intensity of IR light reflected back to the ground sensor from a surface. Will be higher on bright, reflective surfaces</p>
+      <p className={styles.terminologyKey}><b>Foot In Air? </b> The sensor’s best guess as to whether the foot is in the air. 1 = foot in air, 0 = foot on ground</p>
+      <p className={styles.terminologyKey}><b>Ambient IR - Bottom </b> The intensity of IR light received by the ground sensor from elsewhere</p>
+      
       <p className={styles.howToUseModalTextTitle}>
         Colour Sensor
       </p>
-      <p className={styles.terminologyKey}><b>Brightness </b> the [calibrated] reading from the clear channel</p>
-      <p className={styles.terminologyKey}><b>Red Channel </b> the [calibrated] reading from the red channel</p>
-      <p className={styles.terminologyKey}><b>Green Channel </b> the [calibrated] reading from the green channel</p>
-      <p className={styles.terminologyKey}><b>Blue Channel </b> the [calibrated] reading from the blue channel</p>
-      <p className={styles.terminologyKey}><b>Obstacle Sensor </b> the analogue value of the obstacle sense IR receiver with its IR emitter turned on. It is calculated as ir_led - ir_ambient - ir_bleed</p>
-      <p className={styles.terminologyKey}><b>Obstacle Detected? </b> a thresholded version of “Touch_IR” which gives a binary determination of whether an obstacle is present or not</p>
-      <p className={styles.terminologyKey}><b>Foot In Air? </b> a thresholded and flipped version of “Air_IR, which gives a binary determination of whether the foot is in the air</p>
+      <p className={styles.terminologyKey}><b>Brightness </b> How much light is received by the sensor under the foot</p>
+      <p className={styles.terminologyKey}><b>Red Channel </b> How much red light is received by the sensor under the foot</p>
+      <p className={styles.terminologyKey}><b>Green Channel </b> How much green light is received by the sensor under the foot</p>
+      <p className={styles.terminologyKey}><b>Blue Channel </b> How much blue light is received by the sensor under the foot</p>
+      <p className={styles.terminologyKey}><b>Obstacle Sensor </b> The intensity of IR light reflected back to the sensor from an obstacle</p>
+      <p className={styles.terminologyKey}><b>Obstacle Detected? </b> The sensor’s best guess as to whether an obstacle is present. 1 = obstacle, 0 = no obstacle</p>
+      <p className={styles.terminologyKey}><b>Foot In Air? </b> The sensor’s best guess as to whether the foot is in the air. 1 = foot in air, 0 = foot on ground</p>
 
       <p className={styles.howToUseModalTextTitle}>
         Noise Sensor
       </p>
-      <p className={styles.terminologyKey}><b>Recent Noise Level </b> a moving-average low-pass filtered value of the noise intensity</p>
-      <p className={styles.terminologyKey}><b>Noise level </b> the highest recorded value of the “smoothed” sensor since the last reported reading</p>
-      <p className={styles.terminologyKey}><b>Instant Noise Level </b> the unfiltered, instantaneous reading</p>
+      <p className={styles.terminologyKey}><b>Recent Noise Level </b> The average noise level over the last fraction of a second</p>
+      <p className={styles.terminologyKey}><b>Noise level </b> The average noise level over the last 100ms</p>
+      <p className={styles.terminologyKey}><b>Instant Noise Level </b> The noise level this instant - will give higher values than the other options, but is also likely to miss some noises!</p>
       <p className={styles.howToUseModalTextTitle}>
         Light Sensor
       </p>

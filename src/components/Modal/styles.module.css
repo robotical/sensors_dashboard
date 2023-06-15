@@ -40,8 +40,11 @@
   background: var(--colour-GREY_2);
   border-radius: 15px;
   padding: 15px;
-  max-height: 90vh;
   overflow-y: scroll;
+  width: 90%;
+  height: 90%;
+  max-width: 1200px;
+  max-height: 1200px;
 }
 
 .styleModalComeInFromTop {

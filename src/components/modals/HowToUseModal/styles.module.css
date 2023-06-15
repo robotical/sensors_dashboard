@@ -1,5 +1,4 @@
 .howToUseModalContainer {
-  width: 90vw;
   display: grid;
   row-gap: 1rem;
 }
