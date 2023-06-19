@@ -4,7 +4,7 @@ export default function Terminology() {
   return (
     <div className={styles.howToUseModalContainer}>
       <p className={styles.howToUseModalTextParagraph}>
-        This section briefly details the definitions of the sensors and their properties. For a more detailed description of the sensors, please refer to the <a href="https://userguides.robotical.io/martyv2/userguides/sensorsandaddons" target="_blank" rel="noreferrer">sensor user guide</a>.
+        This section briefly details the definitions of the sensors and their properties. For a more detailed description of the sensors, please refer to the <a href="https://userguides.robotical.io/martyv2/userguides/sensors-dashboard" target="_blank" rel="noreferrer">sensor dashboard user guide</a>.
       </p>
       <p className={styles.howToUseModalTextTitle}>
         Obstacle (IR Foot) Sensor
