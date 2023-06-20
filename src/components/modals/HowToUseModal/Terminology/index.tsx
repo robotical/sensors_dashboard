@@ -17,7 +17,7 @@ export default function Terminology() {
       <p className={styles.terminologyKey}><b>Ambient IR - Bottom </b> The intensity of IR light received by the ground sensor from elsewhere</p>
       
       <p className={styles.howToUseModalTextTitle}>
-        Colour Sensor
+        Color Sensor
       </p>
       <p className={styles.terminologyKey}><b>Brightness </b> How much light is received by the sensor under the foot</p>
       <p className={styles.terminologyKey}><b>Red Channel </b> How much red light is received by the sensor under the foot</p>
