@@ -29,6 +29,7 @@ jobs:
       - name: Build phone app and inline index.html
         run: |
           CI=false npm run build
+          node move-script-tag.js
           script --return --quiet --command "npx inliner build/index.html > index-inline.html"
       
 

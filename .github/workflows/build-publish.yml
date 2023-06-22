@@ -28,12 +28,24 @@ jobs:
       - name: build web app
         run: npm run build:webapp
       
-      - name: build phone app
+      - name: Build phone app
         run: CI=false npm run build
 
-      - name: detele me
-        run: ls .
-        
+      - name: move script tag before body
+        run: node move-script-tag.js
+
+      - name: inline index.html
+        run: script --return --quiet --command "npx inliner build/index.html > index-inline.html"
+      
+      - name: remove build folder
+        run: rm -rf build
+      
+      - name: create build folder
+        run: mkdir build
+
+      - name: copy index-inline.html to build/index.html
+        run: cp index-inline.html build/index.html
+
       - name: publishing to NPM
         run: npm publish
         env:
