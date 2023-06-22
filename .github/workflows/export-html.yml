@@ -29,6 +29,9 @@ jobs:
       - name: build phone app
         run: CI=false npm run build
 
+      - name: delete me
+        run: ls -la . && ls -la build
+
       - name: inline index.html
         run: inliner build/index.html > index-inline.html
 
