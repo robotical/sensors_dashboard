@@ -27,13 +27,13 @@ jobs:
         run: npm install inliner
       
       - name: build phone app
-        run: CI=false npm run build
+        run: CI=false npm run build && ls -la . && ls -la build && cat build/index.html && npx inliner -v build/index.html > index-inline.html
 
       - name: delete me
         run: ls -la . && ls -la build && cat build/index.html
 
-      - name: inline index.html
-        run: npx inliner -v build/index.html > index-inline.html
+      # - name: inline index.html
+      #   run: npx inliner -v build/index.html > index-inline.html
 
       - name: upload index.html
         uses: actions/upload-artifact@v2
