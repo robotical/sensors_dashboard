@@ -27,8 +27,10 @@ jobs:
         run: npm install inliner
       
       - name: build phone app
-        run: CI=false npm run build && ls -la . && ls -la build && cat build/index.html && npx inliner -v build/index.html > index-inline.html
-
+        run: |
+          CI=false npm run build
+          npx inliner -v build/index.html
+          
       - name: delete me
         run: ls -la . && ls -la build && cat build/index.html
 
