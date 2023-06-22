@@ -26,10 +26,11 @@ jobs:
       - name: install inliner
         run: npm install inliner -g
       
-      - name: build phone app
+      - name: Build phone app and inline index.html
         run: |
           CI=false npm run build
-          nohup script --quiet --return --comand 'inliner build/index.html' /dev/null > index-inline.html
+          script --return --quiet --command "npx inliner build/index.html > index-inline.html"
+      
 
       - name: delete me
         run: ls -la . && ls -la build && cat build/index.html && cat index-inline.html
