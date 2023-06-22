@@ -1,0 +1,41 @@
+name: 'Generate index.html'
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-publish:
+    environment: NPM_TOKEN_NIK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checking repository out
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.ref }}
+          path: .
+
+      - name: Use Node.js '16.x'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: installing npm dependencies
+        run: npm install
+      
+      - name: install inliner
+        run: npm install -g inliner
+      
+      - name: build phone app
+        run: CI=false npm run build
+
+      - name: inline index.html
+        run: inliner build/index.html > index-inline.html
+
+      - name: upload index.html
+        uses: actions/upload-artifact@v2
+        with:
+          name: index.html
+          path: index-inline.html
