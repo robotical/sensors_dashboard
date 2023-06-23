@@ -16,6 +16,7 @@ import {
 } from "../utils/types/addon-names";
 import EventDispatcher from "./EventDispatcher";
 import renameValueLabel from "../utils/rename-value-label";
+import whoAmINameMap from "../utils/constants/whoAmI-names";
 
 /* 
 We initialise this class in app.tsx, and making it globally 
@@ -63,16 +64,16 @@ export class Marty2 extends EventDispatcher {
       }
       this.addons = addonsDupl;
       for (const addon of this.addons) {
-        if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
+        const whoAmI = whoAmINameMap(addon.whoAmI);
+        if (EXCLUDED_ADDONS.includes(whoAmI)) continue;
         for (const valKey in addon.vals) {
           const value = addon.vals[valKey];
           // if (typeof value === "number") {
           const nameOfAddonInput = renameValueLabel(valKey, addon.name);
-          
           this.dispatchEvent({
-            type: `on${addon.whoAmI}=>${nameOfAddonInput}Change`,
+            type: `on${whoAmI}=>${nameOfAddonInput}Change`,
             value: value,
-            whoAmI: addon.whoAmI,
+            whoAmI: whoAmI,
             addonInput: nameOfAddonInput,
           });
           // }
@@ -235,11 +236,12 @@ const checkForDoubleAddons = (addons: ROSSerialAddOnStatus[]) => {
    */
   const addonsMap: { [key: string]: ROSSerialAddOnStatus[] } = {};
   for (const addon of addons) {
-    if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
-    if (!addonsMap.hasOwnProperty(addon.whoAmI)) {
-      addonsMap[addon.whoAmI] = [];
+    const whoAmIMapped = whoAmINameMap(addon.whoAmI);
+    if (EXCLUDED_ADDONS.includes(whoAmIMapped)) continue;
+    if (!addonsMap.hasOwnProperty(whoAmIMapped)) {
+      addonsMap[whoAmIMapped] = [];
     }
-    addonsMap[addon.whoAmI].push(addon);
+    addonsMap[whoAmIMapped].push(addon);
   }
 
   for (const addonWhoAmIKey in addonsMap) {

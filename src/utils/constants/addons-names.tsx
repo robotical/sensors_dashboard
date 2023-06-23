@@ -6,6 +6,7 @@ const MAP = {
     "Air_IR": "Ground Sensor",
     "Air": "Foot In Air?",
     "Air Ambient": "Ambient IR - Bottom",
+    "Air_Ambient": "Ambient IR - Bottom",
 
     "Clear": "Brightness",
     "Red": "Red Channel",

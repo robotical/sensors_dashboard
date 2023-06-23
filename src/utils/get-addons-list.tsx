@@ -16,11 +16,13 @@ import {
 import EXCLUDED_ADDONS from "./constants/excluded-addons";
 import SERVO_NAMES_MAP from "./constants/servo-names";
 import renameValueLabel from "./rename-value-label";
+import whoAmINameMap from "./constants/whoAmI-names";
 
 function getAddonsList(addons: ROSSerialAddOnStatus[]) {
   const addonsNormalised = [];
   for (const addon of addons) {
-    if (EXCLUDED_ADDONS.includes(addon.whoAmI)) continue;
+    const whoAmI = whoAmINameMap(addon.whoAmI);
+    if (EXCLUDED_ADDONS.includes(whoAmI)) continue;
     const subAddons = [];
     for (const valKey in addon.vals) {
       // @ts-ignore
@@ -30,7 +32,7 @@ function getAddonsList(addons: ROSSerialAddOnStatus[]) {
         subAddons.push(new AddonSub(addonInputName, value));
       // }
     }
-    addonsNormalised.push(new Addon(addon.whoAmI, subAddons));
+    addonsNormalised.push(new Addon(whoAmI, subAddons));
   }
   return addonsNormalised;
 }
