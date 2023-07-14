@@ -11,13 +11,13 @@ export default function HowToUseModal() {
     <div className={styles.howToUseModalContainer}>
         <div className={styles.tabs}>
           <button
-            className={activeTab === "general-info" ? styles.activeTab : ''}
+            className={`${styles.button} ${activeTab === "general-info" ? styles.activeTab : ''}`}
             onClick={() => setActiveTab("general-info")}
           >
             General Info
           </button>
           <button
-            className={activeTab === "terminology" ? styles.activeTab : ''}
+            className={`${styles.button} ${activeTab === "terminology" ? styles.activeTab : ''}`}
             onClick={() => setActiveTab("terminology")}
           >
             Terminology
@@ -27,7 +27,7 @@ export default function HowToUseModal() {
           {activeTab === "general-info" && <GeneralInfo />}
           {activeTab === "terminology" && <Terminology />}
         </div>
-      <button className={styles.closeButton} onClick={() => modalState.closeModal()}> Close </button>
+      <button className={` ${styles.closeButton}`} onClick={() => modalState.closeModal()}> Close </button>
     </div>
   );
 }
