@@ -11,7 +11,7 @@
 
 .graphsArea {
     display: grid;
-    grid-auto-rows: minmax(40vh, 40vh);
+    grid-auto-rows: minmax(310px, 310px);
 }
 
 .addGraphBtn {
