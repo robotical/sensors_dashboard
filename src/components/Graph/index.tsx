@@ -14,7 +14,7 @@ interface GraphProps {
 const SCROLL_THRESHOLD = 5;
 export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef }: GraphProps) {
   const [plotWidth, setPlotWidth] = useState<number | undefined>(undefined);
-  
+
   const shouldScroll = useMemo(() => maxDataXValue > SCROLL_THRESHOLD && autoScrollEnabled, [maxDataXValue, autoScrollEnabled]);
 
   const plotLayout = useMemo(() => ({
@@ -40,6 +40,28 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
         color: MAIN_BLUE
       },
       range: shouldScroll ? [maxDataXValue - SCROLL_THRESHOLD, maxDataXValue] : undefined,
+    },
+    yaxis2: {
+      linecolor: MAIN_BLUE,
+      linewidth: 2,
+      mirror: true,
+      zeroline: false,
+      showgrid: true,
+      gridcolor: AQUA_BLUE_025,
+      title: {
+        text: "",
+        font: {
+          family: 'Lato Regular',
+          size: 16,
+          color: MAIN_BLUE
+        }
+      },
+      tickfont: {
+        family: 'Lato Regular',
+        size: 12,
+        color: MAIN_BLUE
+      },
+      side: 'right',
     },
     yaxis: {
       linecolor: MAIN_BLUE,
@@ -76,7 +98,8 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
         family: 'Lato Regular',
         size: 12,
         color: MAIN_BLUE
-      }
+      },
+      x: 1.09,
     },
     width: plotWidth
   }), [maxDataXValue, autoScrollEnabled, plotWidth]);
@@ -100,13 +123,16 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
     };
   }, [mainRef]);
 
+
   const traces: TraceData[] = [];
   for (const traceKey in data) {
     try {
       const traceName = motorPosDifferentiation(traceKey);
+      const y0ORy2 = traceName.includes("?") ? "y2" : "y";
       const trace = {
         x: data[traceKey as TraceIdType].x,
-        y: data[traceKey as TraceIdType].y,
+        y: traceName.includes("?") ? data[traceKey as TraceIdType].y : data[traceKey as TraceIdType].y.map((y: number) => Math.round(y * 100) / 100),
+        yaxis: y0ORy2,
         type: "scatter",
         mode: "lines",
         name: traceName,
@@ -114,6 +140,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
           color: rgbColorTraceName(traceName)
         }
       };
+      // @ts-ignore
       traces.push(trace);
     } catch (e) { }
   }
@@ -123,6 +150,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
       className={styles.graph}
       key={new Date().getTime()}
       data={traces}
+      // @ts-ignore
       layout={plotLayout}
     />
   );
