@@ -4,7 +4,7 @@ export const motorPosDifferentiation = (traceName: string): string => {
 }
 
 export const rgbColorTraceName = (traceName: string): string | "" => {
-    if (traceName === "Red" || traceName === "Blue" || traceName === "Green") 
-        return traceName.toLocaleLowerCase();
+    if (traceName === "Red Channel" || traceName === "Blue Channel" || traceName === "Green Channel")
+        return traceName.toLocaleLowerCase().split(" ")[0];
     return "";
 }
