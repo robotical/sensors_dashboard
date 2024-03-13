@@ -2,6 +2,7 @@ import Addon from "../models/addons/Addon";
 import {
   ROSSerialAddOnStatus,
   ROSSerialIMU,
+  ROSSerialMagneto,
   ROSSerialSmartServos,
 } from "@robotical/ricjs";
 import AddonSub from "../models/addons/AddonSub";
@@ -10,6 +11,7 @@ import {
   ACCELEROMETER_NAME_X,
   ACCELEROMETER_NAME_Y,
   ACCELEROMETER_NAME_Z,
+  MAGNETOMETER_NAME,
   MOTOR_CURRENT_NAME,
   MOTOR_POSITION_NAME,
 } from "./types/addon-names";
@@ -28,8 +30,8 @@ function getAddonsList(addons: ROSSerialAddOnStatus[]) {
       // @ts-ignore
       const value = addon.vals[valKey];
       // if (typeof value === "number") {
-        const addonInputName = renameValueLabel(valKey, addon.name);
-        subAddons.push(new AddonSub(addonInputName, value));
+      const addonInputName = renameValueLabel(valKey, addon.name);
+      subAddons.push(new AddonSub(addonInputName, value));
       // }
     }
     addonsNormalised.push(new Addon(whoAmI, subAddons));
@@ -61,14 +63,25 @@ function getAccelList(accel: ROSSerialIMU) {
   return [new Addon(ACCELEROMETER_NAME, addonSubs)];
 }
 
+function getMagnetoList(magneto: ROSSerialMagneto) {
+  const addonSubs = [
+    new AddonSub(ACCELEROMETER_NAME_X, magneto.magneto.x),
+    new AddonSub(ACCELEROMETER_NAME_Y, magneto.magneto.y),
+    new AddonSub(ACCELEROMETER_NAME_Z, magneto.magneto.z),
+  ];
+  return [new Addon(MAGNETOMETER_NAME, addonSubs)];
+}
+
 export default function getAllAddonsList(
   addons: ROSSerialAddOnStatus[],
   servos: ROSSerialSmartServos,
-  accel: ROSSerialIMU
+  accel: ROSSerialIMU,
+  magneto: ROSSerialMagneto
 ) {
   let addons_: Addon[] = [];
   let servos_: Addon[] = [];
   let accel_: Addon[] = [];
+  let magneto_: Addon[] = [];
   try {
     addons_ = getAddonsList(addons);
   } catch (e) {
@@ -87,5 +100,11 @@ export default function getAllAddonsList(
     console.log(e);
   }
 
-  return addons_.concat(servos_).concat(accel_);
+  try {
+    magneto_ = getMagnetoList(magneto);
+  } catch (e) {
+    console.log(e);
+  }
+
+  return addons_.concat(servos_).concat(accel_).concat(magneto_);
 }

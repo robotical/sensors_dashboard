@@ -77,7 +77,8 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
     const normalisedAddons = getAllAddonsList(
       mv2Dashboard.addons,
       mv2Dashboard.servos!,
-      mv2Dashboard.accel!
+      mv2Dashboard.accel!,
+      mv2Dashboard.magneto!
     );
     addSelectedListener(normalisedAddons);
     setAddons(normalisedAddons);

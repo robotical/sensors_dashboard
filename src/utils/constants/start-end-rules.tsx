@@ -2,6 +2,9 @@ import {
   ACCELEROMETER_X_BIGGERN_THAN_20,
   ACCELEROMETER_Y_BIGGERN_THAN_20,
   ACCELEROMETER_Z_BIGGERN_THAN_20,
+  MAGNETOMETER_X_BIGGERN_THAN_20,
+  MAGNETOMETER_Y_BIGGERN_THAN_20,
+  MAGNETOMETER_Z_BIGGERN_THAN_20,
   COLOR_SENSOR_BLUE_BIGGER_THAN_100,
   COLOR_SENSOR_GREEN_BIGGER_THAN_100,
   COLOR_SENSOR_RED_BIGGER_THAN_100,
@@ -70,6 +73,26 @@ const START_OPTIONS_BY_WHOAMI_AND_NAME: OptionsInterface = {
     z: [
       {
         ruleStr: ACCELEROMETER_Z_BIGGERN_THAN_20,
+        ruleFunc: (val: number) => val > 20,
+      },
+    ],
+  },
+  Magnetometer: {
+    x: [
+      {
+        ruleStr: MAGNETOMETER_X_BIGGERN_THAN_20,
+        ruleFunc: (val: number) => val > 20,
+      },
+    ],
+    y: [
+      {
+        ruleStr: MAGNETOMETER_Y_BIGGERN_THAN_20,
+        ruleFunc: (val: number) => val > 20,
+      },
+    ],
+    z: [
+      {
+        ruleStr: MAGNETOMETER_Z_BIGGERN_THAN_20,
         ruleFunc: (val: number) => val > 20,
       },
     ],

@@ -33,6 +33,7 @@ export default class MockMarty {
     this.mv2.setMartyName("Marty");
     this.mv2.setAddons(this.createAddons());
     this.mv2.setAccel(this.createAccel());
+    this.mv2.setMagneto(this.createMagneto());
     this.mv2.setServos(this.createServos());
     this.mv2.setIsConnected(this.isConnected);
     this.mv2.setIsConnecting(this.isConnecting);
@@ -43,6 +44,16 @@ export default class MockMarty {
   createAccel() {
     return JSON.stringify({
       accel: {
+        x: Math.random() * 2 - 1,
+        y: Math.random() * 2 - 1,
+        z: Math.random() * 2 - 1,
+      },
+    });
+  }
+
+  createMagneto() {
+    return JSON.stringify({
+      magneto: {
         x: Math.random() * 2 - 1,
         y: Math.random() * 2 - 1,
         z: Math.random() * 2 - 1,

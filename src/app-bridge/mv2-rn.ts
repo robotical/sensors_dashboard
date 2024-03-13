@@ -1,13 +1,14 @@
 import {
   ROSSerialAddOnStatus,
   ROSSerialIMU,
+  ROSSerialMagneto,
   ROSSerialSmartServos,
 } from "@robotical/ricjs";
 import EXCLUDED_ADDONS from "../utils/constants/excluded-addons";
 import SERVO_NAMES_MAP from "../utils/constants/servo-names";
-import addonNamesMap from "../utils/constants/addons-names";
 import {
   ACCELEROMETER_NAME,
+  MAGNETOMETER_NAME,
   ACCELEROMETER_NAME_Y,
   ACCELEROMETER_NAME_Z,
   ACCELEROMETER_NAME_X,
@@ -31,6 +32,7 @@ export class Marty2 extends EventDispatcher {
   public addons: ROSSerialAddOnStatus[] = [];
   public servos: ROSSerialSmartServos | null = null;
   public accel: ROSSerialIMU | null = null;
+  public magneto: ROSSerialMagneto | null = null;
   public isModal: boolean = false;
 
   commandPromise: {
@@ -129,6 +131,32 @@ export class Marty2 extends EventDispatcher {
       });
     } catch (e) {
       this.accel = null;
+    }
+  }
+
+  setMagneto(magneto: string) {
+    try {
+      this.magneto = JSON.parse(magneto);
+      this.dispatchEvent({
+        type: `on${MAGNETOMETER_NAME}=>${ACCELEROMETER_NAME_X}Change`,
+        value: this.magneto?.magneto.x,
+        whoAmI: MAGNETOMETER_NAME,
+        addonInput: ACCELEROMETER_NAME_X,
+      });
+      this.dispatchEvent({
+        type: `on${MAGNETOMETER_NAME}=>${ACCELEROMETER_NAME_Y}Change`,
+        value: this.magneto?.magneto.y,
+        whoAmI: MAGNETOMETER_NAME,
+        addonInput: ACCELEROMETER_NAME_Y,
+      });
+      this.dispatchEvent({
+        type: `on${MAGNETOMETER_NAME}=>${ACCELEROMETER_NAME_Z}Change`,
+        value: this.magneto?.magneto.z,
+        whoAmI: MAGNETOMETER_NAME,
+        addonInput: ACCELEROMETER_NAME_Z,
+      });
+    } catch (e) {
+      this.magneto = null;
     }
   }
 

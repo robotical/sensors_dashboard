@@ -1,6 +1,6 @@
-export WebappHome=/Users/nikolastheodoropoulos/Documents/Robotical/marty-web-app
-export dashHome=/Users/nikolastheodoropoulos/Documents/Robotical/sensors-dashboard
-export PhoneAppHome=/Users/nikolastheodoropoulos/Documents/Robotical/phone-app/marty-react-native
+export WebappHome=/Users/ntheodoropoulos/Robotical/marty-web-app
+export dashHome=/Users/ntheodoropoulos/Robotical/sensors_dashboard
+export PhoneAppHome=/Users/ntheodoropoulos/Robotical/marty-react-native
 
 alias cdhome='cd $dashHome'
 alias sourceDashboardProf='cdhome && source dashboardCliProfile'
