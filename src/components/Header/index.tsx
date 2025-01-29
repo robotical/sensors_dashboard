@@ -1,40 +1,25 @@
-import Connection from "../connection";
 import styles from "./styles.module.css";
 import modalState from "../../state-observables/modal/ModalState";
 import HowToUseModal from "../modals/HowToUseModal";
-import mv2Dashboard from "../../app-bridge/mv2-rn";
-import { useEffect, useState } from "react";
+import { createElement, useEffect, useState } from "react";
+import ConnectionArea from "../ConnectionArea";
 
-export default function Header() {
-  const [isModal, setIsModal] = useState(mv2Dashboard.isModal);
+type Props = {
+  isInModal?: boolean;
+}
 
-  useEffect(() => {
-    mv2Dashboard.addEventListener(
-      "onIsModalChange",
-      "",
-      onIsModalChanged
-    );
-    return () => {
-      mv2Dashboard.removeEventListener(
-        "onIsModalChange",
-        "",
-        onIsModalChanged
-      );
-    };
-  }, []);
-
-  const onIsModalChanged = () => {
-    setIsModal(mv2Dashboard.isModal);
-  };
+export default function Header({ isInModal }: Props) {
 
   return (
     <div className={styles.header}>
-      {!!!isModal && <Connection />}
-      {!!!isModal && <div className={styles.title}>Sensor Insights Hub</div>}
+      {!!!isInModal && <ConnectionArea
+        isNavMenuMinimized={false}
+      />}
+      {!!!isInModal && <div className={styles.title}>Sensor Insights Hub</div>}
       <button
         className={styles.helpButton}
         onClick={() =>
-          modalState.setModal(HowToUseModal, "Discover the Dashboard: A User-friendly Guide!")
+          modalState.setModal(createElement(HowToUseModal, {}), "Discover the Dashboard: A User-friendly Guide!")
         }
       >
         HELP

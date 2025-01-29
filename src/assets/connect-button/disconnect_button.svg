@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><svg
+
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 118.91 118.91"
+>
+  <circle cx="59.46" cy="59.46" r="59.46" style="fill: #f173a6" />
+  <rect
+    x="50.14"
+    y="16.9"
+    width="18.63"
+    height="85.12"
+    rx="9.31"
+    ry="9.31"
+    transform="translate(59.46 -24.63) rotate(45)"
+    style="fill: #fff"
+  />
+  <rect
+    x="50.14"
+    y="16.9"
+    width="18.63"
+    height="85.12"
+    rx="9.31"
+    ry="9.31"
+    transform="translate(143.54 59.46) rotate(135)"
+    style="fill: #fff"
+  />
+</svg>

@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ListenerOptionsType } from "../../app-bridge/EventDispatcher";
-import mv2Dashboard from "../../app-bridge/mv2-rn";
+import { MartyInterface } from "../../app-bridge/MartyInterface";
 import Addon from "../../models/addons/Addon";
 import getAllAddonsList from "../../utils/get-addons-list";
 import { isRuleMet } from "../../utils/start-end-rules/decider";
@@ -16,9 +16,16 @@ import { CSVLink } from "react-csv";
 import { getCSVTitle, prepareCSVData, prepareTitles } from "../../utils/export-csv";
 import { FaTimes, FaFileCsv } from "react-icons/fa";
 import Tooltip from '@mui/material/Tooltip';
+import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
+import RaftInterface from "../../app-bridge/RaftInterface";
+import { RaftTypeE } from "@robotical/webapp-types/dist-types/src/types/raft";
+import Marty from "@robotical/webapp-types/dist-types/src/application/RAFTs/Marty/Marty";
+import CogInterface from "../../app-bridge/CogInterface";
+import Cog from "@robotical/webapp-types/dist-types/src/application/RAFTs/Cog/Cog";
 
 interface GraphAreaProps {
   graphId: string;
+  raft: RAFT;
   removeGraph: (graphId: string) => void;
   mainRef: React.RefObject<HTMLDivElement>;
 }
@@ -35,7 +42,7 @@ export type GraphDataType = {
 
 type CsvData = (number | string)[][];
 
-function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
+function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
   const [refreshGraphArea, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
@@ -53,20 +60,34 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
   const endOptions = useRef<DropdownOptionsInterface[]>([]);
   const startDisplayingTime = useRef<number | null>(null);
 
+  const [raftInterface, setRaftInterface] = useState<RaftInterface | null>(null);
+
   useEffect(() => {
-    mv2Dashboard.addEventListener(
+    if (raft.type === RaftTypeE.COG) {
+      setRaftInterface(new CogInterface(raft as Cog));
+    } else if (raft.type === RaftTypeE.MARTY) {
+      setRaftInterface(new MartyInterface(raft as Marty));
+    }
+
+    return () => {
+      raftInterface?.unsubscribeFromPublishedData();
+    };
+  }, [raft]);
+
+  useEffect(() => {
+    raftInterface?.addEventListener(
       "onAddonsChange",
       "",
       onAddonsChange
     );
     return () => {
-      mv2Dashboard.removeEventListener(
+      raftInterface?.removeEventListener(
         "onAddonsChange",
         "",
         onAddonsChange
       );
     };
-  }, []);
+  }, [raftInterface]);
 
   const onAddonsChange = () => {
     setRefreshAddons((oldV) => oldV + 1);
@@ -74,12 +95,7 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
   };
 
   useEffect(() => {
-    const normalisedAddons = getAllAddonsList(
-      mv2Dashboard.addons,
-      mv2Dashboard.servos!,
-      mv2Dashboard.accel!,
-      mv2Dashboard.magneto!
-    );
+    const normalisedAddons = getAllAddonsList(raft);
     addSelectedListener(normalisedAddons);
     setAddons(normalisedAddons);
   }, [refreshAddonsList]);
@@ -122,13 +138,13 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
     for (const addon of addns) {
       for (const addonInput of addon.addonInputs) {
         if (addonInput.selected) {
-          mv2Dashboard.addEventListener(
+          raftInterface?.addEventListener(
             `on${addon.whoAmI + "=>" + addonInput.name}Change`,
             graphId,
             onAddonChange
           );
         } else {
-          mv2Dashboard.removeEventListener(
+          raftInterface?.removeEventListener(
             `on${addon.whoAmI + "=>" + addonInput.name}Change`,
             graphId,
             onAddonChange
@@ -141,7 +157,7 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
   const removeAddonsListeners = (addns: Addon[]) => {
     for (const addon of addns) {
       for (const addonInput of addon.addonInputs) {
-        mv2Dashboard.removeEventListener(
+        raftInterface?.removeEventListener(
           `on${addon.whoAmI + "=>" + addonInput.name}Change`,
           graphId,
           onAddonChange
@@ -183,7 +199,7 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
     setRefreshGraphArea((old) => old + 1);
   };
 
-  const stopHandler = () => {
+  const stopHandler = useCallback(() => {
     isTracking.current = false;
     for (const traceKey in graphData.current) {
       delete graphData.current[traceKey as TraceIdType];
@@ -194,9 +210,9 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
     hasEndRuleMet.current = false;
     startDisplayingTime.current = null;
     setRefreshGraphArea((old) => old + 1);
-  };
+  }, [addons, raftInterface]);
 
-  const setIsTracking = (value: boolean) => {
+  const setIsTracking = useCallback((value: boolean) => {
     // if there are no selected addons do nothing;
     let isAnyAddonSelected = false;
     for (const addon of addons) {
@@ -210,9 +226,9 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
     if (!isAnyAddonSelected) return;
     isTracking.current = value;
     setRefreshGraphArea((old) => old + 1);
-  };
+  }, [addons]);
 
-  const onRuleOptionChange = (selectedOption: DropdownOptionsInterface, rule: "start" | "end") => {
+  const onRuleOptionChange = useCallback((selectedOption: DropdownOptionsInterface, rule: "start" | "end") => {
     if (isTracking.current) return; // changing rule won't affect graph if it's currently traking 
     cleanupStartEndRules();
     if (rule === "start") {
@@ -221,16 +237,21 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
       endSelectedOption.current = selectedOption;
     }
     setRefreshGraphArea((old) => old + 1);
-  };
+  }, []);
 
-  const exportCsvHandler = async () => {
+  const exportCsvHandler = useCallback(async () => {
     // transform graph data to csv data
     const preparedCsvData = await prepareCSVData(graphData.current);
     const titles = prepareTitles(graphData.current, "Time (s)");
 
     setCsvData([titles, ...preparedCsvData]);
     return true;
-  }
+  }, [graphData]);
+
+  const memoizedStartSelectedOption = useMemo(() => startSelectedOption.current, [startSelectedOption.current]);
+  const memoizedEndSelectedOption = useMemo(() => endSelectedOption.current, [endSelectedOption.current]);
+  const memoizedStartOptions = useMemo(() => startOptions.current, [startOptions.current]);
+  const memoizedEndOptions = useMemo(() => endOptions.current, [endOptions.current]);
 
   return (
     <div className={styles.graphArea}>
@@ -249,10 +270,10 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
         autoScrollEnabled={autoScrollEnabled}
         onStartOptionChange={onRuleOptionChange}
         onEndOptionChange={onRuleOptionChange}
-        startSelectedOption={startSelectedOption.current}
-        endSelectedOption={endSelectedOption.current}
-        startOptions={startOptions.current}
-        endOptions={endOptions.current}
+        startSelectedOption={memoizedStartSelectedOption}
+        endSelectedOption={memoizedEndSelectedOption}
+        startOptions={memoizedStartOptions}
+        endOptions={memoizedEndOptions}
         isTracking={isTracking.current}
       />
       <div className={styles.rightPanel}>
@@ -271,7 +292,7 @@ function GraphArea({ graphId, removeGraph, mainRef }: GraphAreaProps) {
         </Tooltip>
 
       </div>
-    </div >
+    </div>
   );
 }
 

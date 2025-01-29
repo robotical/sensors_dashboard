@@ -2,7 +2,7 @@
     position: relative;
     grid-template-areas: "header" "main-content";
     grid-template-rows: .1fr .9fr;
-    height: 100vh;
+    height: 100%;
     overflow-y: scroll;
     container-type: inline-size; 
 }

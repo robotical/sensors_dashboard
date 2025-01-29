@@ -1,9 +1,14 @@
+import { ReactNode } from "react";
 
-export type ModalContentType = () => JSX.Element;
-export type ModalEventTopics = "SetModal" | "CloseModal";
+export type ModalContentType =  ReactNode;
+
+export type ModalEventTopics = "SetModal" | "CloseModal" | "UpdateModalProps";
 export type ModalStateData = {
-  modalContent: ModalContentType;
-  modalTitle: string;
+  modalContent?: ModalContentType;
+  modalTitle?: string;
+  newWindowLink?: string;
+  withCloseButton?: boolean;
+  withLogo?: boolean;
 };
 export interface ModalObservable {
   // Subscribe

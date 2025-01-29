@@ -1,0 +1,24 @@
+.martyBattContainer {
+    height: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: end;
+    column-gap: 1px;
+    /* padding-bottom: .8rem; */
+    position: relative;
+}
+
+.martyBattPercentage {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    /* color: #133C46; */
+    background-color: rgba(255, 255, 255, 0.3);
+    font-size: .9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    font-family: 'Roboto', sans-serif;
+    align-self: center;
+}

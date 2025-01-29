@@ -1,15 +1,16 @@
 import { useEffect, useRef } from "react";
 import { ReactComponent as EmptySignalSVG } from "../../../assets/connect-button/empty-signal.svg";
-import { SCREENFREE_GREEN, SCREENFREE_YELLOW } from "../../../styles/colors";
 import rescale from "../../../utils/rescale-range";
+import { SCREENFREE_GREEN, SCREENFREE_YELLOW } from "../../../styles/colors";
+import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
 
-type MartySignlaProps = {
+type RaftSignalProps = {
   signalStrength: number;
+  connectedRaft?: RAFT;
 };
 
-export default function MartySignal({ signalStrength }: MartySignlaProps) {
-    const signalRef = useRef<SVGSVGElement>(null);
-
+export default function RaftSignal({ signalStrength, connectedRaft }: RaftSignalProps) {
+  const signalRef = useRef<SVGSVGElement>(null);
   useEffect(() => {
     if (signalRef.current) {
       const signalRaw = (-50 / signalStrength) * 100;
@@ -32,6 +33,7 @@ export default function MartySignal({ signalStrength }: MartySignlaProps) {
       }
     }
   }, [signalStrength]);
-  return <EmptySignalSVG ref={signalRef} width={"80%"}/>
+
+  return <EmptySignalSVG ref={signalRef} width={"100%"} />
 
 }

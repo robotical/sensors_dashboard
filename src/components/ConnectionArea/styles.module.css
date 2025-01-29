@@ -1,0 +1,106 @@
+.connectionAreaContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #133C46;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  padding: .5rem;
+}
+
+.connectionAreaContainerInner {
+  width: 100%;
+  height: 100%;
+  background-color: #B8EBF8;
+  border-radius: 6px;
+  padding: 1rem;
+  padding-bottom: 2rem;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+
+  max-height: 22rem;
+  overflow-y: auto;
+}
+
+.minimizedConnectionAreaInnerContainer {
+  grid-template-columns: 1fr;
+}
+
+.connectButtonContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 2px solid #133C46;
+  border-radius: 5px;
+  cursor: pointer;
+
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1rem 1fr min-content;
+}
+
+.connectButtonIconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* padding: 2.8rem; */
+  width: 100%;
+}
+
+.connectButtonIcon {
+  width: 50%;
+  padding: 4px;
+}
+
+.connectButtonIconSvg {
+  /* width: 2rem; */
+  /* height: 2rem; */
+}
+
+.connectIconContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  width: 100%;
+  padding: 1rem;
+  padding-top: .5rem;
+  padding-bottom: .3rem;
+}
+
+.minimizedConnectIconContainer {
+  bottom: unset;
+  right: unset;
+}
+
+.plusIconContainer {
+  position: absolute;
+  bottom: .6rem;
+  right: .6rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background-color: var(--colour-MAIN_BLUE);
+  color: white;
+
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 -4px 8px rgba(0, 0, 0, 0.2), 4px 0 8px rgba(0, 0, 0, 0.2), -4px 0 8px rgba(0, 0, 0, 0.2); */
+}
+
+.plusIconContainer:hover {
+  background-color: #133C46;
+}
+
+.plusIcon {
+
+}

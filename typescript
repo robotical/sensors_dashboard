@@ -1,0 +1,100 @@
+Script started on Wed Dec 11 20:52:44 2024
+[1m[7m%[27m[1m[0m                                                                                                              [0m[27m[24m[Jntheodoropoulos@Mac sensors_dashboard % [K[?2004h[7mscript --return --quiet --command "npx inliner build/index.html > inde[7mx[7m-inline.html"[27m[K[A[26C[27ms[27mc[27mr[27mi[27mp[27mt[27m [27m-[27m-[27mr[27me[27mt[27mu[27mr[27mn[27m [27m-[27m-[27mq[27mu[27mi[27me[27mt[27m [27m-[27m-[27mc[27mo[27mm[27mm[27ma[27mn[27md[27m [27m"[27mn[27mp[27mx[27m [27mi[27mn[27ml[27mi[27mn[27me[27mr[27m [27mb[27mu[27mi[27ml[27md[27m/[27mi[27mn[27md[27me[27mx[27m.[27mh[27mt[27mm[27ml[27m [27m>[27m [27mi[27mn[27md[27mex[27m-[27mi[27mn[27ml[27mi[27mn[27me[27m.[27mh[27mt[27mm[27ml[27m"[?2004l
+script: illegal option -- -
+usage: script [-aeFkpqr] [-t time] [file [command ...]]
+       script -p [-deq] [-T fmt] [file]
+[1m[7m%[27m[1m[0m                                                                                                              [0m[27m[24m[Jntheodoropoulos@Mac sensors_dashboard % [K[?2004h[7mnpx inliner build/index.html > index-inline.html[27m[48D[27mn[27mp[27mx[27m [27mi[27mn[27ml[27mi[27mn[27me[27mr[27m [27mb[27mu[27mi[27ml[27md[27m/[27mi[27mn[27md[27me[27mx[27m.[27mh[27mt[27mm[27ml[27m [27m>[27m [27mi[27mn[27md[27me[27mx[27m-[27mi[27mn[27ml[27mi[27mn[27me[27m.[27mh[27mt[27mm[27ml[?2004l
+^C
+[1m[7m%[27m[1m[0m                                                                                                              [0m[27m[24m[Jntheodoropoulos@Mac sensors_dashboard % [K[?2004hννπμ ρθν       nnpm run build[?2004l
+
+> @robotical/sensors-dashboard@1.0.27 build
+> react-scripts build
+
+Creating an optimized production build...
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+=============
+
+WARNING: You are currently running a version of TypeScript which is not officially supported by @typescript-eslint/typescript-estree.
+
+You may find that it works just fine, or you may not.
+
+SUPPORTED TYPESCRIPT VERSIONS: >=3.3.1 <4.9.0
+
+YOUR TYPESCRIPT VERSION: 4.9.3
+
+Please only submit bug reports when using the officially supported version.
+
+=============
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[33mCompiled with warnings.[39m
+[33m[39m
+Warning
+(17:3) autoprefixer: start value has mixed support, consider using flex-start instead
+
+[eslint] 
+src/App.tsx
+  [1mLine 5:8:[22m  'MockMarty' is defined but never used  [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+
+src/components/AddonsList/AddonItem/AddonSubItem/index.tsx
+  [1mLine 1:8:[22m  'styles' is defined but never used  [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+
+src/components/AddonsList/AddonItem/index.tsx
+  [1mLine 1:8:[22m   'styles' is defined but never used                                                                            [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+  [1mLine 36:6:[22m  React Hook useEffect has a missing dependency: 'parentRef'. Either include it or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+
+src/components/Graph/index.tsx
+  [1mLine 105:7:[22m  React Hook useMemo has a missing dependency: 'shouldScroll'. Either include it or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+
+src/components/GraphArea/index.tsx
+  [1mLine 40:10:[22m  'refreshGraphArea' is assigned a value but never used                                                                                                           [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+  [1mLine 85:6:[22m   React Hook useEffect has a missing dependency: 'addSelectedListener'. Either include it or remove the dependency array                                          [33m[4mreact-hooks/exhaustive-deps[24m[39m
+  [1mLine 101:6:[22m  React Hook useEffect has missing dependencies: 'addAddonsListeners', 'addons', and 'removeAddonsListeners'. Either include them or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+
+src/components/LoadingSpinner/index.tsx
+  [1mLine 24:6:[22m  React Hook useEffect has missing dependencies: 'colourA' and 'colourB'. Either include them or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+
+src/components/Modal/index.tsx
+  [1mLine 41:6:[22m  React Hook useEffect has a missing dependency: 'closeModalHandler'. Either include it or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+
+src/screens/LandingPage/index.tsx
+  [1mLine 41:6:[22m  React Hook useEffect has a missing dependency: 'modalSubscriptionHelper'. Either include it or remove the dependency array  [33m[4mreact-hooks/exhaustive-deps[24m[39m
+
+src/state-observables/modal/ModalState.ts
+  [1mLine 14:3:[22m  Useless constructor  [33m[4m@typescript-eslint/no-useless-constructor[24m[39m
+
+src/utils/constants/excluded-addons.tsx
+  [1mLine 3:7:[22m   'RIC_WHOAMI_TYPE_CODE_ADDON_DISTANCE' is assigned a value but never used  [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+  [1mLine 4:7:[22m   'RIC_WHOAMI_TYPE_CODE_ADDON_LIGHT' is assigned a value but never used     [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+  [1mLine 5:7:[22m   'RIC_WHOAMI_TYPE_CODE_ADDON_COLOUR' is assigned a value but never used    [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+  [1mLine 6:7:[22m   'RIC_WHOAMI_TYPE_CODE_ADDON_IRFOOT' is assigned a value but never used    [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+  [1mLine 10:7:[22m  'RIC_WHOAMI_TYPE_CODE_ADDON_NOISE' is assigned a value but never used     [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+
+src/utils/start-end-rules/start-end-options.tsx
+  [1mLine 4:3:[22m  'END_OPTIONS_BY_WHOAMI_AND_NAME' is defined but never used  [33m[4m@typescript-eslint/no-unused-vars[24m[39m
+
+Search for the [4m[33mkeywords[39m[24m to learn more about each warning.
+To ignore, add [36m// eslint-disable-next-line[39m to the line before.
+
+File sizes after gzip:
+
+  [33m1.32 MB[39m  [2mbuild/static/js/[22m[36mmain.8925ccc0.js[39m
+  3.33 kB  [2mbuild/static/css/[22m[36mmain.5adbd0d4.css[39m
+
+[33mThe bundle size is significantly larger than recommended.[39m
+[33mConsider reducing it with code splitting: https://goo.gl/9VhYWB[39m
+[33mYou can also analyze the project dependencies: https://goo.gl/LeUzfb[39m
+
+The project was built assuming it is hosted at [32m./[39m.
+You can control this with the [32mhomepage[39m field in your [36mpackage.json[39m.
+
+The [36mbuild[39m folder is ready to be deployed.
+
+Find out more about deployment here:
+
+  [33mhttps://cra.link/deployment[39m
+
+[1m[7m%[27m[1m[0m                                                                                                              [0m[27m[24m[Jntheodoropoulos@Mac sensors_dashboard % [K[?2004h

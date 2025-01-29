@@ -3,10 +3,10 @@ import ReactDOM from "react-dom";
 import Logo from "../Logo";
 
 import styles from "./styles.module.css";
-import mv2Dashboard from "../../app-bridge/mv2-rn";
+import mv2Dashboard from "../../app-bridge/MartyInterface";
 
 type ModalPropsTypes = {
-  children: React.ReactChild | null;
+  children: React.ReactNode | null;
   title: string;
   shouldCloseModal: boolean;
   withLogo?: boolean;
@@ -52,7 +52,7 @@ function Modal({
     }, 700);
   };
 
-  const modalStyleInModalState = !!mv2Dashboard.isModal ? { width: "100%", height: "100%"} : { };
+  const modalStyleInModalState = { } //!!mv2Dashboard.isModal ? { width: "100%", height: "100%"} : { };
 
   const modalContent = showModal ? (
     <div className={styles.styledModalOverlay}>
@@ -71,7 +71,7 @@ function Modal({
   if (isBrowser && showModal) {
     return ReactDOM.createPortal(
       modalContent,
-      document.getElementById("modal-main-container")!
+      document.getElementById("sensors-dashboard-modal-main-container")!
     );
   } else {
     return null;
