@@ -6,23 +6,47 @@ import {
   ModalStateData,
 } from "./ModalObserver";
 
+type ModalReturnValue = any;
+
 class ModalState implements ModalObservable {
   public modalContent!: ModalContentType | null;
   public modalTitle!: string;
   private _observers: { [key: string]: Array<ModalObserver> } = {};
+  private _modalPromise: Promise<ModalReturnValue> | null = null;
+  private _modalResolve: (value: ModalReturnValue) => void = () => { };
+  private _modalReject: (reason?: any) => void = () => { };
 
-  constructor() {}
+  constructor() { }
 
-  setModal(modalContent: ModalContentType, modalTitle: string) {
-    this.modalContent = modalContent;
-    this.modalTitle = modalTitle;
-    this.publish("SetModal", { modalContent, modalTitle });
+  setModal(modalContent: ModalContentType, modalTitle: string, withLogo = true): Promise<ModalReturnValue> {
+    this._modalPromise = new Promise((resolve, reject) => {
+      this._modalResolve = resolve;
+      this._modalReject = reject;
+      this.modalContent = modalContent;
+      this.modalTitle = modalTitle;
+      this.publish("SetModal", { modalContent, modalTitle, withLogo });
+    });
+    return this._modalPromise;
   }
 
-  closeModal() {
+  closeModal(modalReturnValue?: ModalReturnValue, onCloseCb?: () => void) {
     this.modalContent = null;
     this.modalTitle = "";
-    this.publish("CloseModal")
+    this.publish("CloseModal");
+    this._modalResolve(modalReturnValue);
+    this.clearPromise();
+    onCloseCb && onCloseCb();
+  }
+
+  updateModalProps(updatedProps: { modalTitle?: string, withCloseButton?: boolean }) {
+    this.modalTitle = updatedProps.modalTitle || this.modalTitle;
+    this.publish("UpdateModalProps", updatedProps);
+  }
+
+  clearPromise() {
+    this._modalPromise = null;
+    this._modalResolve = () => { };
+    this._modalReject = () => { };
   }
 
   subscribe(observer: ModalObserver, topics: Array<ModalEventTopics>): void {

@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "./styles.module.css";
 import { Checkbox, Tooltip } from "@mui/material";
 import Dropdown from "../Dropdown";
@@ -25,7 +26,7 @@ interface GraphControlsProps {
   isTracking: boolean;
 }
 
-export default function GraphControls({
+const GraphControls = React.memo(({
   onClickPlay,
   onClickPause,
   onClickStop,
@@ -38,7 +39,8 @@ export default function GraphControls({
   startOptions,
   endOptions,
   isTracking,
-}: GraphControlsProps) {
+}: GraphControlsProps) => {
+  console.log("rendering controls");
   return (
     <div className={styles.container}>
       <div className={styles.startEndRules}>
@@ -84,4 +86,15 @@ export default function GraphControls({
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.autoScrollEnabled === nextProps.autoScrollEnabled &&
+    prevProps.startSelectedOption === nextProps.startSelectedOption &&
+    prevProps.endSelectedOption === nextProps.endSelectedOption &&
+    prevProps.startOptions === nextProps.startOptions &&
+    prevProps.endOptions === nextProps.endOptions &&
+    prevProps.isTracking === nextProps.isTracking
+  );
+});
+
+export default GraphControls;

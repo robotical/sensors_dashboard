@@ -10,7 +10,11 @@ import modalState from "../../state-observables/modal/ModalState";
 
 import Modal from "../../components/Modal";
 
-export default function LandingPage() {
+type Props = {
+  isInModal?: boolean;
+}
+
+export default function LandingPage({ isInModal }: Props) {
   const [modalData, setModalData] = useState<null | ModalStateData>(null);
   const [shouldCloseModal, setShouldCloseModal] = useState(false);
 
@@ -44,20 +48,21 @@ export default function LandingPage() {
     setShouldCloseModal(false);
     setModalData(null);
   };
+
   return (
     <>
       {!!modalData?.modalContent && <Modal
-          title={modalData ? modalData.modalTitle : ""}
+          title={modalData && modalData.modalTitle || ""}
           modalResetter={resetModal}
           shouldCloseModal={shouldCloseModal}
           withLogo
         >
-          {modalData && modalData.modalContent && <modalData.modalContent />}
+          {modalData?.modalContent}
         </Modal>
       }
-      <main id="modal-main-container"></main>
+      <main id="sensors-dashboard-modal-main-container"></main>
       <main className={styles.mainContainer} ref={mainRef}>
-        <Header />
+        <Header isInModal={isInModal} />
         <MainContent mainRef={mainRef}/>
       </main>
     </>

@@ -1,7 +1,7 @@
 import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
 import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/trace-name";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Plot from "react-plotly.js";
 import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE } from "../../styles/colors";
 
@@ -14,7 +14,6 @@ interface GraphProps {
 const SCROLL_THRESHOLD = 5;
 export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef }: GraphProps) {
   const [plotWidth, setPlotWidth] = useState<number | undefined>(undefined);
-
   const shouldScroll = useMemo(() => maxDataXValue > SCROLL_THRESHOLD && autoScrollEnabled, [maxDataXValue, autoScrollEnabled]);
 
   const plotLayout = useMemo(() => ({
@@ -101,7 +100,8 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
       },
       x: 1.09,
     },
-    width: plotWidth
+    width: plotWidth,
+    hovermode: 'x unified',
   }), [maxDataXValue, autoScrollEnabled, plotWidth]);
 
   useEffect(() => {
@@ -131,14 +131,16 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
       const y0ORy2 = traceName.includes("?") ? "y2" : "y";
       const trace = {
         x: data[traceKey as TraceIdType].x,
-        y: traceName.includes("?") ? data[traceKey as TraceIdType].y : data[traceKey as TraceIdType].y.map((y: number) => Math.round(y * 100) / 100),
+        y: traceName.includes("?") ? data[traceKey as TraceIdType].y.map(y => y) : data[traceKey as TraceIdType].y.map((y: number) => Math.round(y * 100) / 100),
         yaxis: y0ORy2,
         type: "scatter",
         mode: "lines",
         name: traceName,
         line: {
           color: rgbColorTraceName(traceName)
-        }
+        },
+        hoverinfo: 'x+y+name',
+        hoveron: 'points+lines',
       };
       // @ts-ignore
       traces.push(trace);
@@ -148,7 +150,6 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
   return (
     <Plot
       className={styles.graph}
-      key={new Date().getTime()}
       data={traces}
       // @ts-ignore
       layout={plotLayout}

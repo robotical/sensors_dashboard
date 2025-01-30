@@ -1,12 +1,18 @@
-.container {
+.addGraphBtnContainer {
     display: grid;
     justify-content: center;
     align-content: center;
     position: absolute;
-    top: 20px;
-    right: 20px;  
-    width: 40px;
-    height: 40px;
+    top: 2rem;
+    right: 2rem;  
+    width: 4rem;
+    height: 4rem;
+}
+
+.buttonMiddleOfScreen  {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1.5);
 }
 
 .graphsArea {
@@ -31,5 +37,16 @@
     font-weight: bold;
     font-size: 2rem;
     background-color: lightcoral;
+    padding: 1rem;
+}
+
+.addNewGraphMessage {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-weight: bold;
+    font-size: 2rem;
     padding: 1rem;
 }

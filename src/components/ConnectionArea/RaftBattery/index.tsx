@@ -1,13 +1,10 @@
 import { useEffect, useRef } from "react";
 import { ReactComponent as BatterySVG } from "../../../assets/connect-button/battery.svg";
-import {
-  SCREENFREE_GREEN,
-  SCREENFREE_RED,
-  SCREENFREE_YELLOW,
-} from "../../../styles/colors";
+import { ReactComponent as PowerPlugSVG } from "../../../assets/connect-button/power-plug.svg";
 import styles from "./styles.module.css";
+import { SCREENFREE_GREEN, SCREENFREE_RED, SCREENFREE_YELLOW } from "../../../styles/colors";
 
-type MartyBatteryProps = {
+type RaftBatteryProps = {
   batteryStrength: number;
 };
 const roundBatteryPerc = (battLevel: number) => {
@@ -19,30 +16,30 @@ const roundBatteryPerc = (battLevel: number) => {
   return roundedBattery;
 };
 
-export default function MartyBattery({ batteryStrength }: MartyBatteryProps) {
+export default function RaftBattery({ batteryStrength }: RaftBatteryProps) {
   const batteryRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     if (batteryRef.current) {
-      const svgStartPath = 3;
       const batteryStrenghtRounded = roundBatteryPerc(batteryStrength);
       const batteryBars = Math.ceil(batteryStrenghtRounded / 20);
+      const svgRects = batteryRef.current.getElementsByTagName("rect");
       let colour = SCREENFREE_GREEN;
-      if (batteryStrenghtRounded <= 10) {
+      if (batteryStrength <= 10) {
         colour = SCREENFREE_RED;
-      } else if (batteryStrenghtRounded > 10 && batteryStrenghtRounded <= 30) {
+      } else if (batteryStrength > 10 && batteryStrength <= 35) {
         colour = SCREENFREE_YELLOW;
       }
       for (let i = 0; i < 5; i++) {
         if (i < batteryBars) {
-          batteryRef.current.children[i + svgStartPath].setAttribute(
+          svgRects[i].setAttribute(
             "fill",
             colour
           );
         } else {
-          batteryRef.current.children[i + svgStartPath].setAttribute(
+          svgRects[i].setAttribute(
             "fill",
-            "white"
+            "#d1d3d4"
           );
         }
       }
@@ -51,7 +48,10 @@ export default function MartyBattery({ batteryStrength }: MartyBatteryProps) {
 
   return (
     <div className={styles.martyBattContainer}>
-      <BatterySVG ref={batteryRef} /> <p className={styles.martyBattPercentage}>{batteryStrength}%</p>
+      {
+        batteryStrength === 0 ? <> <p className={styles.martyBattPercentage}></p> <PowerPlugSVG /></> :
+          <><BatterySVG ref={batteryRef} /><p className={styles.martyBattPercentage}>{batteryStrength}%</p></>
+      }
     </div>
   );
 }

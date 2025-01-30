@@ -1,6 +1,6 @@
 {
   "name": "@robotical/sensors-dashboard",
-  "version": "1.0.27",
+  "version": "2.0.0-cog",
   "description": "A dashboard tool for depicting Marty data by Robotical",
   "main": "README.md",
   "homepage": ".",
@@ -27,8 +27,7 @@
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.10.14",
     "@mui/material": "^5.10.14",
-    "@robotical/ricjs": "^1.0.0-magnetometer",
-    "@robotical/ricjs-robotical-addons": "^1.1.4",
+    "@robotical/webapp-types": "^1.1.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -55,6 +54,7 @@
     "@babel/core": "^7.17.8",
     "@babel/preset-env": "^7.16.11",
     "@babel/preset-typescript": "^7.16.7",
+    "@robotical/roboticaljs": "^1.1.16",
     "@types/react-csv": "^1.1.3",
     "@types/react-plotly.js": "^2.5.2",
     "react": "^18.2.0"

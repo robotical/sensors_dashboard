@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import mv2Dashboard from "../../app-bridge/mv2-rn";
+import { createElement, useEffect, useRef, useState } from "react";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
 import { FaPlus, FaChartLine } from "react-icons/fa";
 import { Tooltip } from "@mui/material";
+import modalState from "../../state-observables/modal/ModalState";
+import NewGraphModal from "../modals/NewGraphModal";
 
 interface GraphObj {
   graphId: string;
@@ -15,8 +16,8 @@ type Props = {
 }
 
 function MainContent({ mainRef }: Props) {
-  const [isConnected, setIsConnected] = useState(mv2Dashboard.isConnected);
-  const [isConnecting, setIsConnecting] = useState(mv2Dashboard.isConnecting);
+  const [isConnected, setIsConnected] = useState(false);
+  const connectedRaftsLength = useRef(0);
   const refresh = useState(0)[1];
 
   const removeGraph = (graphId: string) => {
@@ -25,62 +26,38 @@ function MainContent({ mainRef }: Props) {
     refresh(old => old + 1);
   };
 
-  const graphs = useRef<GraphObj[]>([
-    {
-      graphId: "GRAPH_ID",
-      element: (
-        <GraphArea
-          mainRef={mainRef}
-          graphId={"GRAPH_ID"}
-          removeGraph={removeGraph}
-          key={"GRAPH_ID"}
-        />
-      ),
-    },
-  ]);
+  const graphs = useRef<GraphObj[]>([]);
 
   useEffect(() => {
-    mv2Dashboard.addEventListener(
-      "onIsConnectedChange",
-      "",
-      onMartyConnectedChanged
-    );
-    mv2Dashboard.addEventListener(
-      "onIsConnectingChange",
-      "",
-      onMartyConnectingChanged
-    );
+    const connectedRaftInterval = setInterval(() => {
+      const allConnectedRafts = window.applicationManager?.connectedRafts || {};
+      if (connectedRaftsLength.current !== Object.keys(allConnectedRafts).length) {
+        connectedRaftsLength.current = Object.keys(allConnectedRafts).length;
+        refresh(old => old + 1);
+      }
+      if (!allConnectedRafts) {
+        setIsConnected(false);
+        return;
+      }
+      setIsConnected(Object.keys(allConnectedRafts).length > 0);
+    }, 2000);
     return () => {
-      mv2Dashboard.removeEventListener(
-        "onIsConnectedChange",
-        "",
-        onMartyConnectedChanged
-      );
-      mv2Dashboard.removeEventListener(
-        "onIsConnectingChange",
-        "",
-        onMartyConnectingChanged
-      );
-    };
+      clearInterval(connectedRaftInterval);
+    }
   }, []);
 
-  const onMartyConnectedChanged = () => {
-    console.log("got connected event");
-    setIsConnected(mv2Dashboard.isConnected);
-  };
-
-  const onMartyConnectingChanged = () => {
-    console.log("got connecting event");
-    setIsConnecting(mv2Dashboard.isConnecting);
-  };
-
-  const addGraphHandler = () => {
+  const addGraphHandler = async () => {
+    const raftId = await modalState.setModal(createElement(NewGraphModal, {}), "Add new graph");
+    if (!raftId) {
+      return;
+    }
     const graphsUpdated = [...graphs.current];
     const GRAPH_ID = new Date().getTime().toString();
     graphsUpdated.push({
       graphId: GRAPH_ID,
       element: (
         <GraphArea
+          raft={window.applicationManager.connectedRafts[raftId]}
           mainRef={mainRef}
           graphId={GRAPH_ID}
           removeGraph={removeGraph}
@@ -92,12 +69,8 @@ function MainContent({ mainRef }: Props) {
     refresh(old => old + 1);
   };
 
-  if (!isConnected || isConnecting) {
-    if (isConnecting) {
-      return <div className={styles.martyConnectedFallback}>Connecting...</div>;
-    } else {
-      return <div className={styles.martyConnectedFallback}>Please connect to your Marty first</div>;
-    }
+  if (!isConnected) {
+    return <div className={styles.martyConnectedFallback}>Please connect a robot first</div>;
   }
 
   return (
@@ -107,18 +80,19 @@ function MainContent({ mainRef }: Props) {
           return graphArea.element;
         })}
       </div>
-      <div className={styles.container}>
+      <div className={[styles.addGraphBtnContainer, graphs.current.length === 0 ? styles.buttonMiddleOfScreen : ""].join(" ")}>
         <Tooltip title="Add new graph">
-        <div
-          onClick={addGraphHandler}
-          className={styles.addGraphBtn}
-          data-tooltip-id="add-new-graph-tootltip"
-          data-tooltip-content="Add new graph"
-        >
-          <FaPlus /><FaChartLine />
-        </div>
+          <div
+            onClick={addGraphHandler}
+            className={styles.addGraphBtn}
+            data-tooltip-id="add-new-graph-tootltip"
+            data-tooltip-content="Add new graph"
+          >
+            <FaPlus /><FaChartLine />
+          </div>
         </Tooltip>
       </div>
+      {graphs.current.length === 0 && <div className={styles.addNewGraphMessage}>Add a new graph to start</div>}
     </>
   );
 }
