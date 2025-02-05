@@ -1,0 +1,1 @@
+There are two versions of MartyBlocks: one for the legacy app and another for the new app. The legacy code is maintained in the legacy/v1 branch. When publishing the legacy version to npm, it should be versioned as x.x.x-legacy-v1
