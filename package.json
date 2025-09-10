@@ -1,6 +1,6 @@
 {
   "name": "@robotical/sensors-dashboard",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A dashboard tool for depicting Marty data by Robotical",
   "main": "README.md",
   "homepage": ".",
