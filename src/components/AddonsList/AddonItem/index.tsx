@@ -40,7 +40,19 @@ export default function AddonItem({ addon, parentRef }: AddonItemProps) {
 
   return (
     <>
-      <ListItemButton onClick={handleClick}>
+      <ListItemButton
+        onClick={handleClick}
+        sx={{
+          marginBottom: "0.6rem",
+          borderRadius: "1.2rem",
+          padding: "0.8rem 1.4rem",
+          backgroundColor: open ? "var(--colour-AQUA_BLUE_025)" : "transparent",
+          transition: "background-color 0.2s ease, transform 0.15s ease",
+          "&:hover": {
+            backgroundColor: "var(--colour-AQUA_BLUE_05)",
+          },
+        }}
+      >
         {/* <ListItemIcon>
           <InboxIcon />
         </ListItemIcon> */}
@@ -52,7 +64,11 @@ export default function AddonItem({ addon, parentRef }: AddonItemProps) {
       </ListItemButton>
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List
-          sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+          sx={{
+            width: "100%",
+            bgcolor: "transparent",
+            paddingLeft: "0.8rem",
+          }}
           dense
           ref={listRef}
         >

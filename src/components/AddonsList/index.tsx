@@ -16,17 +16,22 @@ export default function AddonsList({ addons }: AddonsListProps) {
     <div className={styles.container} ref={parentRef}>
       <List
         dense
-        sx={{ width: "100%", maxWidth: 360, bgcolor: "background.paper" }}
+        className={styles.list}
         component="nav"
-        aria-labelledby="nested-list-subheader"
+        aria-labelledby="addons-list-subheader"
         subheader={
-          <ListSubheader component="div" id="nested-list-subheader">
-            {addons.map((addon, idx) => {
-              return <AddonItem key={idx} addon={addon} parentRef={parentRef} />;
-            })}
+          <ListSubheader
+            component="div"
+            id="addons-list-subheader"
+            className={styles.listHeader}
+          >
+            Available signals
           </ListSubheader>
         }
       >
+        {addons.map((addon, idx) => {
+          return <AddonItem key={idx} addon={addon} parentRef={parentRef} />;
+        })}
       </List>
     </div>
   );

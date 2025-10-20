@@ -1,14 +1,31 @@
 .container {
-  grid-row: 1;
-  grid-column: 1;
-  overflow-y: scroll;
-  justify-self: left;
-  scrollbar-width: none; /* For Firefox */
-  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-right: 0.4rem;
+  height: 100%;
 }
 
 .container::-webkit-scrollbar {
-  display: none; /* For Chrome, Safari, and Opera */
+  display: none;
+}
+
+.list {
+  width: 100%;
+  padding: 0;
+  background-color: transparent;
+}
+
+.listHeader {
+  position: sticky;
+  top: 0;
+  background-color: var(--colour-BLUE_LIGHT_1);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--colour-BLACK_05);
+  text-transform: uppercase;
 }
 
 @container (max-width: 500px) {

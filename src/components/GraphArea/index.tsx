@@ -70,6 +70,7 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
   const startDisplayingTime = useRef<number | null>(null);
 
   const [raftInterface, setRaftInterface] = useState<RaftInterface | null>(null);
+  const chartPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let interfaceInstance: RaftInterface | null = null;
@@ -277,47 +278,82 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
   const currentEndSelectedOption = endSelectedOption.current;
   const currentStartOptions = startOptions.current;
   const currentEndOptions = endOptions.current;
+  const statusBadgeClassName = [
+    styles.statusBadge,
+    isTracking.current ? styles.statusLive : styles.statusIdle,
+  ].join(" ");
 
   return (
-    <div className={styles.graphArea}>
-      <AddonsList addons={addons} />
-      <Graph
-        mainRef={mainRef}
-        data={graphData.current}
-        maxDataXValue={maxDataXValue.current}
-        autoScrollEnabled={autoScrollEnabled}
-      />
-      <GraphControls
-        onClickPlay={() => setIsTracking(true)}
-        onClickPause={() => setIsTracking(false)}
-        onClickStop={stopHandler}
-        onAutoScrollToggle={() => setAutoScrollEnabled((oldVal) => !oldVal)}
-        autoScrollEnabled={autoScrollEnabled}
-        onStartOptionChange={onRuleOptionChange}
-        onEndOptionChange={onRuleOptionChange}
-        startSelectedOption={currentStartSelectedOption}
-        endSelectedOption={currentEndSelectedOption}
-        startOptions={currentStartOptions}
-        endOptions={currentEndOptions}
-        isTracking={isTracking.current}
-      />
-      <div className={styles.rightPanel}>
-        <div className={styles.closeGraph} onClick={() => removeGraph(graphId)}>
+    <section className={styles.graphCard}>
+      <header className={styles.graphHeader}>
+        <div className={styles.graphHeading}>
+          <p className={styles.graphEyebrow}>Live data</p>
+          <h2 className={styles.graphTitle}>Sensor graph</h2>
+        </div>
+        <div className={styles.graphHeaderActions}>
+          <span className={statusBadgeClassName}>
+            {isTracking.current ? "Recording" : "Paused"}
+          </span>
+          <Tooltip title="Export data to CSV">
+            <span className={styles.iconButtonWrapper}>
+              <CSVLink
+                data={csvData}
+                onClick={exportCsvHandler}
+                filename={getCSVTitle(graphData.current)}
+                className={styles.iconButton}
+              >
+                <FaFileCsv />
+                <span>CSV</span>
+              </CSVLink>
+            </span>
+          </Tooltip>
           <Tooltip title="Close graph">
-            <div>
+            <button
+              type="button"
+              className={styles.iconButton}
+              onClick={() => removeGraph(graphId)}
+              aria-label="Close graph"
+            >
               <FaTimes />
-            </div>
+            </button>
           </Tooltip>
         </div>
-        <Tooltip title="Export data to CSV">
-          <div>
-            <CSVLink
-              data={csvData} onClick={exportCsvHandler} filename={getCSVTitle(graphData.current)}><FaFileCsv fill="black" /></CSVLink>
-          </div>
-        </Tooltip>
+      </header>
 
+      <div className={styles.graphBody}>
+        <aside className={styles.sidebar}>
+          <div className={styles.sidebarHeader}>
+            <h3>Select signals</h3>
+            <p>Choose the data streams you want to visualise in this graph.</p>
+          </div>
+          <AddonsList addons={addons} />
+        </aside>
+
+        <div className={styles.chartPanel} ref={chartPanelRef}>
+          <Graph
+            mainRef={mainRef}
+            data={graphData.current}
+            maxDataXValue={maxDataXValue.current}
+            autoScrollEnabled={autoScrollEnabled}
+            containerRef={chartPanelRef}
+          />
+          <GraphControls
+            onClickPlay={() => setIsTracking(true)}
+            onClickPause={() => setIsTracking(false)}
+            onClickStop={stopHandler}
+            onAutoScrollToggle={() => setAutoScrollEnabled((oldVal) => !oldVal)}
+            autoScrollEnabled={autoScrollEnabled}
+            onStartOptionChange={onRuleOptionChange}
+            onEndOptionChange={onRuleOptionChange}
+            startSelectedOption={currentStartSelectedOption}
+            endSelectedOption={currentEndSelectedOption}
+            startOptions={currentStartOptions}
+            endOptions={currentEndOptions}
+            isTracking={isTracking.current}
+          />
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 

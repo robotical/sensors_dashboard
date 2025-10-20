@@ -1,52 +1,151 @@
-.addGraphBtnContainer {
-    display: grid;
-    justify-content: center;
-    align-content: center;
-    position: absolute;
-    top: 2rem;
-    right: 2rem;  
-    width: 4rem;
-    height: 4rem;
-}
-
-.buttonMiddleOfScreen  {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(1.5);
+.mainContent {
+    position: relative;
+    padding: 2.4rem 3.2rem 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
 }
 
 .graphsArea {
-    display: grid;
-    grid-auto-rows: minmax(310px, 310px);
+    display: flex;
+    flex-direction: column;
+    gap: 2.4rem;
+    width: 100%;
+    padding-top: 4.8rem;
+}
+
+.addGraphBtnContainer {
+    position: absolute;
+    top: 2rem;
+    right: 3.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+}
+
+.buttonMiddleOfScreen  {
+    position: relative;
+    top: 0;
+    right: 0;
+    left: 0;
+    transform: none;
+    margin: 4rem auto 0;
 }
 
 .addGraphBtn {
-    display: inline-block;
-    display: grid;
+    display: inline-flex;
     align-items: center;
-    justify-items: center;
-    padding: 1rem 2rem;
-    background-color: var(--colour-primary);
-    border-radius: 50%;
-    color: white;
+    gap: 1.2rem;
+    padding: 1.1rem 2.6rem;
+    background: linear-gradient(135deg, var(--colour-primary), var(--colour-LIGHT_BLUE));
+    border-radius: 999px;
+    color: var(--colour-TRUE_WHITE);
     cursor: pointer;
-} 
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    box-shadow: 0 18px 30px rgba(55, 171, 200, 0.25);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.addGraphBtn svg {
+    font-size: 1.8rem;
+}
+
+.addGraphBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 36px rgba(55, 171, 200, 0.32);
+}
 
 .martyConnectedFallback {
+    margin: 8rem auto;
+    max-width: 56rem;
+    padding: 3.2rem;
+    background-color: var(--colour-WHITE);
+    border-radius: 1.8rem;
+    box-shadow: 0 18px 45px rgba(38, 38, 38, 0.08);
     text-align: center;
-    font-weight: bold;
-    font-size: 2rem;
-    background-color: lightcoral;
-    padding: 1rem;
+    color: var(--colour-BLACK);
+}
+
+.martyConnectedFallback h2 {
+    font-size: 2.4rem;
+    margin-bottom: 1rem;
+}
+
+.martyConnectedFallback p {
+    font-size: 1.6rem;
+    color: var(--colour-BLACK_075);
 }
 
 .addNewGraphMessage {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    position: relative;
+    margin: 0 auto;
+    margin-top: -2rem;
+    max-width: 48rem;
+    padding: 3rem;
+    background-color: var(--colour-AQUA_BLUE_025);
+    border-radius: 1.6rem;
     text-align: center;
-    font-weight: bold;
-    font-size: 2rem;
-    padding: 1rem;
+    color: var(--colour-BLACK);
+    display: grid;
+    gap: 0.8rem;
+    box-shadow: 0 12px 32px rgba(55, 171, 200, 0.2);
+}
+
+.addNewGraphMessage svg {
+    font-size: 3.2rem;
+    justify-self: center;
+    color: var(--colour-primary);
+}
+
+.addNewGraphMessage h3 {
+    font-size: 2.1rem;
+    font-weight: 600;
+}
+
+.addNewGraphMessage span {
+    font-size: 1.4rem;
+    color: var(--colour-BLACK_075);
+}
+
+@media (max-width: 960px) {
+    .mainContent {
+        padding: 1.6rem 1.8rem 4.8rem;
+    }
+
+    .graphsArea {
+        padding-top: 6.4rem;
+    }
+
+    .addGraphBtnContainer {
+        right: 1.6rem;
+        top: 1.2rem;
+    }
+
+    .addGraphBtn {
+        padding-inline: 2rem;
+    }
+}
+
+@media (max-width: 640px) {
+    .addGraphBtnContainer {
+        position: static;
+        justify-content: flex-end;
+    }
+
+    .graphsArea {
+        padding-top: 2rem;
+    }
+
+    .addGraphBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .buttonMiddleOfScreen {
+        margin: 2.4rem auto 0;
+    }
 }

@@ -14,15 +14,29 @@ export default function AddonSubItem({addonSubItem}: AddonSubItemProps) {
     const labelId = `checkbox-list-label-${addonSubItem.name}`;
     return (
         <ListItem disablePadding>
-          <ListItemButton
-            role={undefined}
-            onClick={addonSubItem.selectedListener ? addonSubItem.selectedListener : () => {}}
-            dense
-            sx={{ margin: 0, padding: 0, paddingLeft: "1rem" }}
-          >
-            <ListItemIcon>
-              <Checkbox
-                sx={{ marginLeft: "1rem" }}
+        <ListItemButton
+          role={undefined}
+          onClick={addonSubItem.selectedListener ? addonSubItem.selectedListener : () => {}}
+          dense
+          sx={{
+            margin: 0,
+            padding: "0.4rem 0.8rem",
+            borderRadius: "1rem",
+            transition: "background-color 0.15s ease",
+            "&:hover": {
+              backgroundColor: "var(--colour-PALE_WHITE)",
+            },
+          }}
+        >
+          <ListItemIcon>
+            <Checkbox
+                sx={{
+                  marginLeft: "0.4rem",
+                  color: "var(--colour-primary)",
+                  "&.Mui-checked": {
+                    color: "var(--colour-primary)",
+                  },
+                }}
                 edge="start"
                 checked={addonSubItem.selected}
                 tabIndex={-1}

@@ -10,9 +10,10 @@ interface GraphProps {
   maxDataXValue: number;
   autoScrollEnabled: boolean;
   mainRef: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement>;
 }
 const SCROLL_THRESHOLD = 5;
-export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef }: GraphProps) {
+export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef, containerRef }: GraphProps) {
   const [plotWidth, setPlotWidth] = useState<number | undefined>(undefined);
   const shouldScroll = useMemo(() => maxDataXValue > SCROLL_THRESHOLD && autoScrollEnabled, [maxDataXValue, autoScrollEnabled]);
 
@@ -105,23 +106,28 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
   }), [maxDataXValue, plotWidth, shouldScroll]);
 
   useEffect(() => {
-    if (!mainRef.current) return;
+    const resizeTarget = containerRef?.current ?? mainRef.current;
+    if (!resizeTarget) return;
 
-    const handleResize = (entries: any) => {
-      for (let entry of entries) {
+    const handleResize = (entries: ResizeObserverEntry[]) => {
+      for (const entry of entries) {
         const { width } = entry.contentRect;
-        const hideControls = width < 500;
-        setPlotWidth(width * (hideControls ? 1 : 0.66));
+        setPlotWidth(width);
       }
     };
 
     const resizeObserver = new ResizeObserver(handleResize);
-    resizeObserver.observe(mainRef.current);
+    resizeObserver.observe(resizeTarget);
+    // Ensure initial width is captured
+    const initialWidth = resizeTarget.getBoundingClientRect().width;
+    if (initialWidth) {
+      setPlotWidth(initialWidth);
+    }
 
     return () => {
       resizeObserver.disconnect();
     };
-  }, [mainRef]);
+  }, [containerRef, mainRef]);
 
 
   const traces: TraceData[] = [];

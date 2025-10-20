@@ -43,46 +43,65 @@ const GraphControls = React.memo(({
   console.log("rendering controls");
   return (
     <div className={styles.container}>
-      <div className={styles.startEndRules}>
-        <Dropdown
-          rule="start"
-          label="Start when"
-          onChange={onStartOptionChange}
-          options={startOptions}
-          selectedOption={startSelectedOption}
-        />
-        <Dropdown
-          rule="end"
-          label="End when"
-          onChange={onEndOptionChange}
-          options={endOptions}
-          selectedOption={endSelectedOption}
-        />
+      <div className={styles.ruleBlock}>
+        <p className={styles.blockLabel}>Trigger conditions</p>
+        <div className={styles.startEndRules}>
+          <Dropdown
+            rule="start"
+            label="Start when"
+            onChange={onStartOptionChange}
+            options={startOptions}
+            selectedOption={startSelectedOption}
+          />
+          <Dropdown
+            rule="end"
+            label="End when"
+            onChange={onEndOptionChange}
+            options={endOptions}
+            selectedOption={endSelectedOption}
+          />
+        </div>
       </div>
 
       <Tooltip title="Automatically scroll on the x-axis as new data arrives, keeping the most recent data in view.">
-        <div className={styles.autoScrollContainer}
-        >
-          <p>Auto-scroll</p>
-          <FaSort />
-          <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
+        <div className={styles.autoScrollContainer}>
+          <p className={styles.blockLabel}>Auto-scroll</p>
+          <div className={styles.autoScrollToggle}>
+            <FaSort />
+            <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
+          </div>
         </div>
       </Tooltip>
 
       <div className={styles.playPauseContainer}>
-        <div className={styles.graphControlsSVGContainer} onClick={onClickPlay}>
+        <button
+          type="button"
+          className={[
+            styles.graphControlsButton,
+            isTracking ? styles.graphControlsButtonActive : "",
+          ].join(" ")}
+          onClick={onClickPlay}
+          aria-label={isTracking ? "Tracking in progress" : "Start tracking"}
+          aria-pressed={isTracking}
+        >
           {isTracking ? <FaDotCircle /> : <FaPlay />}
-        </div>
-        <div
-          className={styles.graphControlsSVGContainer}
+        </button>
+        <button
+          type="button"
+          className={styles.graphControlsButton}
           onClick={onClickPause}
+          aria-label="Pause tracking"
         >
           <FaPause />
-        </div>
-
-        <div className={styles.graphControlsSVGContainer} onClick={onClickStop}>
+        </button>
+        <button
+          type="button"
+          className={styles.graphControlsButton}
+          onClick={onClickStop}
+          aria-label="Stop and reset graph"
+        >
           <FaStop />
-        </div>
+        </button>
       </div>
     </div>
   );

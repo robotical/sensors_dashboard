@@ -98,30 +98,50 @@ function MainContent({ mainRef }: Props) {
   };
 
   if (!isConnected) {
-    return <div className={styles.martyConnectedFallback}>Please connect a robot first</div>;
+    return (
+      <div className={styles.martyConnectedFallback}>
+        <h2>No robot detected</h2>
+        <p>Connect a robot to start streaming sensor data and build live charts.</p>
+      </div>
+    );
   }
 
+  const hasGraphs = graphs.current.length > 0;
+
   return (
-    <>
+    <div className={styles.mainContent}>
       <div className={styles.graphsArea}>
         {graphs.current.map((graphArea) => {
           return graphArea.element;
         })}
       </div>
-      <div className={[styles.addGraphBtnContainer, graphs.current.length === 0 ? styles.buttonMiddleOfScreen : ""].join(" ")}>
+      <div className={[
+        styles.addGraphBtnContainer,
+        !hasGraphs ? styles.buttonMiddleOfScreen : ""
+      ].join(" ")}>
         <Tooltip title="Add new graph">
-          <div
+          <button
+            type="button"
             onClick={addGraphHandler}
             className={styles.addGraphBtn}
             data-tooltip-id="add-new-graph-tootltip"
             data-tooltip-content="Add new graph"
           >
-            <FaPlus /><FaChartLine />
-          </div>
+            <FaPlus />
+            <span>Add graph</span>
+            <FaChartLine />
+          </button>
         </Tooltip>
       </div>
-      {graphs.current.length === 0 && <div className={styles.addNewGraphMessage}>Add a new graph to start</div>}
-    </>
+      {!hasGraphs && (
+        <div className={styles.addNewGraphMessage}>
+          <FaChartLine />
+          <h3>Visualise your robot in real time</h3>
+          <p>Create a graph to monitor sensor readings as they arrive.</p>
+          <span>Use the add graph button and then pick the signals you care about.</span>
+        </div>
+      )}
+    </div>
   );
 }
 

@@ -55,6 +55,13 @@ html {
 body {
   box-sizing: border-box;
   font-size: 1.6rem;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--colour-BLUE_LIGHT_1) 0%, var(--colour-TRUE_WHITE) 60%);
+  color: var(--colour-BLACK);
+}
+
+#root {
+  min-height: 100vh;
 }
 
 p,
@@ -118,4 +125,3 @@ div {
 @media only screen and (max-height: 600px) and (max-width: 1100px) {
 
 }
-
