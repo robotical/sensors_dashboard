@@ -1,7 +1,7 @@
 import styles from "./styles.module.css";
 import modalState from "../../state-observables/modal/ModalState";
 import HowToUseModal from "../modals/HowToUseModal";
-import { createElement, useEffect, useState } from "react";
+import { createElement } from "react";
 import ConnectionArea from "../ConnectionArea";
 
 type Props = {

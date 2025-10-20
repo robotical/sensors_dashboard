@@ -20,27 +20,28 @@ export default function LandingPage({ isInModal }: Props) {
 
   const mainRef = useRef<HTMLDivElement>(null);
 
-  const modalSubscriptionHelper = {
-    notify(eventTopic: ModalEventTopics, eventData: ModalStateData) {
-      switch (eventTopic) {
-        case "SetModal":
-          setModalData(eventData);
-          break;
-        case "CloseModal":
-          setShouldCloseModal(true);
-          break;
-      }
-    },
-  };
-
   // Create subscription to the modal state
   useEffect(() => {
+    const subscriptionHelper = {
+      notify(eventTopic: ModalEventTopics, eventData?: ModalStateData) {
+        switch (eventTopic) {
+          case "SetModal":
+            if (eventData) {
+              setModalData(eventData);
+            }
+            break;
+          case "CloseModal":
+            setShouldCloseModal(true);
+            break;
+        }
+      },
+    };
     // Subscribe
-    modalState.subscribe(modalSubscriptionHelper, ["SetModal", "CloseModal"]);
+    modalState.subscribe(subscriptionHelper, ["SetModal", "CloseModal"]);
 
     // Return unsubscribe function
     return () => {
-      modalState.unsubscribe(modalSubscriptionHelper);
+      modalState.unsubscribe(subscriptionHelper);
     };
   }, []);
 
@@ -52,7 +53,7 @@ export default function LandingPage({ isInModal }: Props) {
   return (
     <>
       {!!modalData?.modalContent && <Modal
-          title={modalData && modalData.modalTitle || ""}
+          title={modalData?.modalTitle ?? ""}
           modalResetter={resetModal}
           shouldCloseModal={shouldCloseModal}
           withLogo

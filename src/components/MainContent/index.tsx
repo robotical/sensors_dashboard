@@ -19,7 +19,7 @@ type Props = {
 function MainContent({ mainRef }: Props) {
   const [isConnected, setIsConnected] = useState(false);
   const connectedRaftsLength = useRef(0);
-  const refresh = useState(0)[1];
+  const [, triggerRerender] = useState(0);
   // Track per-graph disconnect callbacks to allow cleanup when a graph is removed manually
   const graphSubRefs = useRef<Record<string, { raftId: string; callback: () => void }>>({});
 
@@ -35,7 +35,7 @@ function MainContent({ mainRef }: Props) {
     }
     const graphsUpdated = graphs.current.filter((graph) => graph.graphId !== graphId);
     graphs.current = graphsUpdated;
-    refresh(old => old + 1);
+    triggerRerender(old => old + 1);
   };
 
   const graphs = useRef<GraphObj[]>([]);
@@ -45,7 +45,7 @@ function MainContent({ mainRef }: Props) {
       const allConnectedRafts = window.applicationManager?.connectedRafts || {};
       if (connectedRaftsLength.current !== Object.keys(allConnectedRafts).length) {
         connectedRaftsLength.current = Object.keys(allConnectedRafts).length;
-        refresh(old => old + 1);
+        triggerRerender(old => old + 1);
       }
       if (!allConnectedRafts) {
         setIsConnected(false);
@@ -56,7 +56,7 @@ function MainContent({ mainRef }: Props) {
     return () => {
       clearInterval(connectedRaftInterval);
     }
-  }, []);
+  }, [triggerRerender]);
   const addGraphHandler = async () => {
     const raftId = await modalState.setModal(createElement(NewGraphModal, {}), "Add new graph");
     if (!raftId) {
@@ -94,7 +94,7 @@ function MainContent({ mainRef }: Props) {
       ),
     });
     graphs.current = graphsUpdated;
-    refresh(old => old + 1);
+    triggerRerender(old => old + 1);
   };
 
   if (!isConnected) {

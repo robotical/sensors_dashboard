@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ListenerOptionsType } from "../../app-bridge/EventDispatcher";
 import { MartyInterface } from "../../app-bridge/MartyInterface";
 import Addon from "../../models/addons/Addon";
@@ -22,6 +22,15 @@ import { RaftTypeE } from "@robotical/webapp-types/dist-types/src/types/raft";
 import Marty from "@robotical/webapp-types/dist-types/src/application/RAFTs/Marty/Marty";
 import CogInterface from "../../app-bridge/CogInterface";
 import Cog from "@robotical/webapp-types/dist-types/src/application/RAFTs/Cog/Cog";
+import MockMartyInterface from "../../app-bridge/mocks/MockMartyInterface";
+import MockCogInterface from "../../app-bridge/mocks/MockCogInterface";
+import { isMockRaft } from "../../mock/MockApplicationManager";
+
+const hasMockAddonProvider = (
+  raftInterface: RaftInterface
+): raftInterface is RaftInterface & { getAvailableAddons: () => Addon[] } =>
+  typeof (raftInterface as unknown as { getAvailableAddons?: () => Addon[] }).getAvailableAddons ===
+  "function";
 
 interface GraphAreaProps {
   graphId: string;
@@ -44,7 +53,7 @@ type CsvData = (number | string)[][];
 
 function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
-  const [refreshGraphArea, setRefreshGraphArea] = useState(0);
+  const [, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
   const [refreshAddonsList, setRefreshAddonsList] = useState(0);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
@@ -63,110 +72,48 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
   const [raftInterface, setRaftInterface] = useState<RaftInterface | null>(null);
 
   useEffect(() => {
-    if (raft.type === RaftTypeE.COG) {
-      setRaftInterface(new CogInterface(raft as Cog));
+    let interfaceInstance: RaftInterface | null = null;
+    if (isMockRaft(raft)) {
+      if (raft.type === RaftTypeE.COG) {
+        const mockCog = new MockCogInterface();
+        mockCog.start();
+        interfaceInstance = mockCog;
+      } else {
+        const mockMarty = new MockMartyInterface();
+        mockMarty.start();
+        interfaceInstance = mockMarty;
+      }
+    } else if (raft.type === RaftTypeE.COG) {
+      interfaceInstance = new CogInterface(raft as Cog);
     } else if (raft.type === RaftTypeE.MARTY) {
-      setRaftInterface(new MartyInterface(raft as Marty));
+      interfaceInstance = new MartyInterface(raft as Marty);
     }
+    setRaftInterface(interfaceInstance);
 
     return () => {
-      raftInterface?.unsubscribeFromPublishedData();
+      interfaceInstance?.unsubscribeFromPublishedData();
     };
   }, [raft]);
 
-  useEffect(() => {
-    raftInterface?.addEventListener(
-      "onAddonsChange",
-      "",
-      onAddonsChange
-    );
-    return () => {
-      raftInterface?.removeEventListener(
-        "onAddonsChange",
-        "",
-        onAddonsChange
-      );
-    };
-  }, [raftInterface]);
-
-  const onAddonsChange = () => {
-    setRefreshAddons((oldV) => oldV + 1);
-    setRefreshAddonsList((oldV) => oldV + 1);
-  };
-
-  useEffect(() => {
-    const normalisedAddons = getAllAddonsList(raft);
-    addSelectedListener(normalisedAddons);
-    setAddons(normalisedAddons);
-  }, [refreshAddonsList]);
-
-  useEffect(() => {
-    removeAddonsListeners(addons);
-    addAddonsListeners(addons);
-    const startOpts = getRuleOptions(addons, "start");
-    startOptions.current = startOpts;
-    startSelectedOption.current = startOpts.filter(opt => opt[1] === "default")[0];
-    const endOpts = getRuleOptions(addons, "end");
-    endOptions.current = endOpts;
-    endSelectedOption.current = endOpts.filter(opt => opt[1] === "default")[0];
-    setRefreshGraphArea((oldV) => oldV + 1);
-    return () => {
-      removeAddonsListeners(addons);
-      cleanupStartEndRules();
-    };
-  }, [refreshAddons]);
-
-  const cleanupStartEndRules = () => {
+  const cleanupStartEndRules = useCallback(() => {
     console.log("cleaning rules");
-    startSelectedOption.current[4] && startSelectedOption.current[4](); // cleanup rule
-    endSelectedOption.current[4] && endSelectedOption.current[4](); // cleanup rule
-  };
+    startSelectedOption.current[4]?.(); // cleanup rule
+    endSelectedOption.current[4]?.(); // cleanup rule
+  }, []);
 
-  const addSelectedListener = (addonsArr: Addon[]) => {
+  const onSelectAddon = useCallback(() => {
+    setRefreshAddons((oldVal) => oldVal + 1);
+  }, []);
+
+  const addSelectedListener = useCallback((addonsArr: Addon[]) => {
     for (const addon of addonsArr) {
       for (const addonInput of addon.addonInputs) {
         addonInput.setSelectedListener(onSelectAddon);
       }
     }
-  };
+  }, [onSelectAddon]);
 
-  const onSelectAddon = () => {
-    setRefreshAddons((oldVal) => oldVal + 1);
-  };
-
-  const addAddonsListeners = (addns: Addon[]) => {
-    for (const addon of addns) {
-      for (const addonInput of addon.addonInputs) {
-        if (addonInput.selected) {
-          raftInterface?.addEventListener(
-            `on${addon.whoAmI + "=>" + addonInput.name}Change`,
-            graphId,
-            onAddonChange
-          );
-        } else {
-          raftInterface?.removeEventListener(
-            `on${addon.whoAmI + "=>" + addonInput.name}Change`,
-            graphId,
-            onAddonChange
-          );
-        }
-      }
-    }
-  };
-
-  const removeAddonsListeners = (addns: Addon[]) => {
-    for (const addon of addns) {
-      for (const addonInput of addon.addonInputs) {
-        raftInterface?.removeEventListener(
-          `on${addon.whoAmI + "=>" + addonInput.name}Change`,
-          graphId,
-          onAddonChange
-        );
-      }
-    }
-  };
-
-  const onAddonChange = (evt: ListenerOptionsType) => {
+  const onAddonChange = useCallback((evt: ListenerOptionsType) => {
     /* for the following if's, order matters */
     if (!isTracking.current) return;
     if (!startSelectedOption.current || !endSelectedOption.current) return;
@@ -197,7 +144,85 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
       };
     }
     setRefreshGraphArea((old) => old + 1);
-  };
+  }, []);
+
+  const addAddonsListeners = useCallback((addns: Addon[]) => {
+    for (const addon of addns) {
+      for (const addonInput of addon.addonInputs) {
+        if (addonInput.selected) {
+          raftInterface?.addEventListener(
+            `on${addon.whoAmI + "=>" + addonInput.name}Change`,
+            graphId,
+            onAddonChange
+          );
+        } else {
+          raftInterface?.removeEventListener(
+            `on${addon.whoAmI + "=>" + addonInput.name}Change`,
+            graphId,
+            onAddonChange
+          );
+        }
+      }
+    }
+  }, [raftInterface, graphId, onAddonChange]);
+
+  const removeAddonsListeners = useCallback((addns: Addon[]) => {
+    for (const addon of addns) {
+      for (const addonInput of addon.addonInputs) {
+        raftInterface?.removeEventListener(
+          `on${addon.whoAmI + "=>" + addonInput.name}Change`,
+          graphId,
+          onAddonChange
+        );
+      }
+    }
+  }, [raftInterface, graphId, onAddonChange]);
+
+  const onAddonsChange = useCallback(() => {
+    setRefreshAddons((oldV) => oldV + 1);
+    setRefreshAddonsList((oldV) => oldV + 1);
+  }, []);
+
+  useEffect(() => {
+    raftInterface?.addEventListener(
+      "onAddonsChange",
+      "",
+      onAddonsChange
+    );
+    return () => {
+      raftInterface?.removeEventListener(
+        "onAddonsChange",
+        "",
+        onAddonsChange
+      );
+    };
+  }, [raftInterface, onAddonsChange]);
+
+  useEffect(() => {
+    if (!raftInterface) return;
+    const normalisedAddons =
+      isMockRaft(raft) && hasMockAddonProvider(raftInterface)
+        ? raftInterface.getAvailableAddons()
+        : getAllAddonsList(raft);
+    addSelectedListener(normalisedAddons);
+    setAddons(normalisedAddons);
+  }, [addSelectedListener, refreshAddonsList, raftInterface, raft]);
+
+  useEffect(() => {
+    removeAddonsListeners(addons);
+    addAddonsListeners(addons);
+    const startOpts = getRuleOptions(addons, "start");
+    startOptions.current = startOpts;
+    startSelectedOption.current = startOpts.filter(opt => opt[1] === "default")[0];
+    const endOpts = getRuleOptions(addons, "end");
+    endOptions.current = endOpts;
+    endSelectedOption.current = endOpts.filter(opt => opt[1] === "default")[0];
+    setRefreshGraphArea((oldV) => oldV + 1);
+    return () => {
+      removeAddonsListeners(addons);
+      cleanupStartEndRules();
+    };
+  }, [addAddonsListeners, addons, cleanupStartEndRules, refreshAddons, removeAddonsListeners]);
 
   const stopHandler = useCallback(() => {
     isTracking.current = false;
@@ -210,7 +235,7 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
     hasEndRuleMet.current = false;
     startDisplayingTime.current = null;
     setRefreshGraphArea((old) => old + 1);
-  }, [addons, raftInterface]);
+  }, [cleanupStartEndRules]);
 
   const setIsTracking = useCallback((value: boolean) => {
     // if there are no selected addons do nothing;
@@ -237,7 +262,7 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
       endSelectedOption.current = selectedOption;
     }
     setRefreshGraphArea((old) => old + 1);
-  }, []);
+  }, [cleanupStartEndRules]);
 
   const exportCsvHandler = useCallback(async () => {
     // transform graph data to csv data
@@ -246,12 +271,12 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
 
     setCsvData([titles, ...preparedCsvData]);
     return true;
-  }, [graphData]);
+  }, []);
 
-  const memoizedStartSelectedOption = useMemo(() => startSelectedOption.current, [startSelectedOption.current]);
-  const memoizedEndSelectedOption = useMemo(() => endSelectedOption.current, [endSelectedOption.current]);
-  const memoizedStartOptions = useMemo(() => startOptions.current, [startOptions.current]);
-  const memoizedEndOptions = useMemo(() => endOptions.current, [endOptions.current]);
+  const currentStartSelectedOption = startSelectedOption.current;
+  const currentEndSelectedOption = endSelectedOption.current;
+  const currentStartOptions = startOptions.current;
+  const currentEndOptions = endOptions.current;
 
   return (
     <div className={styles.graphArea}>
@@ -270,10 +295,10 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
         autoScrollEnabled={autoScrollEnabled}
         onStartOptionChange={onRuleOptionChange}
         onEndOptionChange={onRuleOptionChange}
-        startSelectedOption={memoizedStartSelectedOption}
-        endSelectedOption={memoizedEndSelectedOption}
-        startOptions={memoizedStartOptions}
-        endOptions={memoizedEndOptions}
+        startSelectedOption={currentStartSelectedOption}
+        endSelectedOption={currentEndSelectedOption}
+        startOptions={currentStartOptions}
+        endOptions={currentEndOptions}
         isTracking={isTracking.current}
       />
       <div className={styles.rightPanel}>

@@ -12,11 +12,8 @@ type Props = {
     isNavMenuMinimized: boolean;
 };
 
-const SHOW_LOGS = true;
-const TAG = "ConnectionArea";
-
 const ConnectionArea: React.FC<Props> = ({ isNavMenuMinimized }) => {
-    const [refresh, setRefresh] = useState<number>(0);
+    const [, setRefresh] = useState<number>(0);
     const connectedRafts = window.applicationManager?.connectedRafts || {};
     const connectedRaftsArray = Object.values(connectedRafts);
 
@@ -37,12 +34,15 @@ const ConnectionArea: React.FC<Props> = ({ isNavMenuMinimized }) => {
     
     const onClickConnect = async () => {
         if (!window.applicationManager) return;
-        window.applicationManager.connectGeneric((newRaft) => setRefresh(refresh + 1));
+        window.applicationManager.connectGeneric(() => setRefresh((old) => old + 1));
     };
 
     const onClickDisconnect = async (raftId: string) => {
         if (!window.applicationManager) return;
-        await window.applicationManager.disconnectGeneric(window.applicationManager.connectedRafts[raftId], () => setRefresh(refresh + 1));
+        await window.applicationManager.disconnectGeneric(
+            window.applicationManager.connectedRafts[raftId],
+            () => setRefresh((old) => old + 1)
+        );
     };
 
     return <div className={[styles.connectionAreaContainer].join(" ")}>

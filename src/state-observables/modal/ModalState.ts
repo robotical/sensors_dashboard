@@ -16,8 +16,6 @@ class ModalState implements ModalObservable {
   private _modalResolve: (value: ModalReturnValue) => void = () => { };
   private _modalReject: (reason?: any) => void = () => { };
 
-  constructor() { }
-
   setModal(modalContent: ModalContentType, modalTitle: string, withLogo = true): Promise<ModalReturnValue> {
     this._modalPromise = new Promise((resolve, reject) => {
       this._modalResolve = resolve;

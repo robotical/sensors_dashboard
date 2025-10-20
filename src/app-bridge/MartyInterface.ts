@@ -8,7 +8,6 @@ import {
   MOTOR_CURRENT_NAME,
   MOTOR_POSITION_NAME,
 } from "../utils/types/addon-names";
-import EventDispatcher from "./EventDispatcher";
 import renameValueLabel from "../utils/rename-value-label";
 import whoAmINameMap from "../utils/constants/whoAmI-names";
 import type MartyType from "@robotical/webapp-types/dist-types/src/application/RAFTs/Marty/Marty";
@@ -33,10 +32,12 @@ export class MartyInterface extends RaftInterface {
 
   public subObject: ReturnType<typeof raftPubSubscriptionHelper> | null = null;
 
-  constructor(marty: MartyType) {
+  constructor(marty: MartyType, options?: { autoSubscribe?: boolean }) {
     super();
     this.marty = marty;
-    this.subscribeToPublishedData();
+    if (options?.autoSubscribe !== false) {
+      this.subscribeToPublishedData();
+    }
   }
 
   subscribeToPublishedData() {

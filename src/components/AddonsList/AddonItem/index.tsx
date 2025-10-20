@@ -1,4 +1,3 @@
-import styles from "./styles.module.css";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
@@ -33,7 +32,7 @@ export default function AddonItem({ addon, parentRef }: AddonItemProps) {
         }
       }, 500);
     }
-  }, [open, listRef]);
+  }, [open, listRef, parentRef]);
 
   const handleClick = () => {
     setOpen(!open);

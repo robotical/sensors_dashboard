@@ -1,4 +1,3 @@
-import EXCLUDED_ADDONS from "../utils/constants/excluded-addons";
 import {
   ACCELEROMETER_NAME,
   ACCELEROMETER_NAME_Y,
@@ -16,7 +15,6 @@ import {
   COG_OBJECT_SENSE_NAME,
   COG_LIGHT_SENSE_NAME,
 } from "../utils/types/addon-names";
-import EventDispatcher from "./EventDispatcher";
 
 import {
   type SimplifiedCogStateInfo,
@@ -40,10 +38,12 @@ export class CogInterface extends RaftInterface {
   private _publishedDataDebouncePeriod = 0; // ms
   private lastPublishedDataTime: number | null = null;
 
-  constructor(cog: Cog) {
+  constructor(cog: Cog, options?: { autoSubscribe?: boolean }) {
     super();
     this.cog = cog;
-    this.subscribeToPublishedData();
+    if (options?.autoSubscribe !== false) {
+      this.subscribeToPublishedData();
+    }
   }
 
   setPublishedDataDebouncePeriod(period: number) {

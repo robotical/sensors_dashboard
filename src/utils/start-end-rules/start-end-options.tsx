@@ -1,8 +1,5 @@
 import Addon from "../../models/addons/Addon";
-import {
-  get_OPTIONS_BY_WHOAMI_AND_NAME,
-  END_OPTIONS_BY_WHOAMI_AND_NAME,
-} from "../constants/start-end-rules";
+import { get_OPTIONS_BY_WHOAMI_AND_NAME } from "../constants/start-end-rules";
 import { spacebarIsPressedRule, spacebarRuleCleanup } from "./key-press-rules/spacebar-start-rule";
 import { qIsPressedRule, qRuleCleanup } from "./key-press-rules/q-end-rule";
 

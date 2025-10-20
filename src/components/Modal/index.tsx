@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import Logo from "../Logo";
 
 import styles from "./styles.module.css";
-import mv2Dashboard from "../../app-bridge/MartyInterface";
 
 type ModalPropsTypes = {
   children: React.ReactNode | null;
@@ -24,6 +23,18 @@ function Modal({
   const [closing, setClosing] = useState(false);
   const [showModal, setShowModal] = useState(true);
 
+  const closeModalHandler = useCallback(() => {
+    setClosing(true);
+    const timer = window.setTimeout(() => {
+      document
+        .getElementsByTagName("body")[0]
+        .setAttribute("style", "overflow: auto");
+      setShowModal(false);
+      modalResetter();
+      window.clearTimeout(timer);
+    }, 700);
+  }, [modalResetter]);
+
   useEffect(() => {
     setIsBrowser(true);
     if (showModal) {
@@ -38,27 +49,12 @@ function Modal({
     if (shouldCloseModal) {
       closeModalHandler();
     }
-  }, [shouldCloseModal]);
-
-  const closeModalHandler = () => {
-    setClosing(true);
-    const timer = setTimeout(() => {
-      document
-        .getElementsByTagName("body")[0]
-        .setAttribute("style", "overflow: auto");
-        setShowModal(false);
-        modalResetter();
-      clearTimeout(timer);
-    }, 700);
-  };
-
-  const modalStyleInModalState = { } //!!mv2Dashboard.isModal ? { width: "100%", height: "100%"} : { };
+  }, [shouldCloseModal, closeModalHandler]);
 
   const modalContent = showModal ? (
     <div className={styles.styledModalOverlay}>
       <div 
         className={[styles.styledModal, closing ? styles.styleModalLeaveToTop : styles.styleModalComeInFromTop].join(" ")}
-        style={modalStyleInModalState}
       >
         <div className={styles.styledModalHeader}></div>
         {withLogo && <div className={styles.modalLogoContainer}><Logo /></div>}

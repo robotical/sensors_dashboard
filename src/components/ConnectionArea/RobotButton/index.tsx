@@ -1,8 +1,6 @@
 import styles from "./styles.module.css";
 import MartyIcon from "../../../assets/connect-button/marty_selected.svg";
-import MartyDeselectedIcon from "../../../assets/connect-button/marty_deselected.svg";
 import CogIcon from "../../../assets/connect-button/cog_selected.svg";
-import CogDeselectedIcon from "../../../assets/connect-button/cog_deselected.svg";
 import { ReactComponent as DisconnectIcon } from "../../../assets/connect-button/disconnect_button.svg";
 import { ReactComponent as DisconnectHoverIcon } from "../../../assets/connect-button/disconnect_button-hover.svg";
 import { useEffect, useState } from "react";

@@ -1,7 +1,7 @@
 import { GraphDataType, TraceData, TraceIdType } from "../GraphArea";
 import styles from "./styles.module.css";
 import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/trace-name";
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Plot from "react-plotly.js";
 import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE } from "../../styles/colors";
 
@@ -102,7 +102,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef 
     },
     width: plotWidth,
     hovermode: 'x unified',
-  }), [maxDataXValue, autoScrollEnabled, plotWidth]);
+  }), [maxDataXValue, plotWidth, shouldScroll]);
 
   useEffect(() => {
     if (!mainRef.current) return;
