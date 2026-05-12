@@ -4,6 +4,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Checkbox from "@mui/material/Checkbox";
 import ListItem from "@mui/material/ListItem";
 import AddonSub from "../../../../models/addons/AddonSub";
+import { useId } from "react";
 
 
 interface AddonSubItemProps {
@@ -11,12 +12,16 @@ interface AddonSubItemProps {
 }
 
 export default function AddonSubItem({addonSubItem}: AddonSubItemProps) {
-    const labelId = `checkbox-list-label-${addonSubItem.name}`;
+    const labelId = useId();
+    const onSelect = () => {
+      addonSubItem.selectedListener?.();
+    };
+
     return (
         <ListItem disablePadding>
         <ListItemButton
           role={undefined}
-          onClick={addonSubItem.selectedListener ? addonSubItem.selectedListener : () => {}}
+          onClick={onSelect}
           dense
           sx={{
             margin: 0,
@@ -39,9 +44,11 @@ export default function AddonSubItem({addonSubItem}: AddonSubItemProps) {
                 }}
                 edge="start"
                 checked={addonSubItem.selected}
+                onClick={(event) => event.stopPropagation()}
+                onChange={onSelect}
                 tabIndex={-1}
                 disableRipple
-                inputProps={{ "aria-labelledby": addonSubItem.name }}
+                inputProps={{ "aria-labelledby": labelId }}
               />
             </ListItemIcon>
             <ListItemText

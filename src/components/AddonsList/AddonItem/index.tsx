@@ -73,7 +73,7 @@ export default function AddonItem({ addon, parentRef }: AddonItemProps) {
           ref={listRef}
         >
           {addon.addonInputs.map((addonInput, idx) => {
-            return <AddonSubItem addonSubItem={addonInput} key={idx} />;
+            return <AddonSubItem addonSubItem={addonInput} key={`${addonInput.name}-${idx}`} />;
           })}
         </List>
       </Collapse>

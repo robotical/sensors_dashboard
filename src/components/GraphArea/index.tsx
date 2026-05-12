@@ -25,6 +25,7 @@ import Cog from "@robotical/webapp-types/dist-types/src/application/RAFTs/Cog/Co
 import MockMartyInterface from "../../app-bridge/mocks/MockMartyInterface";
 import MockCogInterface from "../../app-bridge/mocks/MockCogInterface";
 import { isMockRaft } from "../../mock/MockApplicationManager";
+import { preserveAddonSelections } from "../../utils/addon-selection";
 
 const hasMockAddonProvider = (
   raftInterface: RaftInterface
@@ -71,6 +72,7 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
 
   const [raftInterface, setRaftInterface] = useState<RaftInterface | null>(null);
   const chartPanelRef = useRef<HTMLDivElement>(null);
+  const latestAddons = useRef<Addon[]>([]);
 
   useEffect(() => {
     let interfaceInstance: RaftInterface | null = null;
@@ -205,8 +207,10 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
       isMockRaft(raft) && hasMockAddonProvider(raftInterface)
         ? raftInterface.getAvailableAddons()
         : getAllAddonsList(raft);
-    addSelectedListener(normalisedAddons);
-    setAddons(normalisedAddons);
+    const addonsWithSelections = preserveAddonSelections(normalisedAddons, latestAddons.current);
+    addSelectedListener(addonsWithSelections);
+    latestAddons.current = addonsWithSelections;
+    setAddons(addonsWithSelections);
   }, [addSelectedListener, refreshAddonsList, raftInterface, raft]);
 
   useEffect(() => {

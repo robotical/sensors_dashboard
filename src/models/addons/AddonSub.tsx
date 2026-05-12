@@ -14,11 +14,11 @@ export default class AddonSub {
       selectedListener: () => void
     ) {
       this.selectedListener = () => {
-        // updating react state
-        selectedListener();
-  
         // updating selected value
         this.selected = !this.selected;
+
+        // updating react state
+        selectedListener();
       };
     }
   }

@@ -1,6 +1,6 @@
 {
   "name": "@robotical/sensors-dashboard",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A dashboard tool for depicting Marty data by Robotical",
   "main": "README.md",
   "homepage": ".",
@@ -60,8 +60,8 @@
     "react": "^18.2.0"
   },
   "scripts": {
-    "build:webapp-dev": "rm -rf dist && NODE_ENV=development babel src --out-dir dist --extensions '.tsx' --extensions '.ts'  --copy-files && tsc",
-    "build:webapp": "rm -rf dist && NODE_ENV=production babel src --out-dir dist --extensions '.tsx' --extensions '.ts'  --copy-files && tsc",
+    "build:webapp-dev": "rm -rf dist && NODE_ENV=development babel src --out-dir dist --extensions '.tsx' --extensions '.ts' --ignore '**/*.test.ts','**/*.test.tsx' --copy-files && tsc",
+    "build:webapp": "rm -rf dist && NODE_ENV=production babel src --out-dir dist --extensions '.tsx' --extensions '.ts' --ignore '**/*.test.ts','**/*.test.tsx' --copy-files && tsc",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
