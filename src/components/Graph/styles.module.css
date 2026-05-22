@@ -1,6 +1,6 @@
 .graph {
     width: 100%;
-    min-height: 34rem;
+    min-height: 32rem;
 }
 
 .graph :global(.js-plotly-plot) {

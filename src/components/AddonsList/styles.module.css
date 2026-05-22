@@ -1,51 +1,10 @@
-.wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  min-height: 0;
-}
-
-.scrollButton {
-  align-items: center;
-  background-color: var(--colour-TRUE_WHITE);
-  border: 0.1rem solid var(--colour-BLUE_LIGHT_2);
-  border-radius: 0.8rem;
-  color: var(--colour-BLACK_075);
-  cursor: pointer;
-  display: flex;
-  flex: 0 0 3.2rem;
-  font-size: 1.4rem;
-  justify-content: center;
-  padding: 0;
-  transition: background-color 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-  width: 100%;
-}
-
-.scrollButton:hover:not(:disabled),
-.scrollButton:focus-visible:not(:disabled) {
-  background-color: var(--colour-BLUE_LIGHT_2);
-  box-shadow: 0 0.2rem 0.5rem rgba(0, 0, 0, 0.12);
-}
-
-.scrollButton:focus-visible {
-  outline: 0.2rem solid var(--colour-MAIN_BLUE);
-  outline-offset: 0.2rem;
-}
-
-.scrollButton:disabled {
-  cursor: not-allowed;
-  opacity: 0.35;
-}
-
 .container {
   flex: 1;
-  min-height: 16rem;
-  max-height: clamp(22rem, 42vh, 48rem);
   overflow-y: auto;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding-right: 0.4rem;
+  height: 100%;
 }
 
 .container::-webkit-scrollbar {
@@ -70,7 +29,7 @@
 }
 
 @container (max-width: 500px) {
-  .wrapper {
+  .container {
     display: none;
   }
 }
