@@ -14,6 +14,11 @@ import {
   COG_BUTTON_CLICK_NAME,
   COG_OBJECT_SENSE_NAME,
   COG_LIGHT_SENSE_NAME,
+  COG_ROTATION_NAME,
+  GYROSCOPE_NAME,
+  GYROSCOPE_NAME_X,
+  GYROSCOPE_NAME_Y,
+  GYROSCOPE_NAME_Z,
 } from "../utils/types/addon-names";
 
 import {
@@ -31,6 +36,7 @@ export class CogInterface extends RaftInterface {
   public cog: Cog;
   public lightData: SimplifiedCogStateInfo['light'] | null = null;
   public accel: SimplifiedCogStateInfo['accelerometer'] | null = null;
+  public gyro: SimplifiedCogStateInfo['gyroscope'] | null = null;
   public cogState: PublishedDataAnalyser['cogState'] | null = null;
 
   public subObject: ReturnType<typeof raftPubSubscriptionHelper> | null = null;
@@ -60,6 +66,7 @@ export class CogInterface extends RaftInterface {
       }
       this.lastPublishedDataTime = now;
       this.setAccel(stateInfo.accelerometer);
+      this.setGyro(stateInfo.gyroscope);
       this.setLight(stateInfo.light);
       this.setCogPublishedState(this.cog.publishedDataAnalyser.cogState);
     });
@@ -92,6 +99,32 @@ export class CogInterface extends RaftInterface {
       });
     } catch (e) {
       this.accel = null;
+    }
+  }
+
+  setGyro(gyro: SimplifiedCogStateInfo['gyroscope']) {
+    try {
+      this.gyro = gyro;
+      this.dispatchEvent({
+        type: `on${GYROSCOPE_NAME}=>${GYROSCOPE_NAME_X}Change`,
+        value: this.gyro?.gx,
+        whoAmI: GYROSCOPE_NAME,
+        addonInput: GYROSCOPE_NAME_X,
+      });
+      this.dispatchEvent({
+        type: `on${GYROSCOPE_NAME}=>${GYROSCOPE_NAME_Y}Change`,
+        value: this.gyro?.gy,
+        whoAmI: GYROSCOPE_NAME,
+        addonInput: GYROSCOPE_NAME_Y,
+      });
+      this.dispatchEvent({
+        type: `on${GYROSCOPE_NAME}=>${GYROSCOPE_NAME_Z}Change`,
+        value: this.gyro?.gz,
+        whoAmI: GYROSCOPE_NAME,
+        addonInput: GYROSCOPE_NAME_Z,
+      });
+    } catch (e) {
+      this.gyro = null;
     }
   }
 
@@ -140,6 +173,12 @@ export class CogInterface extends RaftInterface {
         value: this.cogState.movementType,
         whoAmI: COG_MOVEMENT_TYPE_NAME,
         addonInput: COG_MOVEMENT_TYPE_NAME
+      });
+      this.dispatchEvent({
+        type: `on${COG_STATE_NAME}=>${COG_ROTATION_NAME}Change`,
+        value: this.cogState.rotation,
+        whoAmI: COG_ROTATION_NAME,
+        addonInput: COG_ROTATION_NAME
       });
       this.dispatchEvent({
         type: `on${COG_STATE_NAME}=>${COG_BUTTON_CLICK_NAME}Change`,

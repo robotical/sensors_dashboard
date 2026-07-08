@@ -15,8 +15,13 @@ import {
   COG_LIGHT_SENSE_NAME,
   COG_MOVEMENT_TYPE_NAME,
   COG_OBJECT_SENSE_NAME,
+  COG_ROTATION_NAME,
   COG_STATE_NAME,
   COG_TILT_NAME,
+  GYROSCOPE_NAME,
+  GYROSCOPE_NAME_X,
+  GYROSCOPE_NAME_Y,
+  GYROSCOPE_NAME_Z,
 } from "../../utils/types/addon-names";
 import type Cog from "@robotical/webapp-types/dist-types/src/application/RAFTs/Cog/Cog";
 import type PublishedDataAnalyser from "@robotical/webapp-types/dist-types/src/application/RAFTs/Cog/PublishedDataAnalyser";
@@ -76,6 +81,7 @@ const createInitialCogState = (): CogState => ({
 const buildCogAddonList = (
   light: SimplifiedCogStateInfo["light"],
   accel: SimplifiedCogStateInfo["accelerometer"],
+  gyro: SimplifiedCogStateInfo["gyroscope"],
   cogState: CogState
 ) => {
   const lightAddon = new Addon(COG_LIGHT_NAME, [
@@ -91,9 +97,16 @@ const buildCogAddonList = (
     new AddonSub(ACCELEROMETER_NAME_Z, accel.az),
   ]);
 
+  const gyroAddon = new Addon(GYROSCOPE_NAME, [
+    new AddonSub(GYROSCOPE_NAME_X, gyro.gx),
+    new AddonSub(GYROSCOPE_NAME_Y, gyro.gy),
+    new AddonSub(GYROSCOPE_NAME_Z, gyro.gz),
+  ]);
+
   const stateAddon = new Addon(COG_STATE_NAME, [
     new AddonSub(COG_TILT_NAME, cogState.tilt),
     new AddonSub(COG_MOVEMENT_TYPE_NAME, cogState.movementType),
+    new AddonSub(COG_ROTATION_NAME, cogState.rotation),
     new AddonSub(
       COG_BUTTON_CLICK_NAME,
       cogState.buttonClick === "none" ? "release" : cogState.buttonClick
@@ -102,7 +115,7 @@ const buildCogAddonList = (
     new AddonSub(COG_LIGHT_SENSE_NAME, cogState.lightSense),
   ]);
 
-  return [lightAddon, accelAddon, stateAddon];
+  return [lightAddon, accelAddon, gyroAddon, stateAddon];
 };
 
 export class MockCogInterface extends CogInterface {
@@ -115,6 +128,7 @@ export class MockCogInterface extends CogInterface {
   private latestAddonList = buildCogAddonList(
     this.currentLight,
     this.currentAccel,
+    this.currentGyro,
     this.currentCogState
   );
 
@@ -144,10 +158,12 @@ export class MockCogInterface extends CogInterface {
     this.latestAddonList = buildCogAddonList(
       this.currentLight,
       this.currentAccel,
+      this.currentGyro,
       this.currentCogState
     );
     this.setLight({ ...this.currentLight });
     this.setAccel({ ...this.currentAccel });
+    this.setGyro({ ...this.currentGyro });
     this.setCogPublishedState({ ...this.currentCogState });
   }
 
@@ -197,6 +213,7 @@ export class MockCogInterface extends CogInterface {
   private mutateCogState(prev: CogState): CogState {
     const tiltOptions: readonly CogState["tilt"][] = ["none", "forward", "backward", "left", "right"];
     const movementOptions: readonly CogState["movementType"][] = ["none", "shake", "move"];
+    const rotationOptions: readonly CogState["rotation"][] = ["none", "clockwise", "counterClockwise"];
     const objectSenseOptions: readonly CogState["objectSense"][] = ["none", "left", "right"];
     const lightSenseOptions: readonly CogState["lightSense"][] = ["none", "low", "mid", "high"];
 
@@ -214,7 +231,7 @@ export class MockCogInterface extends CogInterface {
     return {
       tilt: pickWithChance(prev.tilt, tiltOptions, 0.12),
       movementType: pickWithChance(prev.movementType, movementOptions, 0.1),
-      rotation: "none",
+      rotation: pickWithChance(prev.rotation, rotationOptions, 0.1),
       buttonClick,
       objectSense: pickWithChance(prev.objectSense, objectSenseOptions, 0.08),
       lightSense: pickWithChance(prev.lightSense, lightSenseOptions, 0.1),

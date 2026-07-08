@@ -14,8 +14,13 @@ import {
   COG_LIGHT_SENSE_NAME,
   COG_MOVEMENT_TYPE_NAME,
   COG_OBJECT_SENSE_NAME,
+  COG_ROTATION_NAME,
   COG_STATE_NAME,
   COG_TILT_NAME,
+  GYROSCOPE_NAME,
+  GYROSCOPE_NAME_X,
+  GYROSCOPE_NAME_Y,
+  GYROSCOPE_NAME_Z,
   MOTOR_CURRENT_NAME,
   MOTOR_POSITION_NAME,
 } from "./types/addon-names";
@@ -118,9 +123,11 @@ function getAllAddonsListCog(cog: Cog) {
   }
   const light = cog.raftStateInfo.light;
   const accel = cog.raftStateInfo.accelerometer;
+  const gyro = cog.raftStateInfo.gyroscope;
 
   let light_: Addon[] = [];
   let accel_: Addon[] = [];
+  let gyro_: Addon[] = [];
 
   try {
     light_ = getLightListCog(light);
@@ -135,20 +142,27 @@ function getAllAddonsListCog(cog: Cog) {
   }
 
   try {
-    const cogState = cog.publishedDataAnalyser.cogState;
-    const cogStateList = getCogStateList(cogState);
-    return light_.concat(accel_).concat(cogStateList);
+    gyro_ = getGyroListCog(gyro);
   } catch (e) {
     console.log(e);
   }
 
-  return light_.concat(accel_);
+  try {
+    const cogState = cog.publishedDataAnalyser.cogState;
+    const cogStateList = getCogStateList(cogState);
+    return light_.concat(accel_).concat(gyro_).concat(cogStateList);
+  } catch (e) {
+    console.log(e);
+  }
+
+  return light_.concat(accel_).concat(gyro_);
 }
 
 function getCogStateList(cogState: PublishedDataAnalyser['cogState']) {
   const addonSubs = [
     new AddonSub(COG_TILT_NAME, cogState.tilt),
     new AddonSub(COG_MOVEMENT_TYPE_NAME, cogState.movementType),
+    new AddonSub(COG_ROTATION_NAME, cogState.rotation),
     new AddonSub(COG_BUTTON_CLICK_NAME, cogState.buttonClick),
     new AddonSub(COG_OBJECT_SENSE_NAME, cogState.objectSense),
     new AddonSub(COG_LIGHT_SENSE_NAME, cogState.lightSense),
@@ -163,6 +177,15 @@ function getAccelListCog(accel: SimplifiedCogStateInfo['accelerometer']) {
     new AddonSub(ACCELEROMETER_NAME_Z, accel.az),
   ];
   return [new Addon(ACCELEROMETER_NAME, addonSubs)];
+}
+
+function getGyroListCog(gyro: SimplifiedCogStateInfo['gyroscope']) {
+  const addonSubs = [
+    new AddonSub(GYROSCOPE_NAME_X, gyro.gx),
+    new AddonSub(GYROSCOPE_NAME_Y, gyro.gy),
+    new AddonSub(GYROSCOPE_NAME_Z, gyro.gz),
+  ];
+  return [new Addon(GYROSCOPE_NAME, addonSubs)];
 }
 
 function getLightListCog(light: SimplifiedCogStateInfo['light']) {
