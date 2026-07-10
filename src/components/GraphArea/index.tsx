@@ -36,6 +36,7 @@ const hasMockAddonProvider = (
 interface GraphAreaProps {
   graphId: string;
   raft: RAFT;
+  deviceName: string;
   removeGraph: (graphId: string) => void;
   mainRef: React.RefObject<HTMLDivElement>;
 }
@@ -52,7 +53,7 @@ export type GraphDataType = {
 
 type CsvData = (number | string)[][];
 
-function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
+function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
   const [, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
@@ -288,11 +289,14 @@ function GraphArea({ graphId, removeGraph, mainRef, raft }: GraphAreaProps) {
   ].join(" ");
 
   return (
-    <section className={styles.graphCard}>
+    <section
+      className={styles.graphCard}
+      aria-label={`Sensor graph for ${deviceName}`}
+    >
       <header className={styles.graphHeader}>
         <div className={styles.graphHeading}>
           <p className={styles.graphEyebrow}>Live data</p>
-          <h2 className={styles.graphTitle}>Sensor graph</h2>
+          <h2 className={styles.graphTitle}>Sensor graph — {deviceName}</h2>
         </div>
         <div className={styles.graphHeaderActions}>
           <span className={statusBadgeClassName}>

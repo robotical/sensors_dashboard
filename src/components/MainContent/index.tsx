@@ -6,6 +6,7 @@ import { Tooltip } from "@mui/material";
 import modalState from "../../state-observables/modal/ModalState";
 import NewGraphModal from "../modals/NewGraphModal";
 import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
+import { resolveRaftDisplayName } from "../../utils/raft-display-name";
 
 interface GraphObj {
   graphId: string;
@@ -66,6 +67,10 @@ function MainContent({ mainRef }: Props) {
     if (!raft) {
       return;
     }
+    const deviceName = await resolveRaftDisplayName(
+      raft,
+      window.applicationManager.connectedRaftsContext || []
+    );
 
     const graphsUpdated = [...graphs.current];
     const GRAPH_ID = new Date().getTime().toString();
@@ -85,7 +90,8 @@ function MainContent({ mainRef }: Props) {
       graphId: GRAPH_ID,
       element: (
         <GraphArea
-          raft={window.applicationManager.connectedRafts[raftId]}
+          raft={raft}
+          deviceName={deviceName}
           mainRef={mainRef}
           graphId={GRAPH_ID}
           removeGraph={removeGraph}
