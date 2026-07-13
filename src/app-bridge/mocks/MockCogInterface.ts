@@ -76,6 +76,7 @@ const createInitialCogState = (): CogState => ({
   buttonClick: "none",
   objectSense: "none",
   lightSense: "mid",
+  steering: "none",
 });
 
 const buildCogAddonList = (
@@ -235,6 +236,7 @@ export class MockCogInterface extends CogInterface {
       buttonClick,
       objectSense: pickWithChance(prev.objectSense, objectSenseOptions, 0.08),
       lightSense: pickWithChance(prev.lightSense, lightSenseOptions, 0.1),
+      steering: prev.steering,
     };
   }
 }
