@@ -1,6 +1,6 @@
+import { useId } from "react";
 import {
   FormControl,
-  InputLabel,
   ListSubheader,
   MenuItem,
   TextField,
@@ -11,8 +11,8 @@ import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-
 
 const CustomFontTheme = createTheme({
   typography: {
-    fontFamily: "Lato Regular"
-  }
+    fontFamily: "Lato Regular",
+  },
 });
 
 interface DropdownProps {
@@ -24,6 +24,7 @@ interface DropdownProps {
   ) => void;
   selectedOption: DropdownOptionsInterface | undefined;
   rule: "start" | "end";
+  disabled?: boolean;
 }
 
 export default function Dropdown({
@@ -32,56 +33,71 @@ export default function Dropdown({
   options,
   selectedOption,
   rule,
+  disabled = false,
 }: DropdownProps) {
-  const optionsJSX = [];
-  // reformat options array to a compatible type for the dropdown with categories
-  const optionsObj: { [whoAmI: string]: DropdownOptionsInterface[] } = {};
+  const reactId = useId();
+  const fieldId = `${rule}-rule-${reactId.replace(/:/g, "")}`;
+  const optionsByAddon: {
+    [whoAmI: string]: DropdownOptionsInterface[];
+  } = {};
+
   for (const option of options) {
     const whoAmI = option[0];
-    if (optionsObj.hasOwnProperty(whoAmI)) {
-      optionsObj[whoAmI].push(option);
+    if (optionsByAddon.hasOwnProperty(whoAmI)) {
+      optionsByAddon[whoAmI].push(option);
     } else {
-      optionsObj[whoAmI] = [option];
+      optionsByAddon[whoAmI] = [option];
     }
   }
-  for (const whoAmI in optionsObj) {
-    const menuItemsWithinCategory = optionsObj[whoAmI].map((option) => {
-      return (
+  const optionElements: JSX.Element[] = [];
+  for (const [whoAmI, addonOptions] of Object.entries(optionsByAddon)) {
+    if (whoAmI !== "default") {
+      optionElements.push(
+        <ListSubheader component="div" key={`${whoAmI}-header`}>
+          {whoAmI}
+        </ListSubheader>
+      );
+    }
+    for (const option of addonOptions) {
+      optionElements.push(
         <MenuItem
           value={option as string[]}
-          key={option[0] + option[1] + option[2]}
+          key={`${option[0]}-${option[1]}-${option[2]}`}
         >
           {option[2]}
         </MenuItem>
       );
-    });
-    optionsJSX.push([
-      whoAmI !== "default" && <ListSubheader>{whoAmI}</ListSubheader>,
-      menuItemsWithinCategory,
-    ]);
+    }
   }
 
   return (
     <ThemeProvider theme={CustomFontTheme}>
-      <FormControl fullWidth>
-        {!selectedOption && (
-          <InputLabel id="demo-simple-select-label"
-          >{label}</InputLabel>
-        )}
+      <FormControl fullWidth disabled={disabled}>
         <TextField
-          id="standard-select-currency"
+          id={fieldId}
           select
           label={label}
-          value={selectedOption}
-          onChange={(e) =>
+          value={selectedOption ?? ""}
+          onChange={(event) =>
             onChange(
-              (e.target.value as unknown) as DropdownOptionsInterface,
+              (event.target.value as unknown) as DropdownOptionsInterface,
               rule
             )
           }
           size="small"
+          disabled={disabled}
+          sx={{
+            "& .MuiInputBase-root": {
+              minHeight: "4.4rem",
+            },
+          }}
+          SelectProps={{
+            inputProps: {
+              "aria-label": label,
+            },
+          }}
         >
-          {optionsJSX}
+          {optionElements}
         </TextField>
       </FormControl>
     </ThemeProvider>

@@ -1,0 +1,43 @@
+.listItem {
+  min-width: 0;
+}
+
+.signalRow {
+  width: 100%;
+  min-height: 4.4rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--colour-BLACK);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.signalRow:hover {
+  background-color: var(--colour-PALE_WHITE);
+}
+
+.signalRow:focus-within {
+  outline: 0.3rem solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.checkbox {
+  width: 4.4rem;
+  height: 4.4rem;
+  flex: 0 0 4.4rem;
+  color: var(--colour-primary-strong);
+}
+
+.checkbox:global(.Mui-checked) {
+  color: var(--colour-primary-strong);
+}
+
+.signalName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 1.25rem;
+  line-height: 1.35;
+}

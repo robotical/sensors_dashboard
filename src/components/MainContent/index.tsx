@@ -1,8 +1,7 @@
-import { createElement, useEffect, useRef, useState } from "react";
+import { createElement, useCallback, useEffect, useRef, useState } from "react";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
-import { FaPlus, FaChartLine } from "react-icons/fa";
-import { Tooltip } from "@mui/material";
+import { FaPlus, FaChartLine, FaPlug, FaCheckCircle } from "react-icons/fa";
 import modalState from "../../state-observables/modal/ModalState";
 import NewGraphModal from "../modals/NewGraphModal";
 import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
@@ -17,9 +16,12 @@ type Props = {
   mainRef: React.RefObject<HTMLDivElement>;
 }
 
+type ConnectionPhase = "idle" | "connecting" | "error";
+
 function MainContent({ mainRef }: Props) {
   const [isConnected, setIsConnected] = useState(false);
-  const connectedRaftsLength = useRef(0);
+  const [connectionPhase, setConnectionPhase] = useState<ConnectionPhase>("idle");
+  const [connectionMessage, setConnectionMessage] = useState("");
   const [, triggerRerender] = useState(0);
   // Track per-graph disconnect callbacks to allow cleanup when a graph is removed manually
   const graphSubRefs = useRef<Record<string, { raftId: string; callback: () => void }>>({});
@@ -41,23 +43,53 @@ function MainContent({ mainRef }: Props) {
 
   const graphs = useRef<GraphObj[]>([]);
 
+  const syncConnectionState = useCallback(() => {
+    const connectedRafts = window.applicationManager?.connectedRafts || {};
+    const connected = Object.keys(connectedRafts).length > 0;
+    setIsConnected(connected);
+    if (connected) {
+      setConnectionPhase("idle");
+      setConnectionMessage("");
+    }
+    return connected;
+  }, []);
+
   useEffect(() => {
+    syncConnectionState();
     const connectedRaftInterval = setInterval(() => {
-      const allConnectedRafts = window.applicationManager?.connectedRafts || {};
-      if (connectedRaftsLength.current !== Object.keys(allConnectedRafts).length) {
-        connectedRaftsLength.current = Object.keys(allConnectedRafts).length;
-        triggerRerender(old => old + 1);
-      }
-      if (!allConnectedRafts) {
-        setIsConnected(false);
-        return;
-      }
-      setIsConnected(Object.keys(allConnectedRafts).length > 0);
-    }, 2000);
+      syncConnectionState();
+    }, 750);
     return () => {
       clearInterval(connectedRaftInterval);
     }
-  }, [triggerRerender]);
+  }, [syncConnectionState]);
+
+  const connectRobot = async () => {
+    if (!window.applicationManager) {
+      setConnectionPhase("error");
+      setConnectionMessage("Device connections are not available in this view.");
+      return;
+    }
+
+    setConnectionPhase("connecting");
+    setConnectionMessage("Choose your device in the connection window.");
+
+    try {
+      await window.applicationManager.connectGeneric(() => {
+        syncConnectionState();
+      });
+      const connected = syncConnectionState();
+      if (!connected) {
+        setConnectionPhase("idle");
+        setConnectionMessage("No device was connected. You can try again when you are ready.");
+      }
+    } catch (error) {
+      console.error("Unable to connect robot", error);
+      setConnectionPhase("error");
+      setConnectionMessage("We could not connect to the device. Please try again.");
+    }
+  };
+
   const addGraphHandler = async () => {
     const raftId = await modalState.setModal(createElement(NewGraphModal, {}), "Add new graph");
     if (!raftId) {
@@ -105,10 +137,50 @@ function MainContent({ mainRef }: Props) {
 
   if (!isConnected) {
     return (
-      <div className={styles.martyConnectedFallback}>
-        <h2>No robot detected</h2>
-        <p>Connect a robot to start streaming sensor data and build live charts.</p>
-      </div>
+      <section className={styles.connectEmptyState} aria-labelledby="connect-empty-title">
+        <div className={styles.connectEmptyHero}>
+          <div className={styles.emptyStateIcon} aria-hidden="true">
+            <FaPlug />
+          </div>
+          <p className={styles.emptyStateEyebrow}>Start here</p>
+          <h2 id="connect-empty-title">Connect a device to see its sensors</h2>
+          <p className={styles.emptyStateDescription}>
+            Pair Marty or Cog, then choose the signals you want to turn into a live graph.
+          </p>
+          <button
+            type="button"
+            className={styles.connectButton}
+            onClick={connectRobot}
+            disabled={connectionPhase === "connecting"}
+          >
+            <FaPlug aria-hidden="true" />
+            <span>{connectionPhase === "connecting" ? "Connecting…" : "Connect device"}</span>
+          </button>
+          {connectionMessage && (
+            <p
+              className={`${styles.connectionFeedback} ${connectionPhase === "error" ? styles.connectionError : ""}`}
+              role={connectionPhase === "error" ? "alert" : "status"}
+              aria-live="polite"
+            >
+              {connectionMessage}
+            </p>
+          )}
+        </div>
+        <ol className={styles.quickJourney} aria-label="Dashboard setup steps">
+          <li>
+            <span>1</span>
+            <div><strong>Connect</strong><small>Pair Marty or Cog.</small></div>
+          </li>
+          <li>
+            <span>2</span>
+            <div><strong>Add a graph</strong><small>Choose the connected device.</small></div>
+          </li>
+          <li>
+            <span>3</span>
+            <div><strong>Pick signals</strong><small>Start recording live data.</small></div>
+          </li>
+        </ol>
+      </section>
     );
   }
 
@@ -116,36 +188,38 @@ function MainContent({ mainRef }: Props) {
 
   return (
     <div className={styles.mainContent}>
+      <div className={styles.graphsToolbar}>
+        <div>
+          <p className={styles.toolbarEyebrow}>
+            <FaCheckCircle aria-hidden="true" /> Robot connected
+          </p>
+          <h2>Graphs</h2>
+          <p>{hasGraphs ? `${graphs.current.length} live workspace${graphs.current.length === 1 ? "" : "s"}` : "Create a graph to begin exploring sensor data."}</p>
+        </div>
+        <button
+          type="button"
+          onClick={addGraphHandler}
+          className={styles.addGraphBtn}
+        >
+          <FaPlus aria-hidden="true" />
+          <span>Add graph</span>
+          <FaChartLine aria-hidden="true" />
+        </button>
+      </div>
       <div className={styles.graphsArea}>
         {graphs.current.map((graphArea) => {
           return graphArea.element;
         })}
       </div>
-      <div className={[
-        styles.addGraphBtnContainer,
-        !hasGraphs ? styles.buttonMiddleOfScreen : ""
-      ].join(" ")}>
-        <Tooltip title="Add new graph">
-          <button
-            type="button"
-            onClick={addGraphHandler}
-            className={styles.addGraphBtn}
-            data-tooltip-id="add-new-graph-tootltip"
-            data-tooltip-content="Add new graph"
-          >
-            <FaPlus />
-            <span>Add graph</span>
-            <FaChartLine />
-          </button>
-        </Tooltip>
-      </div>
       {!hasGraphs && (
-        <div className={styles.addNewGraphMessage}>
-          <FaChartLine />
-          <h3>Visualise your robot in real time</h3>
-          <p>Create a graph to monitor sensor readings as they arrive.</p>
-          <span>Use the add graph button and then pick the signals you care about.</span>
-        </div>
+        <section className={styles.addNewGraphMessage} aria-labelledby="add-first-graph-title">
+          <FaChartLine aria-hidden="true" />
+          <div>
+            <p className={styles.emptyStateEyebrow}>Your workspace is ready</p>
+            <h3 id="add-first-graph-title">Build your first live graph</h3>
+            <p>Select <strong>Add graph</strong>, choose a robot, then pick one or more signals.</p>
+          </div>
+        </section>
       )}
     </div>
   );

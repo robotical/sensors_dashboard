@@ -1,95 +1,129 @@
 .graphCard {
     display: flex;
     flex-direction: column;
-    gap: 1.6rem;
-    padding: 1.8rem 2.4rem 2.2rem;
+    gap: 1.4rem;
+    padding: 1.6rem 1.8rem 1.8rem;
     background-color: var(--colour-TRUE_WHITE);
-    border-radius: 2.4rem;
-    box-shadow: 0 24px 50px rgba(38, 38, 38, 0.08);
     border: 1px solid var(--colour-BLUE_LIGHT_3);
+    border-radius: 2rem;
+    box-shadow: 0 20px 44px rgba(38, 38, 38, 0.08);
     container-type: inline-size;
 }
 
 .graphHeader {
+    min-height: 4.4rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1.6rem;
-    flex-wrap: wrap;
+    gap: 1.2rem;
 }
 
 .graphHeading {
+    min-width: 0;
     display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+    align-items: baseline;
+    gap: 0.8rem;
 }
 
 .graphEyebrow {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    flex: 0 0 auto;
     color: var(--colour-BLACK_05);
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
 }
 
 .graphTitle {
-    font-size: 2.2rem;
-    font-weight: 700;
+    min-width: 0;
     color: var(--colour-BLACK);
+    font-size: 1.9rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .graphHeaderActions {
     display: flex;
     align-items: center;
-    gap: 0.8rem;
-    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    flex: 0 0 auto;
 }
 
 .statusBadge {
+    min-height: 3.2rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--colour-BLACK_075);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+.statusLive {
+    background-color: var(--colour-success-strong);
+    box-shadow: 0 8px 18px rgba(8, 122, 87, 0.2);
+    color: var(--colour-TRUE_WHITE);
+}
+
+.statusReady {
+    background-color: var(--colour-primary-strong);
+    color: var(--colour-TRUE_WHITE);
+}
+
+.statusPaused {
+    background-color: var(--colour-SAND_YELLOW_25);
+    color: var(--colour-BLACK);
+}
+
+.statusChoose {
+    background-color: var(--colour-BLUE_LIGHT_1);
+    color: var(--colour-primary-deep);
+}
+
+.iconButton {
+    min-width: 4.4rem;
+    min-height: 4.4rem;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--colour-primary-strong);
+    border-radius: 1.2rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.6rem;
-    padding: 0.5rem 1.4rem;
-    border-radius: 999px;
-    font-size: 1.3rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    transition: transform 0.15s ease;
-}
-
-.statusLive {
-    background-color: var(--colour-GREEN);
-    color: var(--colour-TRUE_WHITE);
-    box-shadow: 0 12px 26px rgba(0, 213, 146, 0.28);
-}
-
-.statusIdle {
-    background-color: var(--colour-SAND_YELLOW_25);
-    color: var(--colour-BLACK_075);
-    box-shadow: 0 12px 26px rgba(244, 218, 97, 0.18);
-}
-
-.iconButton {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.7rem 1.4rem;
-    border-radius: 999px;
-    border: 1px solid var(--colour-BLUE_LIGHT_2);
     background-color: var(--colour-TRUE_WHITE);
-    color: var(--colour-BLACK);
+    color: var(--colour-primary-deep);
     cursor: pointer;
-    font-size: 1.3rem;
-    font-weight: 600;
+    font: inherit;
+    font-size: 1.25rem;
+    font-weight: 700;
     text-decoration: none;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.2s ease;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background-color 0.15s ease;
 }
 
-.iconButton:hover {
+.iconButton:hover:not(:disabled) {
     transform: translateY(-1px);
     background-color: var(--colour-AQUA_BLUE_025);
-    box-shadow: 0 12px 26px rgba(55, 171, 200, 0.22);
+    box-shadow: 0 10px 22px rgba(11, 111, 135, 0.16);
+}
+
+.iconButton:focus-visible {
+    outline: 0.3rem solid var(--focus-ring);
+    outline-offset: 3px;
+}
+
+.iconButton:disabled {
+    border-color: var(--colour-BLUE_LIGHT_3);
+    background-color: var(--colour-BLUE_LIGHT_1);
+    color: var(--colour-BLACK_05);
+    cursor: not-allowed;
+    opacity: 0.72;
 }
 
 .iconButtonWrapper {
@@ -97,53 +131,93 @@
 }
 
 .iconButton svg {
-    font-size: 1.8rem;
+    flex: 0 0 auto;
+    font-size: 1.6rem;
 }
 
 .graphBody {
+    min-width: 0;
     display: grid;
-    grid-template-columns: minmax(260px, 320px) 1fr;
-    gap: 1.8rem;
-    align-items: flex-start;
+    grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+    gap: 1.4rem;
+    align-items: stretch;
+}
+
+.chartPanel {
+    min-width: 0;
+    min-height: 35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.chartFrame {
+    min-width: 0;
+    min-height: 32rem;
+    position: relative;
+}
+
+.emptyChartMessage {
+    max-width: min(90%, 40rem);
+    padding: 0.9rem 1.2rem;
+    border: 1px solid var(--colour-BLUE_LIGHT_3);
+    border-radius: 999px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 2;
+    color: var(--colour-BLACK_075);
+    background-color: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 10px 24px rgba(38, 38, 38, 0.08);
+    font-size: 1.25rem;
+    line-height: 1.4;
+    pointer-events: none;
+    text-align: center;
+    transform: translate(-50%, -50%);
 }
 
 .sidebar {
+    min-width: 0;
+    padding: 1.3rem;
+    border: 1px solid var(--colour-BLUE_LIGHT_3);
+    border-radius: 1.6rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
     background-color: var(--colour-BLUE_LIGHT_1);
-    border-radius: 1.8rem;
-    padding: 1.6rem 2rem;
-    min-height: 100%;
-    box-shadow: inset 0 0 0 1px var(--colour-BLUE_LIGHT_2);
 }
 
 .sidebarHeader {
     display: flex;
     flex-direction: column;
-    gap: 0.4rem;
+    gap: 0.3rem;
 }
 
 .sidebarHeader h3 {
-    font-size: 1.7rem;
-    font-weight: 600;
     color: var(--colour-BLACK);
-    margin-bottom: 0.4rem;
+    font-size: 1.5rem;
+    font-weight: 700;
 }
 
 .sidebarHeader p {
-    font-size: 1.3rem;
-    color: var(--colour-BLACK_05);
+    color: var(--colour-BLACK_075);
+    font-size: 1.2rem;
+    line-height: 1.4;
 }
 
-.chartPanel {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    min-height: 35rem;
+.visuallyHidden {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+    position: absolute;
 }
 
-@container (max-width: 960px) {
+@container (max-width: 900px) {
     .graphBody {
         grid-template-columns: 1fr;
     }
@@ -153,17 +227,47 @@
     }
 }
 
-@media (max-width: 620px) {
+@container (max-width: 620px) {
     .graphCard {
-        padding: 2rem 1.6rem;
+        padding: 1.3rem;
     }
 
     .graphHeader {
         align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .graphHeading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.2rem;
     }
 
     .graphHeaderActions {
         width: 100%;
         justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .statusBadge {
+        margin-right: auto;
+    }
+}
+
+@container (max-width: 420px) {
+    .graphTitle {
+        font-size: 1.65rem;
+    }
+
+    .iconButton span {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
     }
 }

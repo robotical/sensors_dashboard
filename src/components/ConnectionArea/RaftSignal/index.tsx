@@ -34,6 +34,17 @@ export default function RaftSignal({ signalStrength, connectedRaft }: RaftSignal
     }
   }, [signalStrength]);
 
-  return <EmptySignalSVG ref={signalRef} width={"100%"} />
+  return (
+    <EmptySignalSVG
+      ref={signalRef}
+      width={"100%"}
+      role="img"
+      aria-label={
+        signalStrength <= -200
+          ? "Signal strength unavailable"
+          : `Signal strength: ${signalStrength} dBm`
+      }
+    />
+  )
 
 }

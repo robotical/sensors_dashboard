@@ -8,14 +8,19 @@ import { FaPlus } from "react-icons/fa";
 import { NewRobotIdE } from "@robotical/webapp-types/dist-types/src/store/SelectedRaftContext";
 import { useEffect, useRef, useState } from "react";
 
+type ConnectionStatus = "idle" | "connecting" | "error";
+
 type Props = {
     isNavMenuMinimized: boolean;
 };
 
 const ConnectionArea: React.FC<Props> = ({ isNavMenuMinimized }) => {
     const [, setRefresh] = useState<number>(0);
+    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("idle");
     const connectedRafts = window.applicationManager?.connectedRafts || {};
     const connectedRaftsArray = Object.values(connectedRafts);
+    const visibleConnectedRafts = connectedRaftsArray.filter(raft => raft.id !== NewRobotIdE.NEW);
+    const hasConnectedRafts = visibleConnectedRafts.length > 0;
 
     const connectedRaftsLength = useRef(connectedRaftsArray.length);
 
@@ -34,7 +39,17 @@ const ConnectionArea: React.FC<Props> = ({ isNavMenuMinimized }) => {
     
     const onClickConnect = async () => {
         if (!window.applicationManager) return;
-        window.applicationManager.connectGeneric(() => setRefresh((old) => old + 1));
+        setConnectionStatus("connecting");
+
+        try {
+            await window.applicationManager.connectGeneric(() => {
+                setRefresh((old) => old + 1);
+                setConnectionStatus("idle");
+            });
+            setConnectionStatus("idle");
+        } catch {
+            setConnectionStatus("error");
+        }
     };
 
     const onClickDisconnect = async (raftId: string) => {
@@ -45,23 +60,49 @@ const ConnectionArea: React.FC<Props> = ({ isNavMenuMinimized }) => {
         );
     };
 
+    const connectionLabel =
+        connectionStatus === "connecting"
+            ? "Connecting…"
+            : connectionStatus === "error"
+                ? "Try connecting again"
+                : "Connect device";
+
     return <div className={[styles.connectionAreaContainer].join(" ")}>
-        <div className={[styles.connectionAreaContainerInner, isNavMenuMinimized ? styles.minimizedConnectionAreaInnerContainer : ""].join(" ")}>
+        <div className={[
+            styles.connectionAreaContainerInner,
+            isNavMenuMinimized ? styles.minimizedConnectionAreaInnerContainer : "",
+        ].join(" ")}>
             {/* Connection button */}
-            {connectedRaftsArray.filter(raft => raft.id !== NewRobotIdE.NEW).length === 0 && <div className={styles.connectButtonContainer} onClick={onClickConnect}>
-                <div className={styles.emptyRow}></div>
-                <div className={styles.connectButtonIconContainer}>
-                    <img src={CogSelectedIcon} alt="Cog icon" className={styles.connectButtonIcon} />
-                    <img src={MartySelectedIcon} alt="Marty icon" className={styles.connectButtonIcon} />
-                </div>
-                <div className={[styles.connectIconContainer, isNavMenuMinimized ? styles.minimizedConnectIconContainer : ""].join(" ")}>
-                    <ConnectButtonDefault />
-                </div>
-            </div>}
+            {!hasConnectedRafts && <>
+                <button
+                    type="button"
+                    className={styles.connectButtonContainer}
+                    onClick={onClickConnect}
+                    disabled={!window.applicationManager || connectionStatus === "connecting"}
+                    aria-busy={connectionStatus === "connecting"}
+                    aria-label={connectionLabel}
+                    aria-describedby="robot-connection-status"
+                >
+                    <span className={styles.emptyRow} aria-hidden="true" />
+                    <span className={styles.connectButtonIconContainer} aria-hidden="true">
+                        <img src={CogSelectedIcon} alt="" className={styles.connectButtonIcon} />
+                        <img src={MartySelectedIcon} alt="" className={styles.connectButtonIcon} />
+                    </span>
+                    <span className={[styles.connectIconContainer, isNavMenuMinimized ? styles.minimizedConnectIconContainer : ""].join(" ")} aria-hidden="true">
+                        <ConnectButtonDefault focusable="false" />
+                    </span>
+                </button>
+                <span id="robot-connection-status" className={styles.connectionStatus} role="status">
+                    {connectionStatus === "connecting"
+                        ? "Connecting to a device."
+                        : connectionStatus === "error"
+                            ? "Connection failed. Please try again."
+                            : "Ready to connect a device."}
+                </span>
+            </>}
             {/* End of connection button */}
             {isNavMenuMinimized ? null :
-                connectedRaftsArray.map((connectedRaft) => {
-                    if (connectedRaft.id === NewRobotIdE.NEW) return null;
+                visibleConnectedRafts.map((connectedRaft) => {
                     return <RobotButton
                         key={connectedRaft.id}
                         robotType={connectedRaft.type}
@@ -70,9 +111,18 @@ const ConnectionArea: React.FC<Props> = ({ isNavMenuMinimized }) => {
                     />
                 })
             }
-            {connectedRaftsArray.filter(raft => raft.id !== NewRobotIdE.NEW).length > 0 && <div className={styles.plusIconContainer} onClick={onClickConnect}>
-                <FaPlus className={styles.plusIcon} />
-            </div>}
+            {hasConnectedRafts && <button
+                type="button"
+                className={styles.plusIconContainer}
+                onClick={onClickConnect}
+                disabled={connectionStatus === "connecting"}
+                aria-label={connectionStatus === "connecting" ? "Connecting another robot" : "Connect another robot"}
+                title="Connect another robot"
+            >
+                <span className={styles.plusIconVisual} aria-hidden="true">
+                    <FaPlus className={styles.plusIcon} focusable="false" />
+                </span>
+            </button>}
         </div>
     </div >
 }

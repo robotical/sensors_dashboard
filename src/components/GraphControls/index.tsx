@@ -1,9 +1,21 @@
-import React from "react";
-import styles from "./styles.module.css";
-import { Checkbox, Tooltip } from "@mui/material";
-import Dropdown from "../Dropdown";
+import React, { useId } from "react";
+import { Checkbox } from "@mui/material";
+import {
+  FaChevronDown,
+  FaDotCircle,
+  FaPause,
+  FaPlay,
+  FaStop,
+} from "react-icons/fa";
 import { DropdownOptionsInterface } from "../../utils/start-end-rules/start-end-options";
-import { FaSort, FaPlay, FaPause, FaStop, FaDotCircle } from "react-icons/fa";
+import Dropdown from "../Dropdown";
+import styles from "./styles.module.css";
+
+export type GraphRecordingState =
+  | "choose-signals"
+  | "ready"
+  | "recording"
+  | "paused";
 
 interface GraphControlsProps {
   onClickPlay: () => void;
@@ -23,10 +35,48 @@ interface GraphControlsProps {
   endSelectedOption: DropdownOptionsInterface | undefined;
   startOptions: DropdownOptionsInterface[];
   endOptions: DropdownOptionsInterface[];
-  isTracking: boolean;
+  recordingState: GraphRecordingState;
+  hasData: boolean;
+  endConditionReached?: boolean;
+  mode?: "all" | "primary" | "advanced";
 }
 
-const GraphControls = React.memo(({
+const getStatusCopy = (
+  recordingState: GraphRecordingState,
+  endConditionReached: boolean
+) => {
+  if (recordingState === "choose-signals") {
+    return {
+      title: "Choose signals",
+      description: "Select at least one signal to enable recording.",
+    };
+  }
+  if (recordingState === "ready") {
+    return {
+      title: "Ready to record",
+      description: "Your signals are selected. Start when you’re ready.",
+    };
+  }
+  if (recordingState === "recording") {
+    return {
+      title: "Recording active",
+      description:
+        "Data appears as readings arrive and the start condition is met.",
+    };
+  }
+  if (endConditionReached) {
+    return {
+      title: "Recording ended",
+      description: "The end condition was met. Reset the graph to record again.",
+    };
+  }
+  return {
+    title: "Recording paused",
+    description: "Resume to continue this recording, or reset to start over.",
+  };
+};
+
+function GraphControls({
   onClickPlay,
   onClickPause,
   onClickStop,
@@ -38,82 +88,150 @@ const GraphControls = React.memo(({
   endSelectedOption,
   startOptions,
   endOptions,
-  isTracking,
-}: GraphControlsProps) => {
-  console.log("rendering controls");
-  return (
-    <div className={styles.container}>
-      <div className={styles.ruleBlock}>
-        <p className={styles.blockLabel}>Trigger conditions</p>
-        <div className={styles.startEndRules}>
-          <Dropdown
-            rule="start"
-            label="Start when"
-            onChange={onStartOptionChange}
-            options={startOptions}
-            selectedOption={startSelectedOption}
-          />
-          <Dropdown
-            rule="end"
-            label="End when"
-            onChange={onEndOptionChange}
-            options={endOptions}
-            selectedOption={endSelectedOption}
-          />
-        </div>
-      </div>
+  recordingState,
+  hasData,
+  endConditionReached = false,
+  mode = "all",
+}: GraphControlsProps) {
+  const reactId = useId();
+  const isRecording = recordingState === "recording";
+  const canRecord =
+    recordingState !== "choose-signals" &&
+    !isRecording &&
+    !endConditionReached;
+  const canPause = isRecording;
+  const canReset =
+    hasData || recordingState === "recording" || recordingState === "paused";
+  const statusCopy = getStatusCopy(recordingState, endConditionReached);
+  const recordLabel = recordingState === "paused" ? "Resume" : "Record";
+  const statusDescriptionId = `recording-status-${reactId.replace(/:/g, "")}`;
+  const showPrimaryControls = mode !== "advanced";
+  const showAdvancedSettings = mode !== "primary";
+  const sectionLabel =
+    mode === "primary"
+      ? "Recording controls"
+      : mode === "advanced"
+        ? "Advanced graph settings"
+        : "Recording controls and graph settings";
 
-      <Tooltip title="Automatically scroll on the x-axis as new data arrives, keeping the most recent data in view.">
-        <div className={styles.autoScrollContainer}>
-          <p className={styles.blockLabel}>Auto-scroll</p>
-          <div className={styles.autoScrollToggle}>
-            <FaSort />
-            <Checkbox checked={autoScrollEnabled} onChange={onAutoScrollToggle} />
+  return (
+    <section className={styles.container} aria-label={sectionLabel}>
+      {showPrimaryControls && (
+        <div className={styles.primaryBar}>
+          <div
+            className={styles.statusCopy}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            <p className={styles.statusTitle}>{statusCopy.title}</p>
+            <p className={styles.statusDescription} id={statusDescriptionId}>
+              {statusCopy.description}
+            </p>
+          </div>
+
+          <div className={styles.primaryActions}>
+            <button
+              type="button"
+              className={[
+                styles.controlButton,
+                styles.recordButton,
+                isRecording ? styles.controlButtonActive : "",
+              ].join(" ")}
+              onClick={onClickPlay}
+              disabled={!canRecord}
+              aria-describedby={statusDescriptionId}
+              aria-pressed={isRecording}
+            >
+              {isRecording ? (
+                <FaDotCircle aria-hidden="true" />
+              ) : (
+                <FaPlay aria-hidden="true" />
+              )}
+              <span>{isRecording ? "Recording" : recordLabel}</span>
+            </button>
+            <button
+              type="button"
+              className={styles.controlButton}
+              onClick={onClickPause}
+              disabled={!canPause}
+              aria-describedby={statusDescriptionId}
+            >
+              <FaPause aria-hidden="true" />
+              <span>Pause</span>
+            </button>
+            <button
+              type="button"
+              className={styles.controlButton}
+              onClick={onClickStop}
+              disabled={!canReset}
+              aria-describedby={statusDescriptionId}
+            >
+              <FaStop aria-hidden="true" />
+              <span>Reset</span>
+            </button>
           </div>
         </div>
-      </Tooltip>
+      )}
 
-      <div className={styles.playPauseContainer}>
-        <button
-          type="button"
-          className={[
-            styles.graphControlsButton,
-            isTracking ? styles.graphControlsButtonActive : "",
-          ].join(" ")}
-          onClick={onClickPlay}
-          aria-label={isTracking ? "Tracking in progress" : "Start tracking"}
-          aria-pressed={isTracking}
-        >
-          {isTracking ? <FaDotCircle /> : <FaPlay />}
-        </button>
-        <button
-          type="button"
-          className={styles.graphControlsButton}
-          onClick={onClickPause}
-          aria-label="Pause tracking"
-        >
-          <FaPause />
-        </button>
-        <button
-          type="button"
-          className={styles.graphControlsButton}
-          onClick={onClickStop}
-          aria-label="Stop and reset graph"
-        >
-          <FaStop />
-        </button>
-      </div>
-    </div>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.autoScrollEnabled === nextProps.autoScrollEnabled &&
-    prevProps.startSelectedOption === nextProps.startSelectedOption &&
-    prevProps.endSelectedOption === nextProps.endSelectedOption &&
-    prevProps.startOptions === nextProps.startOptions &&
-    prevProps.endOptions === nextProps.endOptions &&
-    prevProps.isTracking === nextProps.isTracking
-  );
-});
+      {showAdvancedSettings && (
+        <details className={styles.advancedSettings}>
+          <summary className={styles.advancedSummary}>
+            <span>
+              <strong>Advanced settings</strong>
+              <small>Trigger conditions and chart scrolling</small>
+            </span>
+            <FaChevronDown className={styles.chevron} aria-hidden="true" />
+          </summary>
 
-export default GraphControls;
+          <div className={styles.advancedContent}>
+            <div className={styles.ruleBlock}>
+              <div className={styles.blockHeading}>
+                <p className={styles.blockLabel}>Trigger conditions</p>
+                {isRecording && (
+                  <p className={styles.disabledReason} role="note">
+                    Pause recording to edit trigger conditions.
+                  </p>
+                )}
+              </div>
+              <div className={styles.startEndRules}>
+                <Dropdown
+                  rule="start"
+                  label="Start when"
+                  onChange={onStartOptionChange}
+                  options={startOptions}
+                  selectedOption={startSelectedOption}
+                  disabled={isRecording}
+                />
+                <Dropdown
+                  rule="end"
+                  label="End when"
+                  onChange={onEndOptionChange}
+                  options={endOptions}
+                  selectedOption={endSelectedOption}
+                  disabled={isRecording}
+                />
+              </div>
+            </div>
+
+            <label className={styles.autoScrollContainer}>
+              <span>
+                <strong>Keep latest data in view</strong>
+                <small>
+                  Automatically follow new readings along the time axis.
+                </small>
+              </span>
+              <Checkbox
+                checked={autoScrollEnabled}
+                onChange={onAutoScrollToggle}
+                inputProps={{ "aria-label": "Keep latest data in view" }}
+              />
+            </label>
+          </div>
+        </details>
+      )}
+    </section>
+  );
+}
+
+export default React.memo(GraphControls);

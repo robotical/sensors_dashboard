@@ -1,9 +1,6 @@
 .robotButtonContainer {
   position: relative;
   width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: white;
   border: 2px solid #133c46;
   border-radius: 5px;
@@ -14,18 +11,17 @@
 }
 
 .robotButtonContainerInner {
+  position: relative;
   width: 100%;
   height: 100%;
 
   display: grid;
   grid-template-rows: 1fr min-content min-content;
-  /* grid-template-columns: 0.45fr 0.55fr; */
-
+  grid-template-columns: 0.45fr 0.55fr;
   grid-template-areas:
     "robotButtonIconContainer robotButtonIconContainer"
     "signalContainer batteryContainer"
     "robotButtonNameContainer robotButtonNameContainer";
-
   row-gap: 0.2rem;
 }
 
@@ -38,9 +34,9 @@
 }
 
 .robotButtonIcon {
-  width: 4rem;
-  height: 4rem;
-  /* padding-bottom: 2px; */
+  width: 4.3rem;
+  height: 4.3rem;
+  object-fit: contain;
   padding-top: 4px;
 }
 
@@ -55,8 +51,20 @@
 }
 
 .robotButtonName {
-  color: white;
+  color: #133c46;
   font-size: 1.1rem;
+}
+
+.connectionStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .batteryContainer {
@@ -81,16 +89,33 @@
 
 .trashContainer {
   position: absolute;
-  top: -1.2rem;
-  left: -1.2rem;
-
-  background-color: var(--colour-MAIN_BLUE);
-
+  top: -1.5rem;
+  left: -1.5rem;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
   border-radius: 50%;
-  width: 3rem;
-  height: 3rem;
+  width: 44px;
+  height: 44px;
 
   display: flex;
   justify-content: center;
+  align-items: center;
   cursor: pointer;
+  appearance: none;
+}
+
+.trashContainer svg {
+  width: 3.8rem;
+  height: 3.8rem;
+}
+
+.trashContainer:focus-visible {
+  outline: 3px solid var(--focus-ring, #0b6f87);
+  outline-offset: 3px;
+}
+
+.trashContainer:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }

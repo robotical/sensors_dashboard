@@ -118,6 +118,7 @@ export default function LandingPage({ isInModal }: Props) {
   const [shouldCloseModal, setShouldCloseModal] = useState(false);
 
   const mainRef = useRef<HTMLDivElement>(null);
+  const isModalOpen = Boolean(modalData?.modalContent);
 
   // Create subscription to the modal state
   useEffect(() => {
@@ -149,20 +150,38 @@ export default function LandingPage({ isInModal }: Props) {
     setModalData(null);
   };
 
+  useEffect(() => {
+    const mainElement = mainRef.current;
+    if (!mainElement) {
+      return undefined;
+    }
+
+    if (isModalOpen) {
+      mainElement.setAttribute("inert", "");
+    } else {
+      mainElement.removeAttribute("inert");
+    }
+
+    return () => {
+      mainElement.removeAttribute("inert");
+    };
+  }, [isModalOpen]);
+
   return (
     <>
-      {!!modalData?.modalContent && <Modal
+      {isModalOpen && <Modal
           title={modalData?.modalTitle ?? ""}
           modalResetter={resetModal}
           shouldCloseModal={shouldCloseModal}
-          withLogo
+          withLogo={modalData?.withLogo ?? true}
         >
           {modalData?.modalContent}
         </Modal>
       }
-      <main id="sensors-dashboard-modal-main-container"></main>
+      <div id="sensors-dashboard-modal-main-container"></div>
       <main
         aria-label="Sensor Insights Hub"
+        aria-hidden={isModalOpen || undefined}
         className={`${styles.mainContainer} ${isInModal ? styles.mainContainerInModal : ""}`}
         ref={mainRef}
         tabIndex={0}

@@ -1,41 +1,51 @@
 .howToUseModalContainer {
-    max-width: 90vw;
-    width: 100%;
-    height: 100%;
     display: grid;
-    /* row-gap: 1rem; */
+    gap: 0.8rem;
+    padding-block: 0.6rem;
 }
 
 .howToUseModalTextTitle {
-    margin-top: 1.5rem;
-    font-size: 1.5rem;
-    font-weight: bolder;
-    font-family: 'BigNoodleTitling Regular';
-}
-
-.howToUseModalImg {
-    max-width: 100%;
-    justify-self: center;
+    margin-top: 1.4rem;
+    color: var(--colour-BLACK);
+    font-family: "BigNoodleTitling Regular";
+    font-size: 2.2rem;
+    letter-spacing: 0.02em;
 }
 
 .howToUseModalTextParagraph {
-    line-height: 1.5;
+    color: var(--colour-BLACK_075);
+    font-size: 1.45rem;
+    line-height: 1.55;
+}
+
+.howToUseModalTextParagraph a {
+    color: var(--colour-primary-deep);
+    font-weight: 800;
+    text-underline-offset: 0.2rem;
 }
 
 .terminologyKey {
     display: grid;
-    grid-template-columns: 25% 75%;
-    align-items: center;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 5px;
-    background-color: #f8f9fa;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-    font-size: 0.8em;
+    grid-template-columns: minmax(14rem, 0.38fr) 1fr;
+    gap: 1.2rem;
+    align-items: start;
+    padding: 1.2rem;
+    background-color: var(--colour-GREY_2);
+    border: 0.1rem solid var(--colour-GREY_4);
+    border-radius: 1.2rem;
+    color: var(--colour-BLACK_075);
+    font-size: 1.35rem;
+    line-height: 1.45;
 }
 
 .terminologyKey b {
-    font-size: 1em;
-    width: 300px;
-    color: #343a40;
+    color: var(--colour-BLACK);
+    font-size: 1.4rem;
+}
+
+@media (max-width: 560px) {
+    .terminologyKey {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+    }
 }

@@ -1,61 +1,97 @@
 .howToUseModalContainer {
+  width: min(76rem, 88vw);
   display: grid;
-  row-gap: 1rem;
+  gap: 1.4rem;
 }
-.tabWindow {
-  width: 400px;
-  height: 300px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 10px;
-  box-sizing: border-box;
-  background-color: #fff;
+
+.modalIntro {
+  color: var(--colour-BLACK_075);
+  font-size: 1.5rem;
+  line-height: 1.5;
 }
 
 .tabs {
   display: flex;
-  justify-content: flex-start;
-  border-bottom: 1px solid #ddd;
+  gap: 0.6rem;
+  padding: 0.5rem;
+  background: var(--colour-BLUE_LIGHT_1);
+  border: 0.1rem solid var(--colour-BLUE_LIGHT_3);
+  border-radius: 1.4rem;
 }
 
 .button {
+  min-height: 4.4rem;
+  flex: 1;
+  padding: 0.9rem 1.4rem;
+  background: transparent;
+  border: 0.2rem solid transparent;
+  border-radius: 1rem;
+  color: var(--colour-BLACK_075);
   cursor: pointer;
-  background: none;
-  border: none;
-  padding: 10px 20px;
-  margin-right: 5px;
-  outline: none;
+  font-weight: 800;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .button:hover {
-  background-color: #f1f1f1;
+  background: rgba(255, 255, 255, 0.74);
+  color: var(--colour-BLACK);
 }
 
-.button:active {
-  background-color: #ddd;
+.button:focus-visible,
+.closeButton:focus-visible {
+  outline: 0.3rem solid var(--focus-ring);
+  outline-offset: 0.2rem;
 }
 
 .activeTab {
-  border-top: 2px solid #4d90fe;
-  border-bottom: 2px solid white;
-  margin-bottom: -1px;
+  background: var(--colour-TRUE_WHITE);
+  color: var(--colour-primary-deep);
+  box-shadow: 0 0.4rem 1.2rem rgba(38, 38, 38, 0.08);
 }
 
 .tabContent {
-  height: calc(100% - 60px);
-  padding: 10px;
-  box-sizing: border-box;
-  height: 50vh;
-  overflow: scroll;
+  min-height: 30rem;
+  max-height: min(54vh, 52rem);
+  padding: 0.4rem 0.8rem 0.8rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--colour-BLUE_LIGHT_2) transparent;
+  scrollbar-width: thin;
 }
 
 .closeButton {
-  justify-self: center;
-  padding: 0.5rem 1rem;
-  background-color: var(--colour-primary);
-  color: white;
-  border-radius: 5px;
+  min-height: 4.4rem;
+  justify-self: end;
+  padding: 0.9rem 1.8rem;
+  background-color: var(--colour-primary-strong);
+  color: var(--colour-TRUE_WHITE);
+  border: 0.2rem solid transparent;
+  border-radius: 999px;
   cursor: pointer;
-  outline: none;
-  border: none;
+  font-weight: 800;
+  transition: background-color 0.18s ease;
+}
+
+.closeButton:hover {
+  background-color: var(--colour-primary-deep);
+}
+
+@media (max-width: 640px) {
+  .howToUseModalContainer {
+    width: min(84vw, 76rem);
+  }
+
+  .tabs {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .tabContent {
+    max-height: 50vh;
+    padding-inline: 0;
+  }
+
+  .closeButton {
+    width: 100%;
+  }
 }

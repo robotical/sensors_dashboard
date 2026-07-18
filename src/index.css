@@ -1,7 +1,11 @@
 :root {
   --colour-primary: rgb(55, 171, 200);
+  --colour-primary-strong: #0b6f87;
+  --colour-primary-deep: #064b5d;
   --colour-secondary: rgb(244, 218, 97);
   --colour-tertiary: rgb(0, 213, 146);
+  --colour-success-strong: #087a57;
+  --focus-ring: #7a3ff2;
   --colour-BLACK: rgb(38, 38, 38);
   --colour-BLACK_075: rgba(38, 38, 38, 0.75);
   --colour-BLACK_05: rgba(38, 38, 38, 0.5);
@@ -49,19 +53,41 @@ html {
   /* This defines what 1rem is: 1rem = 10px; 10/16 = 62.5 */
   font-size: 62.5%;
   overflow: hidden;
-  /* height: 100%; */
 }
 
 body {
   box-sizing: border-box;
   font-size: 1.6rem;
+  line-height: 1.5;
   min-height: 100vh;
   background: linear-gradient(180deg, var(--colour-BLUE_LIGHT_1) 0%, var(--colour-TRUE_WHITE) 60%);
   color: var(--colour-BLACK);
+  text-rendering: optimizeLegibility;
 }
 
 #root {
   min-height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+a,
+input,
+select,
+textarea,
+[tabindex]:not([tabindex="-1"]) {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 0.3rem solid var(--focus-ring);
+  outline-offset: 0.3rem;
 }
 
 p,
@@ -77,51 +103,13 @@ div {
   font-family: "Lato Regular";
 }
 
-@media only screen and (max-width: 2000px) {
-  html {
-      font-size: 80%;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-}
-
-
-@media only screen and (max-width: 1400px) {
-  html {
-      font-size: 70%;
-  }
-}
-
-@media only screen and (max-width: 1200px) {
-  html {
-      font-size: 65%;
-  }
-}
-
-
-@media only screen and (max-width: 1000px) {
-  html {
-      font-size: 58%;
-  }
-}
-
-@media only screen and (max-width: 800px) {
-  html {
-      font-size: 45%;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  html {
-      font-size: 30%;
-  }
-}
-
-@media only screen and (max-height: 290px) {
-  html {
-      font-size: 20%;
-  }
-}
-
-
-@media only screen and (max-height: 600px) and (max-width: 1100px) {
-
 }

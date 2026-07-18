@@ -1,23 +1,83 @@
-.howToUseModalContainer {
-    max-width: 90vw;
-    width: 100%;
-    height: 100%;
+.guide {
     display: grid;
-    /* row-gap: 1rem; */
+    gap: 2rem;
+    padding-block: 0.6rem;
 }
 
-.howToUseModalTextTitle {
-    margin-top: 1.5rem;
+.eyebrow {
+    color: var(--colour-primary-strong);
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.guide h3 {
+    margin-top: 0.4rem;
+    color: var(--colour-BLACK);
     font-size: 2rem;
-    font-weight: bolder;
-    font-family: 'BigNoodleTitling Regular';
 }
 
-.howToUseModalImg {
-    max-width: 100%;
-    justify-self: center;
+.steps {
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.2rem;
 }
 
-.howToUseModalTextParagraph {
+.steps li {
+    display: grid;
+    grid-template-columns: 4.4rem 1fr;
+    gap: 1.2rem;
+    align-items: start;
+    padding: 1.3rem;
+    background: var(--colour-BLUE_LIGHT_1);
+    border: 0.1rem solid var(--colour-BLUE_LIGHT_3);
+    border-radius: 1.4rem;
+}
+
+.stepNumber {
+    width: 4.4rem;
+    height: 4.4rem;
+    display: grid;
+    place-items: center;
+    background: var(--colour-primary-strong);
+    border-radius: 50%;
+    color: var(--colour-TRUE_WHITE);
+    font-weight: 800;
+}
+
+.steps h4 {
+    font-size: 1.6rem;
+}
+
+.steps p,
+.tipGrid p {
+    margin-top: 0.35rem;
+    color: var(--colour-BLACK_075);
+    font-size: 1.45rem;
     line-height: 1.5;
+}
+
+.tipGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.tipGrid article {
+    padding: 1.4rem;
+    background: var(--colour-GREY_2);
+    border-radius: 1.2rem;
+}
+
+.tipGrid article h3 {
+    margin-top: 0;
+    font-size: 1.55rem;
+}
+
+@media (max-width: 680px) {
+    .tipGrid {
+        grid-template-columns: 1fr;
+    }
 }

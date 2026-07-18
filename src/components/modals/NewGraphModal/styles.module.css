@@ -1,6 +1,7 @@
 .gridContainer {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 20rem));
+  justify-content: center;
   gap: 1rem;
 }
 
@@ -15,11 +16,29 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  min-height: 12rem;
   padding: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   background-color: #fff;
+  color: var(--colour-BLACK);
+  font: inherit;
   cursor: pointer;
+  appearance: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
+}
+
+.card:hover {
+  border-color: var(--colour-primary-strong, #0b6f87);
+  box-shadow: 0 0.35rem 1rem rgba(19, 60, 70, 0.18);
+  transform: translateY(-1px);
+}
+
+.card:focus-visible,
+.closeButton:focus-visible {
+  outline: 3px solid var(--focus-ring, #0b6f87);
+  outline-offset: 3px;
 }
 
 .icon {
@@ -29,14 +48,53 @@
 }
 
 .raftName {
-  font-size: 1rem;
+  font-size: 1.3rem;
   font-weight: bold;
   text-align: center;
 }
 
-.closeIcon {
+.connectedStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+  color: var(--colour-success-strong, #087a57);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.connectedStatusDot {
+  width: 0.7rem;
+  height: 0.7rem;
+  min-width: 7px;
+  min-height: 7px;
+  border-radius: 50%;
+  background-color: var(--colour-success-strong, #087a57);
+}
+
+.closeButton {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: max(4.4rem, 44px);
+  height: max(4.4rem, 44px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background-color: var(--colour-primary-strong, #0b6f87);
+  color: white;
   cursor: pointer;
+  appearance: none;
+  transition: background-color 120ms ease;
+}
+
+.closeButton:hover {
+  background-color: var(--colour-primary-deep, #064b5d);
+}
+
+.closeIcon {
+  font-size: 1.8rem;
 }

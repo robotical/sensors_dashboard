@@ -47,10 +47,22 @@ export default function RaftBattery({ batteryStrength }: RaftBatteryProps) {
   }, [batteryStrength]);
 
   return (
-    <div className={styles.martyBattContainer}>
+    <div
+      className={styles.martyBattContainer}
+      role="img"
+      aria-label={
+        batteryStrength === 0
+          ? "Battery level unavailable or charging"
+          : `Battery: ${batteryStrength} percent`
+      }
+    >
       {
-        batteryStrength === 0 ? <> <p className={styles.martyBattPercentage}></p> <PowerPlugSVG /></> :
-          <><BatterySVG ref={batteryRef} /><p className={styles.martyBattPercentage}>{batteryStrength}%</p></>
+        batteryStrength === 0
+          ? <PowerPlugSVG aria-hidden="true" focusable="false" />
+          : <>
+              <BatterySVG ref={batteryRef} aria-hidden="true" focusable="false" />
+              <p className={styles.martyBattPercentage} aria-hidden="true">{batteryStrength}%</p>
+            </>
       }
     </div>
   );

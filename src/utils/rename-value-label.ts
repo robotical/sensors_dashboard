@@ -1,7 +1,15 @@
 import addonNamesMap from "./constants/addons-names";
 
 export default function renameValueLabel(valKey: string, addonName: string) {
-    let newValueLabel = valKey.replace(addonName, "");
-    newValueLabel = addonNamesMap(newValueLabel);
-    return newValueLabel;
+  const mappedFullKey = addonNamesMap(valKey);
+  if (mappedFullKey !== valKey) {
+    return mappedFullKey;
   }
+
+  const shortenedKey = valKey
+    .replace(addonName, "")
+    .replace(/^[_\s-]+/, "");
+  const mappedShortKey = addonNamesMap(shortenedKey);
+
+  return mappedShortKey || valKey;
+}

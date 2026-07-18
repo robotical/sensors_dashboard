@@ -1,116 +1,274 @@
 .container {
-  display: grid;
-  grid-template-columns: minmax(260px, 2fr) minmax(200px, 1fr) minmax(220px, 1fr);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.primaryBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 1.6rem;
-  align-items: stretch;
-  padding: 1.8rem 2.2rem;
+  padding: 1.4rem 1.6rem;
   background-color: var(--colour-WHITE);
+  border: 1px solid var(--colour-BLUE_LIGHT_3);
   border-radius: 1.6rem;
-  box-shadow: 0 18px 45px rgba(38, 38, 38, 0.08);
+  box-shadow: 0 14px 32px rgba(38, 38, 38, 0.08);
+}
+
+.statusCopy {
+  min-width: 0;
+}
+
+.statusTitle {
+  color: var(--colour-BLACK);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.statusDescription {
+  color: var(--colour-BLACK_075);
+  font-size: 1.3rem;
+  line-height: 1.45;
+  margin-top: 0.2rem;
+}
+
+.primaryActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  flex: 0 0 auto;
+}
+
+.controlButton {
+  min-width: 4.4rem;
+  min-height: 4.4rem;
+  padding: 0.8rem 1.3rem;
+  border: 1px solid var(--colour-primary-strong);
+  border-radius: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  color: var(--colour-primary-deep);
+  cursor: pointer;
+  background: var(--colour-TRUE_WHITE);
+  font: inherit;
+  font-size: 1.3rem;
+  font-weight: 700;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.controlButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background-color: var(--colour-AQUA_BLUE_025);
+  box-shadow: 0 10px 22px rgba(11, 111, 135, 0.16);
+}
+
+.controlButton:focus-visible,
+.advancedSummary:focus-visible {
+  outline: 0.3rem solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.controlButton:disabled {
+  border-color: var(--colour-BLUE_LIGHT_3);
+  background-color: var(--colour-BLUE_LIGHT_1);
+  box-shadow: none;
+  color: var(--colour-BLACK_05);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.recordButton:not(:disabled) {
+  border-color: var(--colour-primary-strong);
+  background: var(--colour-primary-strong);
+  color: var(--colour-TRUE_WHITE);
+  box-shadow: 0 10px 22px rgba(11, 111, 135, 0.24);
+}
+
+.recordButton:hover:not(:disabled) {
+  background: var(--colour-primary-deep);
+  color: var(--colour-TRUE_WHITE);
+}
+
+.controlButtonActive:not(:disabled) {
+  border-color: var(--colour-success-strong);
+  background: var(--colour-success-strong);
+}
+
+.advancedSettings {
+  overflow: clip;
+  border: 1px solid var(--colour-BLUE_LIGHT_3);
+  border-radius: 1.4rem;
+  background-color: var(--colour-TRUE_WHITE);
+}
+
+.advancedSummary {
+  min-height: 4.4rem;
+  padding: 0.8rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--colour-primary-deep);
+  cursor: pointer;
+  list-style: none;
+}
+
+.advancedSummary::-webkit-details-marker {
+  display: none;
+}
+
+.advancedSummary > span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.advancedSummary strong {
+  font-size: 1.3rem;
+}
+
+.advancedSummary small {
+  color: var(--colour-BLACK_05);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.chevron {
+  flex: 0 0 auto;
+  transition: transform 0.18s ease;
+}
+
+.advancedSettings[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.advancedContent {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr);
+  gap: 1.4rem;
+  padding: 1.4rem;
+  border-top: 1px solid var(--colour-BLUE_LIGHT_3);
+  background-color: var(--colour-WHITE);
+}
+
+.ruleBlock,
+.blockHeading {
+  display: flex;
+  flex-direction: column;
 }
 
 .ruleBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  gap: 1rem;
+}
+
+.blockHeading {
+  gap: 0.2rem;
 }
 
 .blockLabel {
+  color: var(--colour-BLACK_075);
   font-size: 1.2rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: var(--colour-BLACK_05);
   font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.disabledReason {
+  color: var(--colour-BLACK_075);
+  font-size: 1.2rem;
+  line-height: 1.4;
 }
 
 .startEndRules {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.2rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
 }
 
 .autoScrollContainer {
+  min-height: 4.4rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--colour-BLUE_LIGHT_3);
+  border-radius: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--colour-BLACK);
+  background-color: var(--colour-BLUE_LIGHT_1);
+  cursor: pointer;
+}
+
+.autoScrollContainer > span {
   display: flex;
   flex-direction: column;
-  gap: 0.8rem;
-  padding: 1.2rem 1.6rem;
-  border-radius: 1.4rem;
-  background-color: var(--colour-BLUE_LIGHT_1);
-  border: 1px solid var(--colour-BLUE_LIGHT_3);
-  height: 100%;
+  gap: 0.2rem;
 }
 
-.autoScrollToggle {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-size: 1.4rem;
-  color: var(--colour-BLACK);
+.autoScrollContainer strong {
+  font-size: 1.3rem;
 }
 
-.autoScrollToggle svg {
-  color: var(--colour-primary);
-  font-size: 1.6rem;
+.autoScrollContainer small {
+  color: var(--colour-BLACK_075);
+  font-size: 1.15rem;
+  line-height: 1.35;
 }
 
-.autoScrollToggle :global(.MuiCheckbox-root) {
-  padding: 0;
+.autoScrollContainer :global(.MuiCheckbox-root) {
+  width: 4.4rem;
+  height: 4.4rem;
+  flex: 0 0 4.4rem;
+  color: var(--colour-primary-strong);
 }
 
-.playPauseContainer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1.2rem;
+.autoScrollContainer :global(.MuiCheckbox-root.Mui-checked) {
+  color: var(--colour-primary-strong);
 }
 
-.graphControlsButton {
-  width: 3.6rem;
-  height: 3.6rem;
-  border-radius: 50%;
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.6rem;
-  color: var(--colour-TRUE_WHITE);
-  cursor: pointer;
-  background: linear-gradient(135deg, var(--colour-primary), var(--colour-LIGHT_BLUE));
-  box-shadow: 0 18px 30px rgba(55, 171, 200, 0.28);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.15s ease;
-}
-
-.graphControlsButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 22px 38px rgba(55, 171, 200, 0.35);
-}
-
-.graphControlsButtonActive {
-  background: linear-gradient(135deg, var(--colour-GREEN), var(--colour-tertiary));
-  box-shadow: 0 22px 40px rgba(0, 213, 146, 0.35);
-}
-
-@media (max-width: 1024px) {
-  .container {
-    grid-template-columns: 1fr;
+@media (max-width: 800px) {
+  .primaryBar {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
-  .playPauseContainer {
+  .primaryActions {
+    width: 100%;
     justify-content: flex-start;
   }
+
+  .advancedContent {
+    grid-template-columns: 1fr;
+  }
 }
 
-@media (max-width: 640px) {
-  .container {
-    padding: 1.6rem;
+@media (max-width: 520px) {
+  .primaryBar {
+    padding: 1.2rem;
+  }
+
+  .primaryActions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .controlButton {
+    width: 100%;
+    padding-inline: 0.8rem;
   }
 
   .startEndRules {
     grid-template-columns: 1fr;
   }
 
-  .playPauseContainer {
-    width: 100%;
-    justify-content: space-between;
+  .advancedSummary small {
+    display: none;
   }
 }

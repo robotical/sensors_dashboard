@@ -1,0 +1,28 @@
+.addonButton {
+  min-height: 4.4rem;
+  margin-bottom: 0.5rem;
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease;
+}
+
+.addonButton:hover {
+  background-color: var(--colour-AQUA_BLUE_025);
+}
+
+.addonButton:focus-visible {
+  outline: 0.3rem solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.addonButton[aria-expanded="true"] {
+  background-color: var(--colour-AQUA_BLUE_025);
+}
+
+.subList {
+  width: 100%;
+  padding: 0 0 0.4rem 0.6rem;
+  background-color: transparent;
+}

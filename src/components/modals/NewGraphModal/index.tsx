@@ -7,10 +7,9 @@ import modalState from "../../../state-observables/modal/ModalState";
 import { FaTimes } from "react-icons/fa";
 
 export default function NewGraphModal() {
-  const connectedRaftsArray = window.applicationManager?.connectedRaftsContext;
+  const connectedRaftsArray = window.applicationManager?.connectedRaftsContext || [];
 
   const handleRaftClick = (raftId: string) => {
-    console.log(`Raft with id ${raftId} clicked`);
     modalState.closeModal(raftId);
   };
 
@@ -18,13 +17,21 @@ export default function NewGraphModal() {
 
   return (
     <div className={styles.newGraphModalContainer}>
-        <FaTimes className={styles.closeIcon} onClick={() => modalState.closeModal()} /> {/* Add the X icon */}
+        <button
+          type="button"
+          className={styles.closeButton}
+          onClick={() => modalState.closeModal()}
+          aria-label="Close add graph dialog"
+          title="Close"
+        >
+          <FaTimes className={styles.closeIcon} aria-hidden="true" focusable="false" />
+        </button>
         {
           areThereConnectedRafts
-            ? <h6 className={styles.title}>Select a robot to generate a graph</h6>
-            : <h2 className={styles.title}>No robots connected. Please close this window and connect a robot to continue.</h2>
+            ? <p className={styles.title}>Select a connected robot for this graph</p>
+            : <p className={styles.title}>No robots are connected. Close this dialog and connect a robot to continue.</p>
         }
-      <div className={styles.gridContainer}>
+      <div className={styles.gridContainer} role="group" aria-label="Connected robots">
         {connectedRaftsArray.filter(raftFil => raftFil.id !== NewRobotIdE.NEW).map((raft, index) => {
 
           let raftIcon;
@@ -34,11 +41,24 @@ export default function NewGraphModal() {
             raftIcon = MartyIcon;
           }
 
+          const robotName = raft.name?.trim() || `${raft.type} robot`;
+
           return (
-            <div key={raft.id} className={styles.card} onClick={() => handleRaftClick(raft.id)}>
-              <img src={raftIcon} alt="Raft Icon" className={styles.icon} />
-              <div className={styles.raftName}>{raft.name}</div>
-            </div>
+            <button
+              key={raft.id}
+              type="button"
+              className={styles.card}
+              onClick={() => handleRaftClick(raft.id)}
+              aria-label={`Create graph for ${robotName}`}
+              data-modal-initial-focus={index === 0 ? "true" : undefined}
+            >
+              <img src={raftIcon} alt="" aria-hidden="true" className={styles.icon} />
+              <span className={styles.raftName}>{robotName}</span>
+              <span className={styles.connectedStatus}>
+                <span className={styles.connectedStatusDot} aria-hidden="true" />
+                Connected
+              </span>
+            </button>
           )
         })}
       </div>

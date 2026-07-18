@@ -13,7 +13,7 @@ import Logger from "../../../services/logger/Logger";
 type Props = {
     robotType: RaftTypeE
     connectedRaft: RAFT
-    onClickDisconnect: (raftId: string) => void
+    onClickDisconnect: (raftId: string) => Promise<void>
 };
 
 const SHOW_LOGS = true;
@@ -24,6 +24,7 @@ const RobotButton: React.FC<Props> = ({ robotType, connectedRaft, onClickDisconn
     const [batteryStrength, setBatteryStrength] = useState(0);
     const [RSSI, setRSSI] = useState(-200);
     const [isDisconnectHovered, setIsDisconnectHovered] = useState(false);
+    const [isDisconnecting, setIsDisconnecting] = useState(false);
 
     useEffect(() => {
         if (!connectedRaft) return;
@@ -35,27 +36,44 @@ const RobotButton: React.FC<Props> = ({ robotType, connectedRaft, onClickDisconn
     }, [connectedRaft]);
 
     useEffect(() => {
-        if (connectedRaft) {
-            setTimeout(() => {
-                connectedRaft.getRaftName()
-                    .then((name) => {
-                        console.log("name", name);
+        if (!connectedRaft) return undefined;
+
+        let cancelled = false;
+        const nameTimer = window.setTimeout(() => {
+            connectedRaft.getRaftName()
+                .then((name) => {
+                    if (!cancelled) {
                         setConnectedRaftName(name);
-                    })
-                    .catch((error) => {
-                        Logger.error(SHOW_LOGS, TAG, "Error getting raft name " + JSON.stringify(error));
-                    });
-            }, 500);
-        }
+                    }
+                })
+                .catch((error) => {
+                    Logger.error(SHOW_LOGS, TAG, "Error getting raft name " + JSON.stringify(error));
+                });
+        }, 500);
+
+        return () => {
+            cancelled = true;
+            window.clearTimeout(nameTimer);
+        };
     }, [connectedRaft]);
 
+    const handleDisconnect = async () => {
+        setIsDisconnecting(true);
+        try {
+            await onClickDisconnect(connectedRaft.id);
+        } finally {
+            setIsDisconnecting(false);
+        }
+    };
 
     const robotIcon = robotType === RaftTypeE.MARTY ? MartyIcon : CogIcon;
+    const robotTypeName = robotType === RaftTypeE.MARTY ? "Marty" : "Cog";
+    const displayName = connectedRaftName.trim() || robotTypeName;
 
     return <div className={[styles.robotButtonContainer, styles.selected].join(" ")}>
         <div className={styles.robotButtonContainerInner}>
             <div className={styles.robotButtonIconContainer}>
-                <img src={robotIcon} alt="Robot icon" className={styles.robotButtonIcon} />
+                <img src={robotIcon} alt="" aria-hidden="true" className={styles.robotButtonIcon} />
             </div>
             <div className={styles.batteryContainer}>
                 <div className={styles.batteryIcon}>
@@ -66,20 +84,35 @@ const RobotButton: React.FC<Props> = ({ robotType, connectedRaft, onClickDisconn
                 <RaftSignal connectedRaft={connectedRaft} signalStrength={RSSI} />
             </div>
             <div className={styles.robotButtonNameContainer}>
-                <div className={styles.robotButtonName}>{truncateRobotName(connectedRaftName)}</div>
+                <div className={styles.robotButtonName} title={displayName}>
+                    {truncateRobotName(displayName)}
+                </div>
             </div>
-            <div className={styles.trashContainer}
-                onClick={() => onClickDisconnect(connectedRaft.id)}
-                onMouseEnter={() => setIsDisconnectHovered(true)}
-                onMouseLeave={() => setIsDisconnectHovered(false)}>
-                {isDisconnectHovered ? <DisconnectHoverIcon /> : <DisconnectIcon />}
-            </div>
+            <span className={styles.connectionStatus} role="status">
+                {isDisconnecting ? `Disconnecting ${displayName}.` : `${displayName} connected.`}
+            </span>
         </div>
+        <button
+            type="button"
+            className={styles.trashContainer}
+            onClick={handleDisconnect}
+            onMouseEnter={() => setIsDisconnectHovered(true)}
+            onMouseLeave={() => setIsDisconnectHovered(false)}
+            onFocus={() => setIsDisconnectHovered(true)}
+            onBlur={() => setIsDisconnectHovered(false)}
+            disabled={isDisconnecting}
+            aria-busy={isDisconnecting}
+            aria-label={isDisconnecting ? `Disconnecting ${displayName}` : `Disconnect ${displayName}`}
+            title={`Disconnect ${displayName}`}
+        >
+            {isDisconnectHovered
+                ? <DisconnectHoverIcon aria-hidden="true" focusable="false" />
+                : <DisconnectIcon aria-hidden="true" focusable="false" />}
+        </button>
     </div>
 }
 
 export default RobotButton;
-
 
 function truncateRobotName(name: string) {
     if (name.length > 13) {

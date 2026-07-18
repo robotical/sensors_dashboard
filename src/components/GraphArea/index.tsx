@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ListenerOptionsType } from "../../app-bridge/EventDispatcher";
 import { MartyInterface } from "../../app-bridge/MartyInterface";
 import Addon from "../../models/addons/Addon";
@@ -10,12 +10,11 @@ import {
 } from "../../utils/start-end-rules/start-end-options";
 import AddonsList from "../AddonsList";
 import Graph from "../Graph";
-import GraphControls from "../GraphControls";
+import GraphControls, { type GraphRecordingState } from "../GraphControls";
 import styles from "./styles.module.css";
-import { CSVLink } from "react-csv";
 import { getCSVTitle, prepareCSVData, prepareTitles } from "../../utils/export-csv";
 import { FaTimes, FaFileCsv } from "react-icons/fa";
-import Tooltip from '@mui/material/Tooltip';
+import Tooltip from "@mui/material/Tooltip";
 import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
 import RaftInterface from "../../app-bridge/RaftInterface";
 import { RaftTypeE } from "@robotical/webapp-types/dist-types/src/types/raft";
@@ -51,22 +50,20 @@ export type GraphDataType = {
   [traceTitle: TraceIdType]: TraceData;
 };
 
-type CsvData = (number | string)[][];
-
 function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAreaProps) {
   const [addons, setAddons] = useState<Addon[]>([]);
   const [, setRefreshGraphArea] = useState(0);
   const [refreshAddons, setRefreshAddons] = useState(0);
   const [refreshAddonsList, setRefreshAddonsList] = useState(0);
   const [autoScrollEnabled, setAutoScrollEnabled] = useState(false);
-  const [csvData, setCsvData] = useState<CsvData>([]);
   const graphData = useRef<GraphDataType>({});
   const maxDataXValue = useRef<number>(0);
   const isTracking = useRef<boolean>(false);
+  const hasSessionStarted = useRef<boolean>(false);
   const hasStartRuleMet = useRef<boolean>(false);
   const hasEndRuleMet = useRef<boolean>(false);
-  const startSelectedOption = useRef<DropdownOptionsInterface>([] as unknown as DropdownOptionsInterface);
-  const endSelectedOption = useRef<DropdownOptionsInterface>([] as unknown as DropdownOptionsInterface);
+  const startSelectedOption = useRef<DropdownOptionsInterface | undefined>(undefined);
+  const endSelectedOption = useRef<DropdownOptionsInterface | undefined>(undefined);
   const startOptions = useRef<DropdownOptionsInterface[]>([]);
   const endOptions = useRef<DropdownOptionsInterface[]>([]);
   const startDisplayingTime = useRef<number | null>(null);
@@ -74,6 +71,9 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
   const [raftInterface, setRaftInterface] = useState<RaftInterface | null>(null);
   const chartPanelRef = useRef<HTMLDivElement>(null);
   const latestAddons = useRef<Addon[]>([]);
+  const reactId = useId();
+  const statusId = `graph-status-${reactId.replace(/:/g, "")}`;
+  const csvHintId = `graph-csv-hint-${reactId.replace(/:/g, "")}`;
 
   useEffect(() => {
     let interfaceInstance: RaftInterface | null = null;
@@ -100,12 +100,14 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
   }, [raft]);
 
   const cleanupStartEndRules = useCallback(() => {
-    console.log("cleaning rules");
-    startSelectedOption.current[4]?.(); // cleanup rule
-    endSelectedOption.current[4]?.(); // cleanup rule
+    startSelectedOption.current?.[4]?.(); // cleanup rule
+    endSelectedOption.current?.[4]?.(); // cleanup rule
   }, []);
 
   const onSelectAddon = useCallback(() => {
+    if (!hasSelectedSignal(latestAddons.current)) {
+      isTracking.current = false;
+    }
     setRefreshAddons((oldVal) => oldVal + 1);
   }, []);
 
@@ -126,6 +128,8 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
     hasStartRuleMet.current = true;
     if (hasEndRuleMet.current || isRuleMet(evt, endSelectedOption.current)) {
       hasEndRuleMet.current = true;
+      isTracking.current = false;
+      setRefreshGraphArea((old) => old + 1);
       return;
     }
 
@@ -232,6 +236,7 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
 
   const stopHandler = useCallback(() => {
     isTracking.current = false;
+    hasSessionStarted.current = false;
     for (const traceKey in graphData.current) {
       delete graphData.current[traceKey as TraceIdType];
     }
@@ -244,20 +249,25 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
   }, [cleanupStartEndRules]);
 
   const setIsTracking = useCallback((value: boolean) => {
-    // if there are no selected addons do nothing;
-    let isAnyAddonSelected = false;
-    for (const addon of addons) {
-      for (const addonInput of addon.addonInputs) {
-        if (addonInput.selected) {
-          isAnyAddonSelected = true;
-          break;
-        }
-      }
+    if (value && (!hasSelectedSignal(addons) || hasEndRuleMet.current)) return;
+    if (value) {
+      hasSessionStarted.current = true;
     }
-    if (!isAnyAddonSelected) return;
     isTracking.current = value;
     setRefreshGraphArea((old) => old + 1);
   }, [addons]);
+
+  const startHandler = useCallback(() => {
+    setIsTracking(true);
+  }, [setIsTracking]);
+
+  const pauseHandler = useCallback(() => {
+    setIsTracking(false);
+  }, [setIsTracking]);
+
+  const autoScrollHandler = useCallback(() => {
+    setAutoScrollEnabled((oldValue) => !oldValue);
+  }, []);
 
   const onRuleOptionChange = useCallback((selectedOption: DropdownOptionsInterface, rule: "start" | "end") => {
     if (isTracking.current) return; // changing rule won't affect graph if it's currently traking 
@@ -271,22 +281,82 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
   }, [cleanupStartEndRules]);
 
   const exportCsvHandler = useCallback(async () => {
-    // transform graph data to csv data
     const preparedCsvData = await prepareCSVData(graphData.current);
     const titles = prepareTitles(graphData.current, "Time (s)");
-
-    setCsvData([titles, ...preparedCsvData]);
-    return true;
+    const csvContent = [titles, ...preparedCsvData]
+      .map((row) =>
+        row
+          .map((value) => `"${String(value).replace(/"/g, '""')}"`)
+          .join(",")
+      )
+      .join("\n");
+    const blob = new Blob(["\uFEFF", csvContent], {
+      type: "text/csv;charset=utf-8",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const downloadLink = document.createElement("a");
+    downloadLink.href = url;
+    downloadLink.download = getCSVTitle(graphData.current);
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    downloadLink.remove();
+    window.setTimeout(() => window.URL.revokeObjectURL(url), 0);
   }, []);
 
   const currentStartSelectedOption = startSelectedOption.current;
   const currentEndSelectedOption = endSelectedOption.current;
   const currentStartOptions = startOptions.current;
   const currentEndOptions = endOptions.current;
+  const selectedSignalCount = getSelectedSignalCount(addons);
+  const hasData = hasGraphData(graphData.current);
+  const recordingState: GraphRecordingState =
+    selectedSignalCount === 0
+      ? "choose-signals"
+      : isTracking.current
+        ? "recording"
+        : hasSessionStarted.current
+          ? "paused"
+          : "ready";
+  const statusLabel = {
+    "choose-signals": "Choose signals",
+    ready: "Ready",
+    recording: "Recording",
+    paused: "Paused",
+  }[recordingState];
   const statusBadgeClassName = [
     styles.statusBadge,
-    isTracking.current ? styles.statusLive : styles.statusIdle,
+    recordingState === "recording"
+      ? styles.statusLive
+      : recordingState === "ready"
+        ? styles.statusReady
+        : recordingState === "paused"
+          ? styles.statusPaused
+          : styles.statusChoose,
   ].join(" ");
+  const emptyChartMessage =
+    recordingState === "choose-signals"
+      ? "Choose at least one signal to begin."
+      : recordingState === "ready"
+        ? "Ready when you are. Press Record to start plotting data."
+        : recordingState === "recording"
+          ? "Waiting for the first sensor reading…"
+          : "No readings have been captured yet. Resume when you’re ready.";
+  const graphControlsProps = {
+    onClickPlay: startHandler,
+    onClickPause: pauseHandler,
+    onClickStop: stopHandler,
+    onAutoScrollToggle: autoScrollHandler,
+    autoScrollEnabled,
+    onStartOptionChange: onRuleOptionChange,
+    onEndOptionChange: onRuleOptionChange,
+    startSelectedOption: currentStartSelectedOption,
+    endSelectedOption: currentEndSelectedOption,
+    startOptions: currentStartOptions,
+    endOptions: currentEndOptions,
+    recordingState,
+    hasData,
+    endConditionReached: hasEndRuleMet.current,
+  };
 
   return (
     <section
@@ -299,22 +369,37 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
           <h2 className={styles.graphTitle}>Sensor graph — {deviceName}</h2>
         </div>
         <div className={styles.graphHeaderActions}>
-          <span className={statusBadgeClassName}>
-            {isTracking.current ? "Recording" : "Paused"}
+          <span
+            className={statusBadgeClassName}
+            id={statusId}
+          >
+            {statusLabel}
           </span>
-          <Tooltip title="Export data to CSV">
+          <Tooltip
+            title={
+              hasData
+                ? "Export recorded data to CSV"
+                : "Record some data before exporting a CSV"
+            }
+          >
             <span className={styles.iconButtonWrapper}>
-              <CSVLink
-                data={csvData}
+              <button
+                type="button"
                 onClick={exportCsvHandler}
-                filename={getCSVTitle(graphData.current)}
                 className={styles.iconButton}
+                disabled={!hasData}
+                aria-describedby={!hasData ? csvHintId : undefined}
               >
-                <FaFileCsv />
+                <FaFileCsv aria-hidden="true" />
                 <span>CSV</span>
-              </CSVLink>
+              </button>
             </span>
           </Tooltip>
+          {!hasData && (
+            <span className={styles.visuallyHidden} id={csvHintId}>
+              CSV export becomes available after sensor data has been recorded.
+            </span>
+          )}
           <Tooltip title="Close graph">
             <button
               type="button"
@@ -322,44 +407,39 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
               onClick={() => removeGraph(graphId)}
               aria-label="Close graph"
             >
-              <FaTimes />
+              <FaTimes aria-hidden="true" />
             </button>
           </Tooltip>
         </div>
       </header>
 
       <div className={styles.graphBody}>
-        <aside className={styles.sidebar}>
+        <div className={styles.chartPanel} ref={chartPanelRef}>
+          <GraphControls {...graphControlsProps} mode="primary" />
+          <div className={styles.chartFrame}>
+            <Graph
+              mainRef={mainRef}
+              data={graphData.current}
+              maxDataXValue={maxDataXValue.current}
+              autoScrollEnabled={autoScrollEnabled}
+              containerRef={chartPanelRef}
+            />
+            {!hasData && (
+              <p className={styles.emptyChartMessage}>{emptyChartMessage}</p>
+            )}
+          </div>
+          <GraphControls {...graphControlsProps} mode="advanced" />
+        </div>
+
+        <aside className={styles.sidebar} aria-labelledby={`${statusId}-signals`}>
           <div className={styles.sidebarHeader}>
-            <h3>Select signals</h3>
-            <p>Choose the data streams you want to visualise in this graph.</p>
+            <h3 id={`${statusId}-signals`}>Select signals</h3>
+            <p>
+              Choose the data streams you want to visualise in this graph.
+            </p>
           </div>
           <AddonsList addons={addons} />
         </aside>
-
-        <div className={styles.chartPanel} ref={chartPanelRef}>
-          <Graph
-            mainRef={mainRef}
-            data={graphData.current}
-            maxDataXValue={maxDataXValue.current}
-            autoScrollEnabled={autoScrollEnabled}
-            containerRef={chartPanelRef}
-          />
-          <GraphControls
-            onClickPlay={() => setIsTracking(true)}
-            onClickPause={() => setIsTracking(false)}
-            onClickStop={stopHandler}
-            onAutoScrollToggle={() => setAutoScrollEnabled((oldVal) => !oldVal)}
-            autoScrollEnabled={autoScrollEnabled}
-            onStartOptionChange={onRuleOptionChange}
-            onEndOptionChange={onRuleOptionChange}
-            startSelectedOption={currentStartSelectedOption}
-            endSelectedOption={currentEndSelectedOption}
-            startOptions={currentStartOptions}
-            endOptions={currentEndOptions}
-            isTracking={isTracking.current}
-          />
-        </div>
       </div>
     </section>
   );
@@ -374,7 +454,23 @@ const getMaxDataXValue = (data: GraphDataType) => {
       mxDataXValue = data[traceKey as TraceIdType].x[currLen - 1];
   }
   return mxDataXValue;
-}
+};
 
+const getSelectedSignalCount = (addons: Addon[]) =>
+  addons.reduce(
+    (count, addon) =>
+      count +
+      addon.addonInputs.reduce(
+        (addonCount, input) => addonCount + (input.selected ? 1 : 0),
+        0
+      ),
+    0
+  );
+
+const hasSelectedSignal = (addons: Addon[]) =>
+  getSelectedSignalCount(addons) > 0;
+
+const hasGraphData = (data: GraphDataType) =>
+  Object.values(data).some((trace) => trace.x.length > 0);
 
 export default GraphArea;
