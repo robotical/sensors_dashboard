@@ -12,7 +12,6 @@ export const MICROBIT_SIGNALS = {
     group: "Gestures",
     moved: "Moved",
     shaken: "Shaken",
-    jumped: "Jumped",
   },
 } as const;
 
@@ -53,10 +52,6 @@ export default class MicroBitInterface extends RaftInterface {
         new AddonSub(
           MICROBIT_SIGNALS.gestures.shaken,
           bitValue(sensors.gestureState, 0)
-        ),
-        new AddonSub(
-          MICROBIT_SIGNALS.gestures.jumped,
-          bitValue(sensors.gestureState, 1)
         ),
       ]),
     ];
@@ -112,11 +107,6 @@ export default class MicroBitInterface extends RaftInterface {
       MICROBIT_SIGNALS.gestures.group,
       MICROBIT_SIGNALS.gestures.shaken,
       bitValue(sensors.gestureState, 0)
-    );
-    this.publish(
-      MICROBIT_SIGNALS.gestures.group,
-      MICROBIT_SIGNALS.gestures.jumped,
-      bitValue(sensors.gestureState, 1)
     );
   }
 

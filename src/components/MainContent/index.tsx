@@ -6,9 +6,9 @@ import {
   FaChartLine,
   FaPlug,
   FaCheckCircle,
-  FaMicrochip,
   FaUnlink,
 } from "react-icons/fa";
+import MicroBitIcon from "../../assets/connect-button/microbit-small.svg";
 import modalState from "../../state-observables/modal/ModalState";
 import NewGraphModal from "../modals/NewGraphModal";
 import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
@@ -278,7 +278,12 @@ function MainContent({ mainRef }: Props) {
               disabled={microBitPhase === "connecting"}
               title={!canConnectMicroBit ? "Web Bluetooth is unavailable" : undefined}
             >
-              <FaMicrochip aria-hidden="true" />
+              <img
+                src={MicroBitIcon}
+                alt=""
+                aria-hidden="true"
+                className={styles.microBitButtonIcon}
+              />
               <span>{microBitPhase === "connecting" ? "Connecting…" : "Connect micro:bit"}</span>
             </button>
           </div>
@@ -349,7 +354,12 @@ function MainContent({ mainRef }: Props) {
               disabled={microBitPhase === "connecting"}
               title={!canConnectMicroBit ? "Web Bluetooth is unavailable" : undefined}
             >
-              <FaMicrochip aria-hidden="true" />
+              <img
+                src={MicroBitIcon}
+                alt=""
+                aria-hidden="true"
+                className={styles.microBitButtonIcon}
+              />
               <span>{microBitPhase === "connecting" ? "Connecting…" : "Connect micro:bit"}</span>
             </button>
           )}

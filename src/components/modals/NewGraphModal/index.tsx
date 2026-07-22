@@ -1,10 +1,11 @@
 import { NewRobotIdE } from "@robotical/webapp-types/dist-types/src/store/SelectedRaftContext";
 import CogIcon from "../../../assets/connect-button/cog_selected.svg";
 import MartyIcon from "../../../assets/connect-button/marty_selected.svg";
+import MicroBitIcon from "../../../assets/connect-button/microbit-small.svg";
 import styles from "./styles.module.css";
 import { RaftTypeE } from "@robotical/webapp-types/dist-types/src/types/raft";
 import modalState from "../../../state-observables/modal/ModalState";
-import { FaMicrochip, FaTimes } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 import type MicroBitWebBluetooth from "../../../microbit/MicroBitWebBluetooth";
 import { useEffect, useState } from "react";
 
@@ -99,7 +100,12 @@ export default function NewGraphModal({ microBit = null }: Props) {
             aria-label={`Create graph for ${connectedMicroBit.getFriendlyName()}`}
             data-modal-initial-focus={connectedRafts.length === 0 ? "true" : undefined}
           >
-            <FaMicrochip className={styles.microBitIcon} aria-hidden="true" />
+            <img
+              src={MicroBitIcon}
+              alt=""
+              aria-hidden="true"
+              className={styles.icon}
+            />
             <span className={styles.raftName}>{connectedMicroBit.getFriendlyName()}</span>
             <span className={styles.connectedStatus}>
               <span className={styles.connectedStatusDot} aria-hidden="true" />

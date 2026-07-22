@@ -114,6 +114,12 @@
     opacity: 0.55;
 }
 
+.microBitButtonIcon {
+    width: 2.4rem;
+    height: 2.4rem;
+    flex: 0 0 auto;
+}
+
 .addGraphBtn:hover,
 .connectButton:hover {
     background-color: var(--colour-primary-deep);

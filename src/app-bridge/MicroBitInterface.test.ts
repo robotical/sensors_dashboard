@@ -18,12 +18,18 @@ describe("MicroBitInterface", () => {
     const adapter = new MicroBitInterface(microBit);
     const dispatch = jest.spyOn(adapter, "dispatchEvent");
 
-    expect(adapter.getAvailableAddons().map((addon) => addon.whoAmI)).toEqual([
+    const availableAddons = adapter.getAvailableAddons();
+    expect(availableAddons.map((addon) => addon.whoAmI)).toEqual([
       MICROBIT_SIGNALS.tilt.group,
       MICROBIT_SIGNALS.buttons.group,
       MICROBIT_SIGNALS.touch.group,
       MICROBIT_SIGNALS.gestures.group,
     ]);
+    expect(
+      availableAddons
+        .find((addon) => addon.whoAmI === MICROBIT_SIGNALS.gestures.group)
+        ?.addonInputs.map((input) => input.name)
+    ).toEqual(["Moved", "Shaken"]);
 
     const sensors: MicroBitSensors = {
       tiltX: -155,
@@ -31,7 +37,7 @@ describe("MicroBitInterface", () => {
       buttonA: 1,
       buttonB: 0,
       touchPins: [1, 0, 1],
-      gestureState: 0b111,
+      gestureState: 0b101,
     };
     sensorListener!(sensors, MicroBitWebBluetooth.defaultSensors());
 
@@ -51,7 +57,6 @@ describe("MicroBitInterface", () => {
       expect.objectContaining({ type: "onTouch pins=>P2Change", value: 1 }),
       expect.objectContaining({ type: "onGestures=>MovedChange", value: 1 }),
       expect.objectContaining({ type: "onGestures=>ShakenChange", value: 1 }),
-      expect.objectContaining({ type: "onGestures=>JumpedChange", value: 1 }),
     ]);
 
     adapter.unsubscribeFromPublishedData();
