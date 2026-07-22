@@ -1,11 +1,22 @@
 import { createElement, useCallback, useEffect, useRef, useState } from "react";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
-import { FaPlus, FaChartLine, FaPlug, FaCheckCircle } from "react-icons/fa";
+import {
+  FaPlus,
+  FaChartLine,
+  FaPlug,
+  FaCheckCircle,
+  FaMicrochip,
+  FaUnlink,
+} from "react-icons/fa";
 import modalState from "../../state-observables/modal/ModalState";
 import NewGraphModal from "../modals/NewGraphModal";
 import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
 import { resolveRaftDisplayName } from "../../utils/raft-display-name";
+import MicroBitWebBluetooth, {
+  isMicroBitDevice,
+  isMicroBitWebBluetoothSupported,
+} from "../../microbit/MicroBitWebBluetooth";
 
 interface GraphObj {
   graphId: string;
@@ -19,21 +30,26 @@ type Props = {
 type ConnectionPhase = "idle" | "connecting" | "error";
 
 function MainContent({ mainRef }: Props) {
-  const [isConnected, setIsConnected] = useState(false);
+  const [hasConnectedRafts, setHasConnectedRafts] = useState(false);
   const [connectionPhase, setConnectionPhase] = useState<ConnectionPhase>("idle");
   const [connectionMessage, setConnectionMessage] = useState("");
+  const [microBit, setMicroBit] = useState<MicroBitWebBluetooth | null>(null);
+  const [microBitPhase, setMicroBitPhase] = useState<ConnectionPhase>("idle");
+  const [microBitMessage, setMicroBitMessage] = useState("");
   const [, triggerRerender] = useState(0);
-  // Track per-graph disconnect callbacks to allow cleanup when a graph is removed manually
-  const graphSubRefs = useRef<Record<string, { raftId: string; callback: () => void }>>({});
+  const graphs = useRef<GraphObj[]>([]);
+  const graphSubRefs = useRef<Record<string, () => void>>({});
+  const microBitRef = useRef<MicroBitWebBluetooth | null>(null);
+  const pendingMicroBitRef = useRef<MicroBitWebBluetooth | null>(null);
+  const microBitDisconnectCleanup = useRef<(() => void) | null>(null);
+  const isMounted = useRef(true);
+  const isConnected = hasConnectedRafts || Boolean(microBit);
+  const canConnectMicroBit = isMicroBitWebBluetoothSupported();
 
   const removeGraph = (graphId: string) => {
-    // If this graph had a disconnect callback, unsubscribe it to avoid leaks
-    const subRef = graphSubRefs.current[graphId];
-    if (subRef) {
-      const mgr = getRaftDisconnectManagerIfExists(subRef.raftId);
-      if (mgr) {
-        mgr.unsubscribe(subRef.callback);
-      }
+    const cleanup = graphSubRefs.current[graphId];
+    if (cleanup) {
+      cleanup();
       delete graphSubRefs.current[graphId];
     }
     const graphsUpdated = graphs.current.filter((graph) => graph.graphId !== graphId);
@@ -41,12 +57,10 @@ function MainContent({ mainRef }: Props) {
     triggerRerender(old => old + 1);
   };
 
-  const graphs = useRef<GraphObj[]>([]);
-
   const syncConnectionState = useCallback(() => {
     const connectedRafts = window.applicationManager?.connectedRafts || {};
     const connected = Object.keys(connectedRafts).length > 0;
-    setIsConnected(connected);
+    setHasConnectedRafts(connected);
     if (connected) {
       setConnectionPhase("idle");
       setConnectionMessage("");
@@ -63,6 +77,21 @@ function MainContent({ mainRef }: Props) {
       clearInterval(connectedRaftInterval);
     }
   }, [syncConnectionState]);
+
+  useEffect(() => {
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
+      Object.values(graphSubRefs.current).forEach((cleanup) => cleanup());
+      graphSubRefs.current = {};
+      microBitDisconnectCleanup.current?.();
+      microBitDisconnectCleanup.current = null;
+      microBitRef.current?.disconnect();
+      pendingMicroBitRef.current?.disconnect();
+      microBitRef.current = null;
+      pendingMicroBitRef.current = null;
+    };
+  }, []);
 
   const connectRobot = async () => {
     if (!window.applicationManager) {
@@ -90,39 +119,124 @@ function MainContent({ mainRef }: Props) {
     }
   };
 
+  const connectMicroBit = async () => {
+    if (!isMicroBitWebBluetoothSupported()) {
+      setMicroBitPhase("error");
+      setMicroBitMessage("Web Bluetooth is not available in this browser.");
+      return;
+    }
+    if (microBitRef.current?.isConnected() || pendingMicroBitRef.current) {
+      return;
+    }
+
+    const candidate = new MicroBitWebBluetooth();
+    pendingMicroBitRef.current = candidate;
+    setMicroBitPhase("connecting");
+    setMicroBitMessage("Choose your micro:bit in the Bluetooth window.");
+
+    try {
+      await candidate.connect();
+      if (!isMounted.current || pendingMicroBitRef.current !== candidate) {
+        candidate.disconnect();
+        return;
+      }
+      if (!candidate.isConnected()) {
+        throw new Error("The micro:bit disconnected while connecting.");
+      }
+
+      const unsubscribeDisconnect = candidate.addDisconnectListener(
+        (disconnectedMicroBit) => {
+          if (microBitRef.current !== disconnectedMicroBit) return;
+          microBitDisconnectCleanup.current?.();
+          microBitDisconnectCleanup.current = null;
+          microBitRef.current = null;
+          if (isMounted.current) {
+            setMicroBit(null);
+            setMicroBitPhase("idle");
+            setMicroBitMessage("micro:bit disconnected.");
+          }
+        }
+      );
+      microBitDisconnectCleanup.current = unsubscribeDisconnect;
+      microBitRef.current = candidate;
+      setMicroBit(candidate);
+      setMicroBitPhase("idle");
+      setMicroBitMessage("");
+    } catch (error) {
+      if (!isMounted.current) return;
+      const wasCancelled =
+        (error as { name?: string } | null)?.name === "NotFoundError";
+      setMicroBitPhase(wasCancelled ? "idle" : "error");
+      setMicroBitMessage(
+        wasCancelled
+          ? "No micro:bit was selected."
+          : "Could not connect. Check that the micro:bit is powered on and running the Robotical firmware."
+      );
+    } finally {
+      if (pendingMicroBitRef.current === candidate) {
+        pendingMicroBitRef.current = null;
+      }
+    }
+  };
+
+  const disconnectMicroBit = () => {
+    const connectedMicroBit = microBitRef.current;
+    if (!connectedMicroBit) return;
+
+    microBitDisconnectCleanup.current?.();
+    microBitDisconnectCleanup.current = null;
+    microBitRef.current = null;
+    setMicroBit(null);
+    setMicroBitPhase("idle");
+    setMicroBitMessage("micro:bit disconnected.");
+    connectedMicroBit.disconnect();
+  };
+
   const addGraphHandler = async () => {
-    const raftId = await modalState.setModal(createElement(NewGraphModal, {}), "Add new graph");
-    if (!raftId) {
-      return;
-    }
-    const raft = window.applicationManager.connectedRafts[raftId];
-    if (!raft) {
-      return;
-    }
-    const deviceName = await resolveRaftDisplayName(
-      raft,
-      window.applicationManager.connectedRaftsContext || []
+    const deviceId = await modalState.setModal(
+      createElement(NewGraphModal, { microBit }),
+      "Add new graph"
     );
+    if (!deviceId) {
+      return;
+    }
+    const device =
+      microBit?.id === deviceId
+        ? microBit
+        : window.applicationManager?.connectedRafts?.[deviceId];
+    if (!device) {
+      return;
+    }
+    if (isMicroBitDevice(device) && !device.isConnected()) {
+      setMicroBitMessage("The micro:bit disconnected before the graph was created.");
+      return;
+    }
+    const deviceName = isMicroBitDevice(device)
+      ? device.getFriendlyName()
+      : await resolveRaftDisplayName(
+          device,
+          window.applicationManager?.connectedRaftsContext || []
+        );
 
     const graphsUpdated = [...graphs.current];
     const GRAPH_ID = new Date().getTime().toString();
 
-    // Subscribe (one shared subscription per raft) to remove this graph when the raft disconnects
-    console.log("Registering disconnect fan-out for raft to remove the graph if it disconnects");
-    const mgr = getOrCreateRaftDisconnectManager(raftId, raft);
     const disconnectCb = () => {
-      console.log("Raft disconnected, removing graph", GRAPH_ID);
       removeGraph(GRAPH_ID);
     };
-    mgr.subscribe(disconnectCb);
-    graphSubRefs.current[GRAPH_ID] = { raftId, callback: disconnectCb };
-
+    if (isMicroBitDevice(device)) {
+      graphSubRefs.current[GRAPH_ID] = device.addDisconnectListener(disconnectCb);
+    } else {
+      const mgr = getOrCreateRaftDisconnectManager(deviceId, device);
+      mgr.subscribe(disconnectCb);
+      graphSubRefs.current[GRAPH_ID] = () => mgr.unsubscribe(disconnectCb);
+    }
 
     graphsUpdated.push({
       graphId: GRAPH_ID,
       element: (
         <GraphArea
-          raft={raft}
+          raft={device}
           deviceName={deviceName}
           mainRef={mainRef}
           graphId={GRAPH_ID}
@@ -145,17 +259,29 @@ function MainContent({ mainRef }: Props) {
           <p className={styles.emptyStateEyebrow}>Start here</p>
           <h2 id="connect-empty-title">Connect a device to see its sensors</h2>
           <p className={styles.emptyStateDescription}>
-            Pair Marty or Cog, then choose the signals you want to turn into a live graph.
+            Pair Marty, Cog, or a micro:bit, then choose the signals you want to turn into a live graph.
           </p>
-          <button
-            type="button"
-            className={styles.connectButton}
-            onClick={connectRobot}
-            disabled={connectionPhase === "connecting"}
-          >
-            <FaPlug aria-hidden="true" />
-            <span>{connectionPhase === "connecting" ? "Connecting…" : "Connect device"}</span>
-          </button>
+          <div className={styles.connectActions}>
+            <button
+              type="button"
+              className={styles.connectButton}
+              onClick={connectRobot}
+              disabled={connectionPhase === "connecting"}
+            >
+              <FaPlug aria-hidden="true" />
+              <span>{connectionPhase === "connecting" ? "Connecting…" : "Connect Marty or Cog"}</span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.connectButton} ${styles.secondaryButton}`}
+              onClick={connectMicroBit}
+              disabled={microBitPhase === "connecting"}
+              title={!canConnectMicroBit ? "Web Bluetooth is unavailable" : undefined}
+            >
+              <FaMicrochip aria-hidden="true" />
+              <span>{microBitPhase === "connecting" ? "Connecting…" : "Connect micro:bit"}</span>
+            </button>
+          </div>
           {connectionMessage && (
             <p
               className={`${styles.connectionFeedback} ${connectionPhase === "error" ? styles.connectionError : ""}`}
@@ -165,11 +291,20 @@ function MainContent({ mainRef }: Props) {
               {connectionMessage}
             </p>
           )}
+          {microBitMessage && (
+            <p
+              className={`${styles.connectionFeedback} ${microBitPhase === "error" ? styles.connectionError : ""}`}
+              role={microBitPhase === "error" ? "alert" : "status"}
+              aria-live="polite"
+            >
+              {microBitMessage}
+            </p>
+          )}
         </div>
         <ol className={styles.quickJourney} aria-label="Dashboard setup steps">
           <li>
             <span>1</span>
-            <div><strong>Connect</strong><small>Pair Marty or Cog.</small></div>
+            <div><strong>Connect</strong><small>Pair Marty, Cog, or micro:bit.</small></div>
           </li>
           <li>
             <span>2</span>
@@ -191,21 +326,53 @@ function MainContent({ mainRef }: Props) {
       <div className={styles.graphsToolbar}>
         <div>
           <p className={styles.toolbarEyebrow}>
-            <FaCheckCircle aria-hidden="true" /> Robot connected
+            <FaCheckCircle aria-hidden="true" /> Device connected
           </p>
           <h2>Graphs</h2>
           <p>{hasGraphs ? `${graphs.current.length} live workspace${graphs.current.length === 1 ? "" : "s"}` : "Create a graph to begin exploring sensor data."}</p>
         </div>
-        <button
-          type="button"
-          onClick={addGraphHandler}
-          className={styles.addGraphBtn}
-        >
-          <FaPlus aria-hidden="true" />
-          <span>Add graph</span>
-          <FaChartLine aria-hidden="true" />
-        </button>
+        <div className={styles.toolbarActions}>
+          {microBit ? (
+            <button
+              type="button"
+              onClick={disconnectMicroBit}
+              className={styles.deviceActionButton}
+            >
+              <FaUnlink aria-hidden="true" />
+              <span>Disconnect {microBit.getFriendlyName()}</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={connectMicroBit}
+              className={styles.deviceActionButton}
+              disabled={microBitPhase === "connecting"}
+              title={!canConnectMicroBit ? "Web Bluetooth is unavailable" : undefined}
+            >
+              <FaMicrochip aria-hidden="true" />
+              <span>{microBitPhase === "connecting" ? "Connecting…" : "Connect micro:bit"}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={addGraphHandler}
+            className={styles.addGraphBtn}
+          >
+            <FaPlus aria-hidden="true" />
+            <span>Add graph</span>
+            <FaChartLine aria-hidden="true" />
+          </button>
+        </div>
       </div>
+      {microBitMessage && (
+        <p
+          className={`${styles.toolbarFeedback} ${microBitPhase === "error" ? styles.connectionError : ""}`}
+          role={microBitPhase === "error" ? "alert" : "status"}
+          aria-live="polite"
+        >
+          {microBitMessage}
+        </p>
+      )}
       <div className={styles.graphsArea}>
         {graphs.current.map((graphArea) => {
           return graphArea.element;
@@ -217,7 +384,7 @@ function MainContent({ mainRef }: Props) {
           <div>
             <p className={styles.emptyStateEyebrow}>Your workspace is ready</p>
             <h3 id="add-first-graph-title">Build your first live graph</h3>
-            <p>Select <strong>Add graph</strong>, choose a robot, then pick one or more signals.</p>
+            <p>Select <strong>Add graph</strong>, choose a device, then pick one or more signals.</p>
           </div>
         </section>
       )}
@@ -283,21 +450,6 @@ const getOrCreateRaftDisconnectManager = (raftId: string, raft: RAFT): RaftDisco
       mgr.callbacks.delete(cb);
       if (mgr.callbacks.size === 0) {
         // No more listeners; clean up subscription
-        mgr.raft.unsubscribe(mgr.observer);
-        delete raftManagers[raftId];
-      }
-    },
-  };
-};
-
-const getRaftDisconnectManagerIfExists = (raftId: string): RaftDisconnectManager | null => {
-  const mgr = raftManagers[raftId];
-  if (!mgr) return null;
-  return {
-    subscribe: (cb: () => void) => mgr.callbacks.add(cb),
-    unsubscribe: (cb: () => void) => {
-      mgr.callbacks.delete(cb);
-      if (mgr.callbacks.size === 0) {
         mgr.raft.unsubscribe(mgr.observer);
         delete raftManagers[raftId];
       }

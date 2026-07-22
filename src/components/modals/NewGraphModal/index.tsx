@@ -4,16 +4,46 @@ import MartyIcon from "../../../assets/connect-button/marty_selected.svg";
 import styles from "./styles.module.css";
 import { RaftTypeE } from "@robotical/webapp-types/dist-types/src/types/raft";
 import modalState from "../../../state-observables/modal/ModalState";
-import { FaTimes } from "react-icons/fa";
+import { FaMicrochip, FaTimes } from "react-icons/fa";
+import type MicroBitWebBluetooth from "../../../microbit/MicroBitWebBluetooth";
+import { useEffect, useState } from "react";
 
-export default function NewGraphModal() {
+type Props = {
+  microBit?: MicroBitWebBluetooth | null;
+};
+
+export default function NewGraphModal({ microBit = null }: Props) {
+  const [connectedMicroBit, setConnectedMicroBit] =
+    useState<MicroBitWebBluetooth | null>(() =>
+      microBit?.isConnected() ? microBit : null
+    );
   const connectedRaftsArray = window.applicationManager?.connectedRaftsContext || [];
+  const connectedRafts = connectedRaftsArray.filter(
+    (raft) => raft.id !== NewRobotIdE.NEW
+  );
 
-  const handleRaftClick = (raftId: string) => {
-    modalState.closeModal(raftId);
+  const handleDeviceClick = (deviceId: string) => {
+    modalState.closeModal(deviceId);
   };
 
-  const areThereConnectedRafts = connectedRaftsArray.filter(raft => raft.id !== NewRobotIdE.NEW).length > 0;
+  useEffect(() => {
+    if (!microBit?.isConnected()) {
+      setConnectedMicroBit(null);
+      return;
+    }
+
+    setConnectedMicroBit(microBit);
+    const unsubscribe = microBit.addDisconnectListener(() =>
+      setConnectedMicroBit(null)
+    );
+    if (!microBit.isConnected()) {
+      setConnectedMicroBit(null);
+    }
+    return unsubscribe;
+  }, [microBit]);
+
+  const hasConnectedDevices =
+    connectedRafts.length > 0 || Boolean(connectedMicroBit);
 
   return (
     <div className={styles.newGraphModalContainer}>
@@ -27,12 +57,12 @@ export default function NewGraphModal() {
           <FaTimes className={styles.closeIcon} aria-hidden="true" focusable="false" />
         </button>
         {
-          areThereConnectedRafts
-            ? <p className={styles.title}>Select a connected robot for this graph</p>
-            : <p className={styles.title}>No robots are connected. Close this dialog and connect a robot to continue.</p>
+          hasConnectedDevices
+            ? <p className={styles.title}>Select a connected device for this graph</p>
+            : <p className={styles.title}>No devices are connected. Close this dialog and connect a device to continue.</p>
         }
-      <div className={styles.gridContainer} role="group" aria-label="Connected robots">
-        {connectedRaftsArray.filter(raftFil => raftFil.id !== NewRobotIdE.NEW).map((raft, index) => {
+      <div className={styles.gridContainer} role="group" aria-label="Connected devices">
+        {connectedRafts.map((raft, index) => {
 
           let raftIcon;
           if (raft.type === RaftTypeE.COG) {
@@ -48,7 +78,7 @@ export default function NewGraphModal() {
               key={raft.id}
               type="button"
               className={styles.card}
-              onClick={() => handleRaftClick(raft.id)}
+              onClick={() => handleDeviceClick(raft.id)}
               aria-label={`Create graph for ${robotName}`}
               data-modal-initial-focus={index === 0 ? "true" : undefined}
             >
@@ -61,6 +91,22 @@ export default function NewGraphModal() {
             </button>
           )
         })}
+        {connectedMicroBit && (
+          <button
+            type="button"
+            className={styles.card}
+            onClick={() => handleDeviceClick(connectedMicroBit.id)}
+            aria-label={`Create graph for ${connectedMicroBit.getFriendlyName()}`}
+            data-modal-initial-focus={connectedRafts.length === 0 ? "true" : undefined}
+          >
+            <FaMicrochip className={styles.microBitIcon} aria-hidden="true" />
+            <span className={styles.raftName}>{connectedMicroBit.getFriendlyName()}</span>
+            <span className={styles.connectedStatus}>
+              <span className={styles.connectedStatusDot} aria-hidden="true" />
+              Connected
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );

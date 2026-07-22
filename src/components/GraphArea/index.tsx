@@ -25,8 +25,12 @@ import MockMartyInterface from "../../app-bridge/mocks/MockMartyInterface";
 import MockCogInterface from "../../app-bridge/mocks/MockCogInterface";
 import { isMockRaft } from "../../mock/MockApplicationManager";
 import { preserveAddonSelections } from "../../utils/addon-selection";
+import MicroBitInterface from "../../app-bridge/MicroBitInterface";
+import MicroBitWebBluetooth, {
+  isMicroBitDevice,
+} from "../../microbit/MicroBitWebBluetooth";
 
-const hasMockAddonProvider = (
+const hasAddonProvider = (
   raftInterface: RaftInterface
 ): raftInterface is RaftInterface & { getAvailableAddons: () => Addon[] } =>
   typeof (raftInterface as unknown as { getAvailableAddons?: () => Addon[] }).getAvailableAddons ===
@@ -34,7 +38,7 @@ const hasMockAddonProvider = (
 
 interface GraphAreaProps {
   graphId: string;
-  raft: RAFT;
+  raft: RAFT | MicroBitWebBluetooth;
   deviceName: string;
   removeGraph: (graphId: string) => void;
   mainRef: React.RefObject<HTMLDivElement>;
@@ -77,7 +81,9 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
 
   useEffect(() => {
     let interfaceInstance: RaftInterface | null = null;
-    if (isMockRaft(raft)) {
+    if (isMicroBitDevice(raft)) {
+      interfaceInstance = new MicroBitInterface(raft);
+    } else if (isMockRaft(raft)) {
       if (raft.type === RaftTypeE.COG) {
         const mockCog = new MockCogInterface();
         mockCog.start();
@@ -209,9 +215,9 @@ function GraphArea({ graphId, removeGraph, mainRef, raft, deviceName }: GraphAre
   useEffect(() => {
     if (!raftInterface) return;
     const normalisedAddons =
-      isMockRaft(raft) && hasMockAddonProvider(raftInterface)
+      hasAddonProvider(raftInterface)
         ? raftInterface.getAvailableAddons()
-        : getAllAddonsList(raft);
+        : getAllAddonsList(raft as RAFT);
     const addonsWithSelections = preserveAddonSelections(normalisedAddons, latestAddons.current);
     addSelectedListener(addonsWithSelections);
     latestAddons.current = addonsWithSelections;

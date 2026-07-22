@@ -2,12 +2,12 @@ import styles from "./styles.module.css";
 
 const steps = [
   {
-    title: "Connect a robot",
-    description: "Select Connect device and pair Marty or Cog. The header will show its name, battery and signal.",
+    title: "Connect a device",
+    description: "Pair Marty or Cog, or use Connect micro:bit for a micro:bit running the Robotical firmware.",
   },
   {
     title: "Add a graph",
-    description: "Use Add graph in the Graphs toolbar, then choose which connected robot the graph belongs to.",
+    description: "Use Add graph in the Graphs toolbar, then choose which connected device the graph belongs to.",
   },
   {
     title: "Choose signals and record",

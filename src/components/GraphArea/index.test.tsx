@@ -1,9 +1,12 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
 import Addon from "../../models/addons/Addon";
 import AddonSub from "../../models/addons/AddonSub";
 import getAllAddonsList from "../../utils/get-addons-list";
 import GraphArea from ".";
+import MicroBitWebBluetooth, {
+  MicroBitSensorListener,
+} from "../../microbit/MicroBitWebBluetooth";
 
 jest.mock("@robotical/webapp-types/dist-types/src/types/raft", () => ({
   RaftTypeE: {
@@ -72,6 +75,7 @@ jest.mock("../GraphControls", () => ({
 
 describe("GraphArea", () => {
   beforeEach(() => {
+    (getAllAddonsList as jest.MockedFunction<typeof getAllAddonsList>).mockReset();
     (getAllAddonsList as jest.MockedFunction<typeof getAllAddonsList>).mockReturnValue([]);
   });
 
@@ -145,5 +149,65 @@ describe("GraphArea", () => {
     expect(
       (screen.getByRole("button", { name: "CSV" }) as HTMLButtonElement).disabled
     ).toBe(true);
+  });
+
+  it("records micro:bit sensor events through the fixed addon adapter", async () => {
+    let sensorListener: MicroBitSensorListener | null = null;
+    const unsubscribe = jest.fn();
+    const microBit = {
+      id: "microbit-1",
+      name: "BBC micro:bit",
+      isMicroBitWebBluetooth: true,
+      sensors: MicroBitWebBluetooth.defaultSensors(),
+      addSensorListener: jest.fn((listener: MicroBitSensorListener) => {
+        sensorListener = listener;
+        return unsubscribe;
+      }),
+    } as unknown as MicroBitWebBluetooth;
+
+    const { unmount } = render(
+      <GraphArea
+        graphId="graph-microbit"
+        raft={microBit}
+        deviceName="BBC micro:bit"
+        removeGraph={jest.fn()}
+        mainRef={{ current: document.createElement("div") }}
+      />
+    );
+
+    await waitFor(() =>
+      expect(
+        (screen.getByRole("button", {
+          name: "Toggle test signal",
+        }) as HTMLButtonElement).disabled
+      ).toBe(false)
+    );
+    expect(getAllAddonsList).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle test signal" }));
+    fireEvent.click(screen.getByRole("button", { name: "Test record" }));
+    act(() => {
+      sensorListener?.(
+        {
+          tiltX: 120,
+          tiltY: -40,
+          buttonA: 0,
+          buttonB: 0,
+          touchPins: [0, 0, 0],
+          gestureState: 0,
+        },
+        MicroBitWebBluetooth.defaultSensors()
+      );
+    });
+
+    await waitFor(() =>
+      expect(
+        (screen.getByRole("button", { name: "CSV" }) as HTMLButtonElement)
+          .disabled
+      ).toBe(false)
+    );
+
+    unmount();
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 });
