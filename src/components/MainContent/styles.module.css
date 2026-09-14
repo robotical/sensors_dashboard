@@ -224,7 +224,9 @@
 }
 
 .quickJourney {
-    list-style: none;
+    border: 0;
+    padding: 0;
+    background: transparent;
     display: grid;
     align-content: center;
     gap: 1.2rem;
@@ -381,28 +383,127 @@
 
 .deviceControls {
     min-width: 0;
+}
+
+.extensionToggle {
+    min-height: 4.4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: fit-content;
+    color: var(--colour-BLACK_075);
+    font-size: 1.3rem;
+    cursor: pointer;
+    border: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.extensionToggle:hover {
+    color: var(--colour-primary-strong);
+}
+
+.extensionToggle:focus-visible {
+    outline: 0.3rem solid var(--focus-ring);
+    outline-offset: 0.2rem;
+    border-radius: 0.4rem;
+}
+
+.extensionDescription {
+    margin-bottom: 1.6rem;
+    color: var(--colour-BLACK_075);
+    font-size: 1.8rem;
+    line-height: 1.6;
+}
+
+.extensionContent {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.8rem;
+    padding-bottom: 0.4rem;
 }
 
-.extensionLabel {
-    color: var(--colour-BLACK_075);
-    font-size: 1.2rem;
-}
-
-.deviceControls .deviceActionButton {
+.extensionContent .deviceActionButton {
     width: auto;
-    min-height: 3.6rem;
+    min-height: 4.8rem;
     gap: 0.6rem;
-    padding: 0.5rem 1rem;
+    padding: 1rem 2rem;
     border-width: 0.1rem;
-    font-size: 1.25rem;
+    font-size: 1.6rem;
     overflow-wrap: anywhere;
 }
 
-.deviceControls .connectionFeedback {
+.extensionContent .connectionFeedback {
     flex-basis: 100%;
     margin-top: 0;
+}
+
+.extensionHero {
+    text-align: center;
+    padding: 0.8rem 0 2rem;
+}
+
+.extensionHero h3 {
+    font-family: inherit;
+    font-size: 2.6rem;
+    margin: 2rem 0 1rem;
+    line-height: 1.25;
+}
+
+.microBitArtwork {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 16rem;
+    height: 14rem;
+    margin: 0 auto;
+    border-radius: 42% 58% 55% 45%;
+    background: linear-gradient(135deg, #b8ebf8, #ddf6c3);
+}
+
+.microBitArtwork > img {
+    width: 11rem;
+    height: 11rem;
+    transform: rotate(-10deg);
+    filter: drop-shadow(0 0.8rem 0.5rem rgba(19, 60, 70, 0.2));
+}
+
+.artworkSpark {
+    position: absolute;
+    top: -0.4rem;
+    right: 0;
+    color: #eaa92b;
+    font-size: 3.6rem;
+}
+
+.artworkGraph {
+    position: absolute;
+    bottom: 0;
+    right: -0.8rem;
+    width: 4.6rem;
+    height: 4.6rem;
+    padding: 1rem;
+    border-radius: 50%;
+    background: #fff;
+    color: #0b6f87;
+    box-shadow: 0 0.4rem 1rem #133c461a;
+}
+
+.extensionContent {
+    justify-content: center;
+}
+
+.extensionContent .deviceActionButton {
+    background: var(--colour-primary-strong);
+    color: white;
+}
+
+.extensionContent .deviceActionButton:hover {
+    background: var(--colour-primary-deep);
+}
+
+.extensionContent .microBitButtonIcon {
+    width: 3.2rem;
+    height: 3.2rem;
 }
