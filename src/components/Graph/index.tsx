@@ -4,6 +4,7 @@ import { motorPosDifferentiation, rgbColorTraceName } from "../../utils/graph/tr
 import { useEffect, useState, useMemo } from "react";
 import Plot from "react-plotly.js";
 import { AQUA_BLUE_025, MAIN_BLUE, PALE_WHITE } from "../../styles/colors";
+import { COG_LIGHT_SENSE_NAME } from "../../utils/types/addon-names";
 
 interface GraphProps {
   data: GraphDataType;
@@ -15,6 +16,9 @@ interface GraphProps {
 const SCROLL_THRESHOLD = 5;
 export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef, containerRef }: GraphProps) {
   const [plotWidth, setPlotWidth] = useState<number | undefined>(undefined);
+  const hasCogLightTrace = Object.keys(data).some(
+    (traceKey) => traceKey.split("=>")[1] === COG_LIGHT_SENSE_NAME
+  );
   const shouldScroll = useMemo(() => maxDataXValue > SCROLL_THRESHOLD && autoScrollEnabled, [maxDataXValue, autoScrollEnabled]);
 
   const plotLayout = useMemo(() => ({
@@ -42,6 +46,8 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef,
       range: shouldScroll ? [maxDataXValue - SCROLL_THRESHOLD, maxDataXValue] : undefined,
     },
     yaxis2: {
+      categoryorder: hasCogLightTrace ? 'array' : 'trace',
+      categoryarray: hasCogLightTrace ? ['none', 'low', 'mid', 'high'] : undefined,
       linecolor: MAIN_BLUE,
       linewidth: 2,
       mirror: true,
@@ -103,7 +109,7 @@ export default function Graph({ data, maxDataXValue, autoScrollEnabled, mainRef,
     },
     width: plotWidth,
     hovermode: 'x unified',
-  }), [maxDataXValue, plotWidth, shouldScroll]);
+  }), [maxDataXValue, plotWidth, shouldScroll, hasCogLightTrace]);
 
   useEffect(() => {
     const resizeTarget = containerRef?.current ?? mainRef.current;
