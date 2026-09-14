@@ -7,9 +7,10 @@ import { FaQuestionCircle } from "react-icons/fa";
 
 type Props = {
   isInModal?: boolean;
+  deviceControlsRef?: (element: HTMLDivElement | null) => void;
 }
 
-export default function Header({ isInModal }: Props) {
+export default function Header({ isInModal, deviceControlsRef }: Props) {
 
   return (
     <header className={`${styles.header} ${isInModal ? styles.headerInModal : ""}`}>
@@ -21,8 +22,11 @@ export default function Header({ isInModal }: Props) {
         </div>
       )}
       {!isInModal && (
-        <div className={styles.connectionRegion} aria-label="Robot connections">
-          <ConnectionArea isNavMenuMinimized={false} />
+        <div className={styles.connectionRegion} aria-label="Device connections">
+          <div className={styles.robotPanel}>
+            <ConnectionArea isNavMenuMinimized={false} />
+          </div>
+          <div ref={deviceControlsRef} className={styles.extensionRegion} />
         </div>
       )}
       <button

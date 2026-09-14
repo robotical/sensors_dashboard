@@ -118,6 +118,7 @@ export default function LandingPage({ isInModal }: Props) {
   const [shouldCloseModal, setShouldCloseModal] = useState(false);
 
   const mainRef = useRef<HTMLDivElement>(null);
+  const [deviceControlsContainer, setDeviceControlsContainer] = useState<HTMLDivElement | null>(null);
   const isModalOpen = Boolean(modalData?.modalContent);
 
   // Create subscription to the modal state
@@ -187,8 +188,8 @@ export default function LandingPage({ isInModal }: Props) {
         tabIndex={0}
       >
         <ScrollCue mainRef={mainRef} />
-        <Header isInModal={isInModal} />
-        <MainContent mainRef={mainRef}/>
+        <Header isInModal={isInModal} deviceControlsRef={setDeviceControlsContainer} />
+        <MainContent mainRef={mainRef} deviceControlsContainer={deviceControlsContainer} />
       </main>
     </>
   );

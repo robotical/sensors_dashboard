@@ -1,3 +1,4 @@
+import { createPortal } from "react-dom";
 import { createElement, useCallback, useEffect, useRef, useState } from "react";
 import GraphArea from "../GraphArea";
 import styles from "./styles.module.css";
@@ -25,11 +26,12 @@ interface GraphObj {
 
 type Props = {
   mainRef: React.RefObject<HTMLDivElement>;
+  deviceControlsContainer?: HTMLDivElement | null;
 }
 
 type ConnectionPhase = "idle" | "connecting" | "error";
 
-function MainContent({ mainRef }: Props) {
+function MainContent({ mainRef, deviceControlsContainer }: Props) {
   const [hasConnectedRafts, setHasConnectedRafts] = useState(false);
   const [connectionPhase, setConnectionPhase] = useState<ConnectionPhase>("idle");
   const [connectionMessage, setConnectionMessage] = useState("");
@@ -326,8 +328,52 @@ function MainContent({ mainRef }: Props) {
 
   const hasGraphs = graphs.current.length > 0;
 
+  const deviceControls = (
+    <div className={styles.deviceControls}>
+      <span className={styles.extensionLabel}>Extension</span>
+      {microBit ? (
+        <button
+          type="button"
+          onClick={disconnectMicroBit}
+          className={styles.deviceActionButton}
+        >
+          <FaUnlink aria-hidden="true" />
+          <span>Disconnect {microBit.getFriendlyName()}</span>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={connectMicroBit}
+          className={styles.deviceActionButton}
+          disabled={microBitPhase === "connecting"}
+          title={!canConnectMicroBit ? "Web Bluetooth is unavailable" : undefined}
+        >
+          <img
+            src={MicroBitIcon}
+            alt=""
+            aria-hidden="true"
+            className={styles.microBitButtonIcon}
+          />
+          <span>{microBitPhase === "connecting" ? "Connecting…" : "Connect micro:bit"}</span>
+        </button>
+      )}
+      {microBitMessage && (
+        <p
+          className={`${styles.connectionFeedback} ${microBitPhase === "error" ? styles.connectionError : ""}`}
+          role={microBitPhase === "error" ? "alert" : "status"}
+          aria-live="polite"
+        >
+          {microBitMessage}
+        </p>
+      )}
+    </div>
+  );
+
   return (
     <div className={styles.mainContent}>
+      {deviceControlsContainer
+        ? createPortal(deviceControls, deviceControlsContainer)
+        : deviceControls}
       <div className={styles.graphsToolbar}>
         <div>
           <p className={styles.toolbarEyebrow}>
@@ -337,32 +383,6 @@ function MainContent({ mainRef }: Props) {
           <p>{hasGraphs ? `${graphs.current.length} live workspace${graphs.current.length === 1 ? "" : "s"}` : "Create a graph to begin exploring sensor data."}</p>
         </div>
         <div className={styles.toolbarActions}>
-          {microBit ? (
-            <button
-              type="button"
-              onClick={disconnectMicroBit}
-              className={styles.deviceActionButton}
-            >
-              <FaUnlink aria-hidden="true" />
-              <span>Disconnect {microBit.getFriendlyName()}</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={connectMicroBit}
-              className={styles.deviceActionButton}
-              disabled={microBitPhase === "connecting"}
-              title={!canConnectMicroBit ? "Web Bluetooth is unavailable" : undefined}
-            >
-              <img
-                src={MicroBitIcon}
-                alt=""
-                aria-hidden="true"
-                className={styles.microBitButtonIcon}
-              />
-              <span>{microBitPhase === "connecting" ? "Connecting…" : "Connect micro:bit"}</span>
-            </button>
-          )}
           <button
             type="button"
             onClick={addGraphHandler}
@@ -374,15 +394,6 @@ function MainContent({ mainRef }: Props) {
           </button>
         </div>
       </div>
-      {microBitMessage && (
-        <p
-          className={`${styles.toolbarFeedback} ${microBitPhase === "error" ? styles.connectionError : ""}`}
-          role={microBitPhase === "error" ? "alert" : "status"}
-          aria-live="polite"
-        >
-          {microBitMessage}
-        </p>
-      )}
       <div className={styles.graphsArea}>
         {graphs.current.map((graphArea) => {
           return graphArea.element;

@@ -223,16 +223,6 @@
     font-weight: 700;
 }
 
-.toolbarFeedback {
-    margin: -0.8rem 0 0;
-    color: var(--colour-BLACK_075);
-    font-size: 1.3rem;
-}
-
-.toolbarFeedback.connectionError {
-    color: #a22525;
-}
-
 .quickJourney {
     list-style: none;
     display: grid;
@@ -387,4 +377,32 @@
     .addNewGraphMessage > svg {
         justify-self: center;
     }
+}
+
+.deviceControls {
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.extensionLabel {
+    color: var(--colour-BLACK_075);
+    font-size: 1.2rem;
+}
+
+.deviceControls .deviceActionButton {
+    width: auto;
+    min-height: 3.6rem;
+    gap: 0.6rem;
+    padding: 0.5rem 1rem;
+    border-width: 0.1rem;
+    font-size: 1.25rem;
+    overflow-wrap: anywhere;
+}
+
+.deviceControls .connectionFeedback {
+    flex-basis: 100%;
+    margin-top: 0;
 }
