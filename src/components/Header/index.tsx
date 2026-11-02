@@ -33,7 +33,7 @@ export default function Header({ isInModal, deviceControlsRef }: Props) {
         type="button"
         className={styles.helpButton}
         onClick={() =>
-          modalState.setModal(createElement(HowToUseModal, {}), "Sensor dashboard guide")
+          modalState.setModal(createElement(HowToUseModal, { isInModal }), "Sensor dashboard guide")
         }
       >
         <FaQuestionCircle aria-hidden="true" />

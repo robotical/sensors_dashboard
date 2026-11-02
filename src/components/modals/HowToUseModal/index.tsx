@@ -4,7 +4,7 @@ import styles from "./styles.module.css";
 import GeneralInfo from "./GeneralInfo";
 import Terminology from "./Terminology";
 
-export default function HowToUseModal() {
+export default function HowToUseModal({ isInModal }: { isInModal?: boolean }) {
   const [activeTab, setActiveTab] = useState<"general-info" | "terminology">("general-info");
   const tabsId = useId();
   const quickStartTabRef = useRef<HTMLButtonElement>(null);
@@ -66,7 +66,7 @@ export default function HowToUseModal() {
           id={`${tabsId}-${activeTab === "general-info" ? "quick-start" : "terminology"}-panel`}
           aria-labelledby={`${tabsId}-${activeTab === "general-info" ? "quick-start" : "terminology"}-tab`}
         >
-          {activeTab === "general-info" && <GeneralInfo />}
+          {activeTab === "general-info" && <GeneralInfo isInModal={isInModal} />}
           {activeTab === "terminology" && <Terminology />}
         </div>
       <button type="button" className={styles.closeButton} onClick={() => modalState.closeModal()}>

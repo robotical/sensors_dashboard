@@ -10,12 +10,14 @@ import {
   FaCheckCircle,
   FaUnlink,
   FaPuzzlePiece,
+  FaArrowLeft,
 } from "react-icons/fa";
 import MicroBitIcon from "../../assets/connect-button/microbit-small.svg";
 import modalState from "../../state-observables/modal/ModalState";
 import NewGraphModal from "../modals/NewGraphModal";
 import RAFT from "@robotical/webapp-types/dist-types/src/application/RAFTs/RAFT";
 import { resolveRaftDisplayName } from "../../utils/raft-display-name";
+import { blocksConnectionSteps } from "../../utils/blocks-connection-steps";
 import MicroBitWebBluetooth, {
   isMicroBitDevice,
   isMicroBitWebBluetoothSupported,
@@ -29,11 +31,13 @@ interface GraphObj {
 type Props = {
   mainRef: React.RefObject<HTMLDivElement>;
   deviceControlsContainer?: HTMLDivElement | null;
+  isInModal?: boolean;
+  onReturnToHost?: () => void;
 }
 
 type ConnectionPhase = "idle" | "connecting" | "error";
 
-function MainContent({ mainRef, deviceControlsContainer }: Props) {
+function MainContent({ mainRef, deviceControlsContainer, isInModal, onReturnToHost }: Props) {
   const [hasConnectedRafts, setHasConnectedRafts] = useState(false);
   const [extensionsOpen, setExtensionsOpen] = useState(false);
   const [connectionPhase, setConnectionPhase] = useState<ConnectionPhase>("idle");
@@ -254,7 +258,7 @@ function MainContent({ mainRef, deviceControlsContainer }: Props) {
     triggerRerender(old => old + 1);
   };
 
-  const deviceControls = (
+  const deviceControls = !isInModal && (
     <div className={styles.deviceControls}>
       <button
         type="button"
@@ -333,6 +337,42 @@ function MainContent({ mainRef, deviceControlsContainer }: Props) {
   );
 
   if (!isConnected) {
+    if (isInModal) {
+      return (
+        <section className={`${styles.connectEmptyState} ${styles.connectEmptyStateInModal}`} aria-labelledby="connect-empty-title">
+          <div className={styles.connectEmptyHero}>
+            <div className={styles.emptyStateIcon} aria-hidden="true">
+              <FaChartLine />
+            </div>
+            <p className={styles.emptyStateEyebrow}>Start in Blocks</p>
+            <h2 id="connect-empty-title">Connect your device in Blocks</h2>
+            <p className={styles.emptyStateDescription}>
+              Connect Marty or Cog from the Devices panel, then come back here to explore its sensor data.
+            </p>
+            {onReturnToHost && (
+              <div className={styles.connectActions}>
+                <button type="button" className={styles.connectButton} onClick={onReturnToHost}>
+                  <FaArrowLeft aria-hidden="true" />
+                  <span>Back to Blocks</span>
+                </button>
+              </div>
+            )}
+            <p className={styles.connectionFeedback}>
+              Already added a device? Select its tile in Blocks and choose <strong>Connect</strong>.
+            </p>
+          </div>
+          <ol className={styles.quickJourney} aria-label="Connect a device in Blocks">
+            {blocksConnectionSteps.map((step, index) => (
+              <li key={step.title}>
+                <span aria-hidden="true">{index + 1}</span>
+                <div><strong>{step.title}</strong><small>{step.description}</small></div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      );
+    }
+
     return (
       <section className={styles.connectEmptyState} aria-labelledby="connect-empty-title">
         <div className={styles.connectEmptyHero}>

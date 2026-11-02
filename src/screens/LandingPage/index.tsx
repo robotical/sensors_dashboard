@@ -13,6 +13,7 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 type Props = {
   isInModal?: boolean;
+  onReturnToHost?: () => void;
 }
 
 type ScrollTarget = HTMLElement | Window;
@@ -113,7 +114,7 @@ const hasNestedScrollableTarget = (
   return false;
 };
 
-export default function LandingPage({ isInModal }: Props) {
+export default function LandingPage({ isInModal, onReturnToHost }: Props) {
   const [modalData, setModalData] = useState<null | ModalStateData>(null);
   const [shouldCloseModal, setShouldCloseModal] = useState(false);
 
@@ -189,7 +190,7 @@ export default function LandingPage({ isInModal }: Props) {
       >
         <ScrollCue mainRef={mainRef} />
         <Header isInModal={isInModal} deviceControlsRef={setDeviceControlsContainer} />
-        <MainContent mainRef={mainRef} deviceControlsContainer={deviceControlsContainer} />
+        <MainContent mainRef={mainRef} deviceControlsContainer={deviceControlsContainer} isInModal={isInModal} onReturnToHost={onReturnToHost} />
       </main>
     </>
   );

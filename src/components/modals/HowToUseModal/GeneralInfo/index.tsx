@@ -1,4 +1,5 @@
 import styles from "./styles.module.css";
+import { blocksConnectionSteps } from "../../../../utils/blocks-connection-steps";
 
 const steps = [
   {
@@ -15,14 +16,15 @@ const steps = [
   },
 ];
 
-export default function GeneralInfo() {
+export default function GeneralInfo({ isInModal }: { isInModal?: boolean }) {
+  const quickStartSteps = isInModal ? blocksConnectionSteps : steps;
   return (
     <div className={styles.guide}>
       <section aria-labelledby="quick-start-heading">
         <p className={styles.eyebrow}>Three steps</p>
         <h3 id="quick-start-heading">Create your first live graph</h3>
         <ol className={styles.steps}>
-          {steps.map((step, index) => (
+          {quickStartSteps.map((step, index) => (
             <li key={step.title}>
               <span className={styles.stepNumber} aria-hidden="true">{index + 1}</span>
               <div>

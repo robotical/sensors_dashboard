@@ -16,7 +16,7 @@
   backdrop-filter: blur(1.2rem);
 }
 
-.headerInModal {
+.header.headerInModal {
   display: flex;
   justify-content: flex-end;
   min-height: 0;

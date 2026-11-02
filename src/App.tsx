@@ -7,11 +7,12 @@ import './index.css';
 
 type Props = {
   isInModal?: boolean;
+  onReturnToHost?: () => void;
 }
 
-function App({ isInModal }: Props) {
+function App({ isInModal, onReturnToHost }: Props) {
   return (
-    <LandingPage isInModal={isInModal}/>
+    <LandingPage isInModal={isInModal} onReturnToHost={onReturnToHost}/>
   );
 }
 
